@@ -1,0 +1,56 @@
+{
+  "productName": "生产软件WAC710C",
+  "appId": "com.electron.ee",
+  "copyright": "© 20248883 生产软件 Technology to 青岛海龙马科技有限公司.",
+  "directories": {
+    "output": "D:\\生产软件打包\\WAC710C"
+  },
+  "asar": true,
+  "files": [
+    "**/*",
+    "!frontend/",
+    "!run/",
+    "!logs/",
+    "!go/",
+    "!python/",
+    "!data/"
+  ],
+  "extraResources": {
+    "from": "build/extraResources/",
+    "to": "extraResources"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowElevation": true,
+    "allowToChangeInstallationDirectory": true,
+    "installerIcon": "build/icons/icon.ico",
+    "uninstallerIcon": "build/icons/icon.ico",
+    "installerHeaderIcon": "build/icons/icon.ico",
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "生产软件V1.0.0"
+  },
+  "mac": {
+    "icon": "build/icons/icon.icns",
+    "artifactName": "${productName}-${os}-${version}-${arch}.${ext}",
+    "darkModeSupport": true,
+    "hardenedRuntime": false
+  },
+  "win": {
+    "icon": "build/icons/icon.ico",
+    "artifactName": "${productName}-${os}-${version}-${arch}.${ext}",
+    "target": [
+      {
+        "target": "nsis"
+      }
+    ]
+  },
+  "linux": {
+    "icon": "build/icons",
+    "artifactName": "${productName}-${os}-${version}-${arch}.${ext}",
+    "target": [
+      "deb"
+    ],
+    "category": "Utility"
+  }
+}
