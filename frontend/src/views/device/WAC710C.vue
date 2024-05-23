@@ -868,10 +868,11 @@ export default {
       let protocolCode = 'EN1434_0109'
       // 注册设备
       //TODO : 改hems正式平台
-      let registerResponse = await axios.post(`http://124.70.68.52:20206/produce/imei/${this.valveAddress}?joinMode=2&model=62&imei=${this.imei}&protocolCode=${protocolCode}&simNumber=${this.iccId}`, null, {
+      // let registerResponse = await axios.post(`http://124.70.68.52:20206/produce/imei/${this.valveAddress}?joinMode=2&model=62&imei=${this.imei}&protocolCode=${protocolCode}&simNumber=${this.iccId}`, null, {
+      let registerResponse = await axios.post(`http://hems.chaobiao.qdhlm.cn:20206/produce/imei/${this.valveAddress}?joinMode=2&model=62&imei=${this.imei}&protocolCode=${protocolCode}&simNumber=${this.iccId}`, null, {
         headers: {
-          // Authorization: '9e4a2b76d03f7b5eac2927f16441df75'//生产环境
-          Authorization: 'de8fddd634f668f69a9abc5b08fe9e4c'//测试环境
+          Authorization: '9e4a2b76d03f7b5eac2927f16441df75' //正式
+          // Authorization: '2dbd98f85cc2cb26f3a0d3ddf7821d46' //dev
 
         }
       });
