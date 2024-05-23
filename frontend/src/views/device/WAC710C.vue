@@ -865,7 +865,7 @@ export default {
 
       //model :hems 字典中 terminal_model
       //join_model :接入模式 MQTT_IOT_NB      value=2
-      let protocolCode = 'EN1434_0109'
+      let protocolCode = 'EN1434_0146'
       // 注册设备
       //TODO : 改hems正式平台
       // let registerResponse = await axios.post(`http://124.70.68.52:20206/produce/imei/${this.valveAddress}?joinMode=2&model=62&imei=${this.imei}&protocolCode=${protocolCode}&simNumber=${this.iccId}`, null, {
