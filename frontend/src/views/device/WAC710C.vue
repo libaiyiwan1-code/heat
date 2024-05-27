@@ -164,6 +164,7 @@ import {
   decodeCheckWriteTemperatureProbe, decodeICCID, decodeIMEI, decodeProtocolId, decodeValveVersion,
 } from '@/utils/wac710c/decode/wac710c'
 import axios from 'axios';
+import {checkIMEIExist} from "@/components/global/hemssdb";
 const {SerialPort} = require('serialport')
 // import {getTerminalWhereByMacAddr} from '@/components/global/hemssdb.js';
 const Log = require('ee-core/log');
@@ -823,6 +824,20 @@ export default {
         return;
       }
       this.imei = imei;
+      let imeiExist = await checkIMEIExist(this.imei);
+      console.log(imeiExist)
+      if(imeiExist.length>0){
+        if (imeiExist[0].imei!==''||imeiExist[0].imei!==undefined){
+          this.$message.error('写地址失败hems平台 IMEI已存在: '+this.imei);
+          this.receptionText = this.receptionText + '写地址失败hems平台 IMEI已存在: '+this.imei + '\n';
+          this.updateOperationMessage('写地址失败', 'red');
+          Log.error('写地址失败hems平台 IMEI已存在: '+this.imei);
+          console.error('写地址失败hems平台 IMEI已存在: ');
+          return;
+        }
+      }
+
+
       this.receptionText = this.receptionText + 'wac710c 读取imei成功:' + this.imei + ' 稍后写地址、注册平台、生产入库' + '\n';
       this.$message.success('wac710c 读取imei成功:' + this.imei + ' 稍后写地址、注册平台、生产入库');
       this.globalReceivedData = '';
