@@ -84,13 +84,13 @@ export function packWAC710CSelfTest(selectTemperatureProbes, selectPressureProbe
   let bodyTailDataView = new DataView(bodyTailBuffer)
   bodyTailDataView.setUint8(0, csByte)
   bodyTailDataView.setUint8(1, 0x16)
-  let resultArrayBuffer = mergeArrayBuffer( wac710cTransparentBodyBuffer,wac710cBodyBuffer, bodyTailBuffer)
+  let resultArrayBuffer = mergeArrayBuffer(wac710cTransparentBodyBuffer, wac710cBodyBuffer, bodyTailBuffer)
   let csAllByte = calculateCSByte(resultArrayBuffer)
   let tailBuffer = new ArrayBuffer(2)
   let tailDataView = new DataView(tailBuffer)
   tailDataView.setUint8(0, csAllByte);
   tailDataView.setUint8(1, 0x16);
-  return Buffer.from(mergeArrayBuffer(headBuffer,resultArrayBuffer, tailBuffer))
+  return Buffer.from(mergeArrayBuffer(headBuffer, resultArrayBuffer, tailBuffer))
 }
 
 
@@ -116,7 +116,7 @@ export function packWAC710CWritePressureProbe(selectPressureProbes) {
   wac710cTransparentBodyDataView.setUint8(7, 0xFF)
   wac710cTransparentBodyDataView.setUint8(8, 0x01)
   wac710cTransparentBodyDataView.setUint8(9, 0x01)
-  wac710cTransparentBodyDataView.setUint8(10, 0x11)
+  wac710cTransparentBodyDataView.setUint8(10, 0x12)
 
   let wac710cBodyBuffer = new ArrayBuffer(16)
   let wac710cBodyDataView = new DataView(wac710cBodyBuffer)
@@ -153,13 +153,13 @@ export function packWAC710CWritePressureProbe(selectPressureProbes) {
   let bodyTailDataView = new DataView(bodyTailBuffer)
   bodyTailDataView.setUint8(0, csByte)
   bodyTailDataView.setUint8(1, 0x16)
-  let resultArrayBuffer = mergeArrayBuffer( wac710cTransparentBodyBuffer,wac710cBodyBuffer, bodyTailBuffer)
+  let resultArrayBuffer = mergeArrayBuffer(headBuffer, wac710cTransparentBodyBuffer, wac710cBodyBuffer, bodyTailBuffer)
   let csAllByte = calculateCSByte(resultArrayBuffer)
   let tailBuffer = new ArrayBuffer(2)
   let tailDataView = new DataView(tailBuffer)
   tailDataView.setUint8(0, csAllByte);
   tailDataView.setUint8(1, 0x16);
-  return Buffer.from(mergeArrayBuffer(headBuffer,resultArrayBuffer, tailBuffer))
+  return Buffer.from(mergeArrayBuffer(resultArrayBuffer, tailBuffer))
 }
 
 
@@ -186,7 +186,7 @@ export function packWAC710CWriteTemperatureProbe(selectTemperatureProbes) {
   wac710cTransparentBodyDataView.setUint8(7, 0xFF)
   wac710cTransparentBodyDataView.setUint8(8, 0x01)
   wac710cTransparentBodyDataView.setUint8(9, 0x01)
-  wac710cTransparentBodyDataView.setUint8(10, 0x11)
+  wac710cTransparentBodyDataView.setUint8(10, 0x12)
 
   let wac710cBodyBuffer = new ArrayBuffer(16)
   let wac710cBodyDataView = new DataView(wac710cBodyBuffer)
@@ -223,13 +223,13 @@ export function packWAC710CWriteTemperatureProbe(selectTemperatureProbes) {
   let bodyTailDataView = new DataView(bodyTailBuffer)
   bodyTailDataView.setUint8(0, csByte)
   bodyTailDataView.setUint8(1, 0x16)
-  let resultArrayBuffer = mergeArrayBuffer( wac710cTransparentBodyBuffer,wac710cBodyBuffer, bodyTailBuffer)
+  let resultArrayBuffer = mergeArrayBuffer(headBuffer, wac710cTransparentBodyBuffer, wac710cBodyBuffer, bodyTailBuffer)
   let csAllByte = calculateCSByte(resultArrayBuffer)
   let tailBuffer = new ArrayBuffer(2)
   let tailDataView = new DataView(tailBuffer)
   tailDataView.setUint8(0, csAllByte);
   tailDataView.setUint8(1, 0x16);
-  return Buffer.from(mergeArrayBuffer(headBuffer,resultArrayBuffer, tailBuffer))
+  return Buffer.from(mergeArrayBuffer(resultArrayBuffer, tailBuffer))
 }
 
 

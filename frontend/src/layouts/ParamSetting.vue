@@ -33,17 +33,17 @@
         </a-select>
       </a-form-item>
 
-      <a-form-item
-        label="运营商选择："
-        name="selectOperator"
-        :rules="[{ required: true, message: '请选择运营商' }]"
-      >
-        <a-select v-model:value="formData.selectOperator" placeholder="请选择运营商" style="width: 200px;">
-          <a-select-option v-for="operator in Enum.operators" :value="operator">
-            {{ operator }}
-          </a-select-option>
-        </a-select>
-      </a-form-item>
+<!--      <a-form-item-->
+<!--        label="运营商选择："-->
+<!--        name="selectOperator"-->
+<!--        :rules="[{ required: true, message: '请选择运营商' }]"-->
+<!--      >-->
+<!--        <a-select v-model:value="formData.selectOperator" placeholder="请选择运营商" style="width: 200px;">-->
+<!--          <a-select-option v-for="operator in Enum.operators" :value="operator">-->
+<!--            {{ operator }}-->
+<!--          </a-select-option>-->
+<!--        </a-select>-->
+<!--      </a-form-item>-->
 
       <a-form-item
         label="温度探头："
@@ -106,7 +106,7 @@ export default {
     return {
       formData: {
         password: undefined,
-        selectDeviceMode: 'WAC_710C',
+        selectDeviceMode: 'WAC710C',
         selectOperator: '移动',
         selectPrintModel: 'WAC710C',
         selectTemperatureProbes: '无探头',
@@ -115,7 +115,7 @@ export default {
         protocolId: undefined,
       },
       Enum: {
-        deviceModelList: ['WAC_710C'],
+        deviceModelList: ['WAC710C'],
         operators: ['移动', '电信'],
         printModelList: ['WAC710C'],
         temperatureProbesList: ['无探头', '蓝色-回温探头', '红色-进温探头', '红蓝-双探头'],

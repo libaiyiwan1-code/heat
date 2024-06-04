@@ -45,13 +45,13 @@
                contenteditable="false">{{ this.routerSettingParams.selectDeviceMode }}</p>
           </div>
         </div>
-        <div style="display: inline-block;">
-          <div>
-            <p style="display: inline-block; margin-left: 50px;">运营商：</p>
-            <p style="display: inline-block; width: 100px;  color: #0080FF; font-weight: bold;"
-               contenteditable="false">{{ this.routerSettingParams.selectOperator }}</p>
-          </div>
-        </div>
+<!--        <div style="display: inline-block;">-->
+<!--          <div>-->
+<!--            <p style="display: inline-block; margin-left: 50px;">运营商：</p>-->
+<!--            <p style="display: inline-block; width: 100px;  color: #0080FF; font-weight: bold;"-->
+<!--               contenteditable="false">{{ this.routerSettingParams.selectOperator }}</p>-->
+<!--          </div>-->
+<!--        </div>-->
         <div style="display: inline-block; margin-left: 20px;">
           <div>
             <p style="display: inline-block; margin-left: 50px;">打印型号：</p>
@@ -182,7 +182,7 @@ export default {
         Log.info('监听触发')
         const formData = JSON.parse(args);
         this.routerSettingParams.selectDeviceMode = formData.selectDeviceMode;
-        this.routerSettingParams.selectOperator = formData.selectOperator;
+        // this.routerSettingParams.selectOperator = formData.selectOperator;
         this.routerSettingParams.selectPrintModel = formData.selectPrintModel;
         this.routerSettingParams.selectTemperatureProbes = formData.selectTemperatureProbes;
         this.routerSettingParams.selectPressureProbes = formData.selectPressureProbes;
@@ -884,7 +884,7 @@ export default {
       // 注册设备
       //TODO : 改hems正式平台
       // let registerResponse = await axios.post(`http://124.70.68.52:20206/produce/imei/${this.valveAddress}?joinMode=2&model=62&imei=${this.imei}&protocolCode=${protocolCode}&simNumber=${this.iccId}`, null, {
-      let registerResponse = await axios.post(`http://hems.chaobiao.qdhlm.cn:20206/produce/imei/${this.valveAddress}?joinMode=2&model=62&imei=${this.imei}&protocolCode=${protocolCode}&simNumber=${this.iccId}`, null, {
+      let registerResponse = await axios.post(`http://hems.chaobiao.qdhlm.cn:20206/produce/imei/${this.valveAddress}?joinMode=2&model=63&imei=${this.imei}&protocolCode=${protocolCode}&simNumber=${this.iccId}`, null, {
         headers: {
           Authorization: '9e4a2b76d03f7b5eac2927f16441df75' //正式
           // Authorization: '2dbd98f85cc2cb26f3a0d3ddf7821d46' //dev
@@ -896,12 +896,12 @@ export default {
         Log.info('hems: 注册平台成功');
         console.log('hems: 注册平台成功');
         this.receptionText = this.receptionText + 'hems: 注册平台成功' + '\n';
-        let netprovider
-        if (this.routerSettingParams.selectOperator === '电信') {
-          netprovider = 1
-        } else if (this.routerSettingParams.selectOperator === '移动') {
-          netprovider = 2
-        }
+        let netprovider=1
+        // if (this.routerSettingParams.selectOperator === '电信') {
+        //   netprovider = 1
+        // } else if (this.routerSettingParams.selectOperator === '移动') {
+        //   netprovider = 2
+        // }
         //生产入库
         const productionData = {
           userid: this.routerSettingParams.userId, // 生产账号id

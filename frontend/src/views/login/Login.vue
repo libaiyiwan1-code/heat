@@ -101,7 +101,7 @@ export default {
           Log.info('登录页面-监听触发',args)
           const formData = JSON.parse(args);
           this.routerSettingParams.selectDeviceMode = formData.selectDeviceMode;
-          this.routerSettingParams.selectOperator = formData.selectOperator;
+          // this.routerSettingParams.selectOperator = formData.selectOperator;
           this.routerSettingParams.selectPrintModel = formData.selectPrintModel;
           this.routerSettingParams.selectTemperatureProbes = formData.selectTemperatureProbes;
           this.routerSettingParams.selectPressureProbes = formData.selectPressureProbes;
