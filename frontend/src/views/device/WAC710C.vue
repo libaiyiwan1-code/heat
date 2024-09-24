@@ -3,7 +3,7 @@
   <div>
     <a-layout>
       <a-layout-content>
-        <div style="margin-top: 45px">
+        <div style="margin-top: 45px ;">
           <a-form
             name="basic"
             layout="inline"
@@ -26,8 +26,27 @@
               <a-button @click="closePort(this.selectedPort)" :disabled="this.buttonStatus.portClosedStatus">关闭
               </a-button>
             </a-form-item>
+
+            <a-form-item label="校验位" >
+              <a-select v-model:value="selectCheckDigit" style="width: 10vw">
+                <a-select-option v-for="item in this.checkDigitList"
+                                 :value="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+
+            <a-form-item label="波特率">
+              <a-select v-model:value="this.selectBaudRate" style="width: 10vw">
+                <a-select-option v-for="item in this.baudRates"
+                                 :value="item">
+                  {{ item }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+
             <a-form-item>
-              <a-button @click="getPrinter()" style="margin-left: 250px"> 打印机设置</a-button>
+              <a-button @click="getPrinter()" > 打印机设置</a-button>
             </a-form-item>
 
           </a-form>
@@ -160,7 +179,7 @@ import {
   decodeCheckControlCode,
   decodeCheckFrame,
   decodeCheckInquireSelfTest, decodeCheckSelfTest,
-  decodeCheckSumLength,
+  decodeCheckSumLength, decodeCheckWritePressureProbe,
   decodeCheckWriteTemperatureProbe, decodeICCID, decodeIMEI, decodeProtocolId, decodeValveVersion,
 } from '@/utils/wac710c/decode/wac710c'
 import axios from 'axios';
@@ -216,15 +235,21 @@ export default {
       modalShow: false,
       valveAddress: undefined,
       ports: [],
-      baudRates: [
-        '110', '300', '600', '1200', '2400', '4800', '9600', '14400', '19200', '38400', '56000', '57600', '115200', '128000', '230400', '256000'
+      baudRates : [
+        // '110', '300', '600', '1200',
+        '2400',
+        // '4800',
+        '9600',
+        // '14400', '19200', '38400', '56000', '57600', '115200', '128000', '230400', '256000'
       ],
+      selectBaudRate:undefined,
       dataBitsList: [
         '6', '7', '8'
       ],
       checkDigitList: [
         '无', '奇校验', '偶校验', 'Mark', '空格校验'
       ],
+      selectCheckDigit:undefined,
       StopPositionList: [
         '1', '1.5', '2',
       ],
@@ -316,7 +341,11 @@ export default {
 
     },
     openPort(portName) {
-      this.createPort(portName)
+      if (this.selectBaudRate===undefined||this.selectCheckDigit===undefined){
+        this.$message.error("请选择串口参数");
+        return
+      }
+      this.createPort(portName,this.selectBaudRate,this.selectCheckDigit)
       this.serialPort.open((err) => {
         if (err) {
           //串口拿不到
@@ -356,13 +385,13 @@ export default {
       }
 
     },
-    createPort(portName) {
+    createPort(portName,selectBaudRate,selectCheckDigit) {
       if (this.serialPort == null) {
         this.serialPort =
           new SerialPort({
             path: portName,
-            // baudRate: Number(this.defaultParam.defaultBaudRate),
-            baudRate: 2400,
+            baudRate: Number(selectBaudRate),
+            // baudRate: 2400,
             // 串口默认关闭
             autoOpen: false,
             // dataBits: Number(this.defaultParam.defaultDataBits),
@@ -370,7 +399,12 @@ export default {
             // stopBits: Number(this.defaultParam.defaultStopPosition),
             stopBits: 1,
             // parity: this.defaultParam.defaultCheckDigit
-            parity: 'even'
+            // parity: 'even'
+            parity: selectCheckDigit === '无' ? 'none'
+              : selectCheckDigit === '奇校验' ? 'odd'
+                : selectCheckDigit === '偶校验' ? 'even'
+                  : selectCheckDigit === 'Mark' ? 'mark'
+                    : selectCheckDigit === '空格校验' ? 'space' : 'none'
           }, (err) => {
             if (err) {
               console.error('creat port fail : ', err.message);
@@ -526,7 +560,7 @@ export default {
       await new Promise(resolve => setTimeout(resolve, 2500));
       console.log('[响应报文]   wac710c写温度探头=>  ', this.globalReceivedData);
       Log.info('[响应报文]   wac710c写温度探头=>  ', this.globalReceivedData);
-      if (decodeCheckWriteTemperatureProbe(this.globalReceivedData) || this.globalReceivedData === '' || this.globalReceivedData === undefined) {
+      if ( this.globalReceivedData === '' ||decodeCheckWriteTemperatureProbe(this.globalReceivedData) || this.globalReceivedData === undefined) {
         this.updateOperationMessage('线路检测失败', 'red');
         this.$message.error('wac710c写温度探头-写温度探头失败');
         this.receptionText = this.receptionText + 'wac710c写温度探头-写温度探头失败' + '\n';
@@ -559,8 +593,15 @@ export default {
       await new Promise(resolve => setTimeout(resolve, 2500));
       console.log('[响应报文]   wac710c写入压力探头=>  ', this.globalReceivedData);
       Log.info('[响应报文]   wac710c写入压力探头=>  ', this.globalReceivedData);
-
-
+      if (this.globalReceivedData === '' || decodeCheckWritePressureProbe(this.globalReceivedData) || this.globalReceivedData === undefined) {
+        this.updateOperationMessage('线路检测失败', 'red');
+        this.$message.error('wac710c写压力探头-写压力探头失败');
+        this.receptionText = this.receptionText + 'wac710c写压力探头-写压力探头失败' + '\n';
+        console.error('wac710c写压力探头-写压力探头失败');
+        Log.error('wac710c写压力探头-写压力探头失败');
+        this.globalReceivedData = '';
+        return
+      }
       this.globalReceivedData = '';
       this.$message.success('wac710c写压力探头成功');
       this.receptionText = this.receptionText + 'wac710c写压力探头成功 待开启自检' + '\n';
@@ -741,7 +782,8 @@ export default {
         return
       }
       //自检判断
-      let {selfTestState, msg} = decodeCheckSelfTest(this.globalReceivedData);
+      let {selfTestState, msg,decodeModel} = decodeCheckSelfTest(this.globalReceivedData);
+      console.log('型号解析:',decodeModel)
       if (selfTestState) {
         this.globalReceivedData = '';
         this.receptionText = this.receptionText + '自检未通过 : ' + msg + '' + '\n';
@@ -906,7 +948,7 @@ export default {
         const productionData = {
           userid: this.routerSettingParams.userId, // 生产账号id
           customerid: null, // 出厂客户id
-          valveModel: this.routerSettingParams.selectDeviceMode, // 阀门型号
+          valveModel: decodeModel, // 阀门型号
           valveVersion: valveVersion, // 阀门版本号
           protocolid: protocolId, // 协议ID号
           IMEI: this.imei, // 设备IMEI

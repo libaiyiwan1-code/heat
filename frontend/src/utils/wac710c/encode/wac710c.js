@@ -52,15 +52,15 @@ export function packWAC710CSelfTest(selectTemperatureProbes, selectPressureProbe
   wac710cBodyDataView.setUint8(13, 0x01)
   // -00：不带进回温标定，01：带回温标定，02：带进温标定，03：带进回温标定
   if (selectTemperatureProbes === '无探头') {
-    wac710cBodyDataView.setUint8(15, 0x00)
+    wac710cBodyDataView.setUint8(14, 0x00)
   } else if (selectTemperatureProbes === '蓝色-回温探头') {
-    wac710cBodyDataView.setUint8(15, 0x01)
+    wac710cBodyDataView.setUint8(14, 0x01)
   } else if (selectTemperatureProbes === '红色-进温探头') {
-    wac710cBodyDataView.setUint8(15, 0x02)
+    wac710cBodyDataView.setUint8(14, 0x02)
   } else if (selectTemperatureProbes === '红蓝-双探头') {
-    wac710cBodyDataView.setUint8(15, 0x03)
+    wac710cBodyDataView.setUint8(14, 0x03)
   } else {
-    wac710cBodyDataView.setUint8(15, 0x00)
+    wac710cBodyDataView.setUint8(14, 0x00)
   }
   //-00：带进回压自检，	01：带回压自检，02：带进压自检，03：不带进回压自检
   if (selectPressureProbes === '无探头') {
@@ -100,7 +100,7 @@ export function packWAC710CWritePressureProbe(selectPressureProbes) {
   let headDataView = new DataView(headBuffer)
   //head buffer
   headDataView.setUint8(0, 0x68)
-  headDataView.setUint8(1, 0x1D)
+  headDataView.setUint8(1, 0x1C)
   headDataView.setUint8(2, 0x00)
   headDataView.setUint8(3, 0x68)
   //透传 Transparent buffer
@@ -118,7 +118,7 @@ export function packWAC710CWritePressureProbe(selectPressureProbes) {
   wac710cTransparentBodyDataView.setUint8(9, 0x01)
   wac710cTransparentBodyDataView.setUint8(10, 0x12)
 
-  let wac710cBodyBuffer = new ArrayBuffer(16)
+  let wac710cBodyBuffer = new ArrayBuffer(15)
   let wac710cBodyDataView = new DataView(wac710cBodyBuffer)
   wac710cBodyDataView.setUint8(0, 0x68)
   wac710cBodyDataView.setUint8(1, 0x75)
@@ -132,34 +132,32 @@ export function packWAC710CWritePressureProbe(selectPressureProbes) {
   wac710cBodyDataView.setUint8(9, 0x04)
   wac710cBodyDataView.setUint8(10, 0x04)
   wac710cBodyDataView.setUint8(11, 0xAC)
-  wac710cBodyDataView.setUint8(12, 0x09)
+  wac710cBodyDataView.setUint8(12, 0x90)
   wac710cBodyDataView.setUint8(13, 0x01)
-  wac710cBodyDataView.setUint8(14, 0x00)
   //压力探头配置，00：带进回压，01：只带回压，02：只带进压，03：不带进回压。
   if (selectPressureProbes === '无探头') {
-    wac710cBodyDataView.setUint8(15, 0x03)
+    wac710cBodyDataView.setUint8(14, 0x03)
   } else if (selectPressureProbes === '回压探头') {
-    wac710cBodyDataView.setUint8(15, 0x01)
+    wac710cBodyDataView.setUint8(14, 0x01)
   } else if (selectPressureProbes === '进压探头') {
-    wac710cBodyDataView.setUint8(15, 0x02)
+    wac710cBodyDataView.setUint8(14, 0x02)
   } else if (selectPressureProbes === '进回压双探头') {
-    wac710cBodyDataView.setUint8(15, 0x00)
+    wac710cBodyDataView.setUint8(14, 0x00)
   } else {
-    wac710cBodyDataView.setUint8(15, 0x03)
+    wac710cBodyDataView.setUint8(14, 0x03)
   }
-  wac710cBodyDataView.setUint8(15, 0x03)
   let csByte = calculateCSByte(wac710cBodyBuffer)
   let bodyTailBuffer = new ArrayBuffer(2)
   let bodyTailDataView = new DataView(bodyTailBuffer)
   bodyTailDataView.setUint8(0, csByte)
   bodyTailDataView.setUint8(1, 0x16)
-  let resultArrayBuffer = mergeArrayBuffer(headBuffer, wac710cTransparentBodyBuffer, wac710cBodyBuffer, bodyTailBuffer)
+  let resultArrayBuffer = mergeArrayBuffer( wac710cTransparentBodyBuffer, wac710cBodyBuffer, bodyTailBuffer)
   let csAllByte = calculateCSByte(resultArrayBuffer)
   let tailBuffer = new ArrayBuffer(2)
   let tailDataView = new DataView(tailBuffer)
   tailDataView.setUint8(0, csAllByte);
   tailDataView.setUint8(1, 0x16);
-  return Buffer.from(mergeArrayBuffer(resultArrayBuffer, tailBuffer))
+  return Buffer.from(mergeArrayBuffer(headBuffer,resultArrayBuffer, tailBuffer))
 }
 
 
@@ -200,7 +198,7 @@ export function packWAC710CWriteTemperatureProbe(selectTemperatureProbes) {
   wac710cBodyDataView.setUint8(7, 0xAA)
   wac710cBodyDataView.setUint8(8, 0xAA)
   wac710cBodyDataView.setUint8(9, 0x04)
-  wac710cBodyDataView.setUint8(10, 0x04)
+  wac710cBodyDataView.setUint8(10, 0x05)
   wac710cBodyDataView.setUint8(11, 0xAC)
   wac710cBodyDataView.setUint8(12, 0x09)
   wac710cBodyDataView.setUint8(13, 0x01)
@@ -223,13 +221,13 @@ export function packWAC710CWriteTemperatureProbe(selectTemperatureProbes) {
   let bodyTailDataView = new DataView(bodyTailBuffer)
   bodyTailDataView.setUint8(0, csByte)
   bodyTailDataView.setUint8(1, 0x16)
-  let resultArrayBuffer = mergeArrayBuffer(headBuffer, wac710cTransparentBodyBuffer, wac710cBodyBuffer, bodyTailBuffer)
+  let resultArrayBuffer = mergeArrayBuffer( wac710cTransparentBodyBuffer, wac710cBodyBuffer, bodyTailBuffer)
   let csAllByte = calculateCSByte(resultArrayBuffer)
   let tailBuffer = new ArrayBuffer(2)
   let tailDataView = new DataView(tailBuffer)
   tailDataView.setUint8(0, csAllByte);
   tailDataView.setUint8(1, 0x16);
-  return Buffer.from(mergeArrayBuffer(resultArrayBuffer, tailBuffer))
+  return Buffer.from(mergeArrayBuffer(headBuffer,resultArrayBuffer, tailBuffer))
 }
 
 

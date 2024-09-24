@@ -30,6 +30,21 @@ export function decodeCheckWriteTemperatureProbe(messageStr) {
     || dataView.getUint8(11).toString(16) !== 'ff';
 }
 
+/*
+* 写压力探头
+* */
+export function decodeCheckWritePressureProbe(messageStr) {
+  //68 0C 00 68 80 75 11 00 00 00 0C FF 01 01 00 00 13 16
+  let messageBuffer = hex2arrayBuffer(messageStr);
+  let dataView = new DataView(messageBuffer)
+  return dataView.getUint8(4).toString(16) !== '80'
+    || dataView.getUint8(5).toString(16) !== '75'
+    || dataView.getUint8(10).toString(16) !== 'c'
+    || dataView.getUint8(11).toString(16) !== 'ff';
+}
+
+
+
 
 /**
  *     1.包内长度与报文总长度
@@ -102,16 +117,17 @@ export function decodeCheckSelfTest(messageStr) {
   let dataView = new DataView(messageBuffer);
   let model = '';
   let msg = ''; // 初始化消息字符串
+  let decodeModel=''
 
   //判断型号
   for (let i = 30; i < 54; i++) {
     model += dataView.getUint8(i).toString(16);
   }
-  if (hexToAscii(model) !== 'WAC710C-NT26E') {
+  if (!hexToAscii(model).includes('WAC710C')) {
     selfTestState = true;
     msg += '产品型号不匹配, ';
   }
-
+  decodeModel=hexToAscii(model);
   // 是否自检过
   if (dataView.getUint8(54) === 0x00) {
     selfTestState = true;
@@ -181,7 +197,7 @@ export function decodeCheckSelfTest(messageStr) {
   // 去除 msg 字符串末尾的 ", "
   msg = msg.slice(0, -2);
 
-  return {selfTestState, msg};
+  return {selfTestState, msg,decodeModel};
 }
 
 /*
