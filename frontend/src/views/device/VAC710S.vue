@@ -467,7 +467,7 @@ export default {
           this.scanAddress = ''
           return
         }
-
+        this.updateOperationMessage('验证温度成功', 'green');
         //打印地址和型号标签。
         this.printAddressAndModelLabel()
 
