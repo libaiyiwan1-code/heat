@@ -18,3 +18,7 @@
 ###### 🐸 npm run build-wz-32：32位版本
 ###### 🐸 npm run build-wz-64：64位版本
 ###### 🐸 npm run build-wz-arm64：arm64版本
+
+
+# 标签大小
+##### 20mm*10mm 的标签 单排

@@ -11,25 +11,15 @@ const constantRouterMap = [
   },
 
   {
-    path: '/special',
-    children: [
-      {
-        path: '/production',
-        name: 'production',
-        component: () => import('@/views/framework/serialport/SerialPort.vue'),
-      },
-      {
-        path: 'login',
-        name: 'login',
-        component: () => import('@/views/login/Login.vue'),
-      },
-      {
-        path: 'serialPort',
-        name: 'serialPort',
-        component: () => import('@/views/device/WAC710C.vue'),
-      },
-    ]
-  }
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/login/Login.vue'),
+  },
+  {
+    path: '/device',
+    name: 'device',
+    component: () => import('@/views/device/VAC710S.vue'),
+  },
 ]
 
 export default constantRouterMap

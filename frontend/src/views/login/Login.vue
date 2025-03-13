@@ -31,7 +31,7 @@
                  style="width: 200px;"></a-input>
       </a-form-item>
       <a-form-item>
-        <a-button class="login-button" type="primary" @click="login">登录</a-button>
+        <a-button class="login-button" type="primary" @click="login" html-type="submit">登录</a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -42,6 +42,7 @@ import {message} from 'ant-design-vue';
 import {ipc} from "@/utils/ipcRenderer";
 import {ipcApiRoute, specialIpcRoute} from "@/api/main";
 import {getIdByUsername} from "@/components/global/productdb";
+import {useRoute} from "vue-router";
 
 const path = require('path');
 const Log = require('ee-core/log');
@@ -49,7 +50,14 @@ const Log = require('ee-core/log');
 export default {
   mounted() {
     this.init();
-    this.getMessage();
+    // this.getMessage();
+    const route = useRoute();
+    this.routerParam.selectDeviceMode = route.query.selectDeviceMode
+    this.routerParam.selectPrintModel = route.query.selectPrintModel
+    this.routerParam.selectTemperatureProbes = route.query.selectTemperatureProbes
+    this.routerParam.selectOperator = route.query.selectOperator
+    this.routerParam.selectPressureProbes = route.query.selectPressureProbes
+    console.warn(this.routerParam)
   },
   data() {
     return {
@@ -58,63 +66,31 @@ export default {
         password: undefined,
         selectType: undefined,
       },
-      routerSettingParams: {
-        selectDeviceMode: undefined,
-        selectOperator: undefined,
-        selectPrintModel: undefined,
-        selectTemperatureProbes: undefined,
-        protocolId: undefined,
-        userId: undefined,
-        selectPressureProbes: undefined,
-      },
       typeList: ['生产'],
       // typeList: ['生产', '管理员', '测试专用'],
       messageString: '',
-      viewChildren: [
-        {
-          type: 'vue',
-          windowName: 'serialPort',
-          windowTitle: '生产软件',
-          content: '#/special/serialPort',
-        },
-      ],
-      viewCurrent: [
-        {
-          windowsName: 'login',
-          currentWindowsId: undefined,
-        }
-      ]
+      routerParam: {
+        selectDeviceMode: undefined,
+        selectPrintModel: undefined,
+        selectTemperatureProbes: undefined,
+        selectOperator: undefined,
+        selectPressureProbes: undefined,
+        userId: undefined,
+      },
+      routerInfo: {
+        type: 'vue',
+        windowTitle: 'VAC710S',
+        content: '#/device',
+        childrenWindowId: undefined,
+      },
+      currentWindowName: 'login',
     };
   },
   methods: {
     async init() {
-      this.viewCurrent[0].currentWindowsId = await ipc.invoke(ipcApiRoute.getWCid, this.viewCurrent[0].windowsName);
-    },
-    getMessage() {
-      try {
-        console.log('登录页面-监听开始')
-        Log.info('登录页面-监听开始')
-        ipc.removeAllListeners(specialIpcRoute.paramSettingsWindowToLoginWindow);
-        //监听 主窗口通信信息.
-        ipc.on(specialIpcRoute.paramSettingsWindowToLoginWindow, (event, args) => {
-          console.log('登录页面-监听触发',args)
-          Log.info('登录页面-监听触发',args)
-          const formData = JSON.parse(args);
-          this.routerSettingParams.selectDeviceMode = formData.selectDeviceMode;
-          // this.routerSettingParams.selectOperator = formData.selectOperator;
-          this.routerSettingParams.selectPrintModel = formData.selectPrintModel;
-          this.routerSettingParams.selectTemperatureProbes = formData.selectTemperatureProbes;
-          this.routerSettingParams.selectPressureProbes = formData.selectPressureProbes;
-          // this.$message.success(args);
-          // console.log(formData)
-        });
-      } catch (error) {
-        console.error('login page Error occurred while handling IPC message:', error);
-        Log.error('login page Error occurred while handling IPC message:', error)
-      }
+      this.currentWindowsId = await ipc.invoke(ipcApiRoute.getWCid, this.currentWindowName);
     },
     async login() {
-      // this.$message.info(JSON.stringify(this.routerSettingParams));
       const formRef = this.$refs.formRef;
       if (formRef) {
         formRef.validate().then(async () => {
@@ -124,49 +100,26 @@ export default {
           //登录成功 需要创建新的view 窗口 并提示登录成功 关闭当前窗口
           if (res.length === 0 || res === '' || res === undefined) {
             message.error('账户或密码错误!');
-            console.error('账户或密码错误!')
             Log.error('账号密码错误')
           } else {
             message.success('登录成功');
-            this.routerSettingParams.userId = await getIdByUsername(username); // 使用 await 等待结果
-            console.log('查询当前登录用户id', this.routerSettingParams.userId)
-            Log.info('查询当前登录用户id',this.routerSettingParams.userId)
-            const formDataString = JSON.stringify(this.routerSettingParams);
-            console.log('登录页面路由参数:', formDataString)
-            Log.info('登录页面路由参数:', formDataString)
+            this.routerParam.userId =( await getIdByUsername(username))[0].id;
+            console.log(this.routerParam.userId)
+            let param = this.routerParam
             ipc.invoke(ipcApiRoute.loginRouter, {
-              width: 870, height: 900, content: this.viewChildren[0].content,
-              windowName: this.viewChildren[0].windowName,
-              windowTitle: this.viewChildren[0].windowTitle,
-              type: this.viewChildren[0].type,
-              windowsId: this.viewCurrent[0].currentWindowsId
+              width: 870, height: 900,
+              content: this.routerInfo.content,
+              windowName: this.routerInfo.windowName,
+              windowTitle: this.routerInfo.windowTitle,
+              type: this.routerInfo.type,
+              windowsId: this.currentWindowsId,
+              param: JSON.stringify(param),
             }).then(id => {
-              this.newWcId = id;
-              console.log('创建WAC710C子窗口成功 子窗口id:', id)
-              Log.info('创建WAC710C子窗口成功  子窗口id:', id);
-              // 这里设置延迟 1s 消息延迟 因为ipc 消息通信是异步 ,要给子窗口创建时间
-              setTimeout(() => {
-                this.sendMessageToTwoWindow(this.newWcId, formDataString);
-              }, 2000);
-            }).catch((error) => {
-              console.error('创建WAC710C子窗口失败', error)
-              Log.error('创建WAC710C子窗口失败', error);
-            });
+              this.routerInfo.childrenWindowId = id
+            })
           }
-        }).catch((error) => {
-          console.error('login Error form :', error);
-          Log.error('login Error form :', error)
-        });
-      } else {
-        console.error('login Error form validate');
-        Log.error('login Error form validate')
+        })
       }
-    }
-    ,
-    async sendMessageToTwoWindow(newWcId, formDataString) {
-      console.log('登录页面路由参数发送-->', formDataString)
-      Log.info('登录页面路由参数发送', formDataString)
-      ipc.sendTo(newWcId, specialIpcRoute.loginWindowToSerialPortWindow, formDataString);
     },
   }
 };

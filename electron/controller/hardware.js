@@ -8,7 +8,7 @@ const Addon = require('ee-core/addon');
 const fs = require("fs");
 const JsBarcode = require('jsbarcode');
 const bwipjs = require('bwip-js');
-const Log = require('ee-core/log');
+
 /**
  * 硬件设备 - 功能demo
  * @class
@@ -31,35 +31,35 @@ class HardwareController extends Controller {
         return list;
     }
 
+    /*30mm * 12mm*/
     /**
      * 打印
      */
     print(args, event) {
         const deviceName = args.deviceName;
-        const address = args.address;
-        const model = 'WAC710C调节阀';
-        const date = args.date;
-        Log.info('args' + JSON.stringify(args));
+        let address = args.address;
+        // const model = 'WAC300LH_LORA';
+        // const date = args.date;
         const opt = {
             title: 'printer window',
             x: 10,
             y: 10,
             width:400 ,
-            height: 600
+            height: 600,
+            show: false
         };
         const name = 'window-printer';
         const printWindow = Addon.get('window').create(name, opt);
+        const tempHtmlPath = path.join(Ps.getHomeDir(), '/public/html/view_example.html');
 
-        // const tempHtmlPath = path.join(Ps.getHomeDir(), '/electron/view_print.html');
-        // Log.info('homedir=',Ps.getHomeDir())
         bwipjs.toBuffer({
-                bcid: 'code128',       // Barcode type
-                text: address,         // Text to encode
-                scaleX: 4,              // Scaling factor
-                width: 10, // 宽度
+                bcid: 'code128',
+                text: address,
+                scale: 4,
+                width: 11, // 宽度
                 height: 1.5, // 高度
-                includetext: false,    // Show human-readable text
-                textxalign: 'center',  // Text horizontal alignment
+                includetext: false,
+                textxalign: 'center',
                 // textfont: 'Arial',     // 设置文本字体
             },
             function (err, png) {
@@ -68,72 +68,68 @@ class HardwareController extends Controller {
                     return;
                 }
 
+                address = address.replace(/(.)/g, '$1  ');
                 // Write content to tempHtmlPath
                 const content = `
        <html>
 <head>
-    <style>
+        <style>
         .container {
             display: flex;
-            width: 30mm;
-            height: 3mm;
-            margin-top: 24px;
+            width: 200mm;
+            /*height: 12mm;*/
+            margin-top: 78px;
+            /*  margin-top: 67px;       !*放低*!*/
+            margin-left:70px;
         }
         .label1 {
-            width: 44mm;
-            height: 18mm;
+            /*width: 50mm;*/
+            margin-left: 106px;
         }
         .label2 {
-            width: 44mm;
-            height: 18mm;
-            margin-left: 3mm;
+            width: 80mm;
+  
         }
-        .barcode-container {
-            width: 35mm;
+        .barcode-container1 {
+            /*width: 30mm;*/
+            margin-top: 3mm;
+            margin-left: 6px;
             height: 5mm;
-            margin-top: 1mm;
-            padding-left: 32px;
         }
-        .info-container1{
-            /*font-size: 3mm;*/
-            height: 5mm; 
-            width: 44mm;
-            margin-left:1mm
+           .info-container1{
+           width: 34mm;
+            font-size: 3mm;  
+            /*margin-left: 62px;*/
         }
-        .info-container2 {
-            /*font-size: 3mm;*/
-            height: 5mm; 
-             width: 43mm;
-             margin-right: 3mm;
+         .barcode-container2 {
+           width: 34mm;
+            margin-top:1mm;
+            margin-left: -5px;
+        }
+        .info-container2 {  
+         width: 34mm;
+            /*margin-left:60px;*/
         }
                .info-container1, .info-container2 {
         font-family: 'Microsoft YaHei', sans-serif;
-    }.png{
-    width: 23mm;
+    }
+
+    .png{
+    width: 27mm;    /*调整标签整体大小*/
+    height: 6mm;
     }
         
     </style>
+
 </head>
 <body >
     <div class="container">
         <div class="label1">
-            <div class="barcode-container">
+            <div class="barcode-container1">
                 <img class="png" src="data:image/jpg;base64,${png.toString('base64')}" >
             </div>
             <div class="info-container1">
-                 <p  style="line-height:1mm ; font-size: 3mm;font-family: 'Microsoft YaHei', sans-serif;margin-left: 11mm;font-weight: bold;">${address}</p>
-                <p style="line-height:1mm ; font-size: 3mm;font-family: 'Microsoft YaHei', sans-serif; font-weight: bold; margin-left: 4mm;">型号:${model}</p>
-                <p style="line-height:1mm ; font-size: 3mm;font-family: 'Microsoft YaHei', sans-serif;font-weight: bold; margin-left: 4mm; ">日期:${date}</p>
-            </div>
-        </div>
-        <div class="label2">
-            <div class="barcode-container">
-                <img  class="png" src="data:image/jpg;base64,${png.toString('base64')}" >
-            </div>
-            <div class="info-container2">
-          <p  style="line-height:1mm;margin-left: 12mm; font-size: 3mm;font-family: 'Microsoft YaHei', sans-serif; font-weight: bold;">${address}</p>
-                <p style="line-height:1mm ; font-size: 3mm; font-family: 'Microsoft YaHei', sans-serif;font-weight: bold; margin-left: 4mm; ">型号:${model}</p>
-                <p style="line-height:1mm ;  font-size: 3mm; font-family: 'Microsoft YaHei', sans-serif;font-weight: bold; margin-left: 4mm;">日期:${date}</p>
+                 <p  style="line-height:0.3mm ;margin-left: 9px; font-weight: bold;font-size: 3.4mm;">${address}</p>
             </div>
         </div>
     </div>
@@ -146,10 +142,12 @@ class HardwareController extends Controller {
                 // printWindow.loadURL(`file://${tempHtmlPath}`);
                 /*控制纸张大小*/
                 const pageSize = {
-                    width: 86 * 1000, // 转换为微米
-                    height: 22 * 1000
+                    width: 13 * 1000, // 转换为微米
+                    // width: 86 * 1000, // 转换为微米
+                    height: 8 * 1000
+                    // height: 22 * 1000
                 };
-
+                // printWindow.openDevTools();
                 printWindow.webContents.once('did-finish-load', () => {
                     printWindow.webContents.print({
                         silent: true,
@@ -162,6 +160,132 @@ class HardwareController extends Controller {
                         const channel = 'controller.hardware.printStatus';
                         event.reply(`${channel}`, {success, failureReason});
                         printWindow.close();
+                    });
+                });
+            });
+
+        return true;
+    }
+    printAddressAndModel(args, event) {
+        const deviceName = args.deviceName;
+        let address = args.address;
+        const model = args.selectPrintModel;
+        // const date = args.date;
+        const opt = {
+            title: 'printer window',
+            x: 10,
+            y: 10,
+            width:400 ,
+            height: 600,
+            includetext: false,
+            show: false,
+        };
+        const name = 'window-printer';
+        const printWindow = Addon.get('window').create(name, opt);
+        const tempHtmlPath = path.join(Ps.getHomeDir(), '/public/html/view_example.html');
+
+        bwipjs.toBuffer({
+                bcid: 'code128',
+                text: address,
+                scale: 4,
+                width: 11, // 宽度
+                height: 1.5, // 高度
+                includetext: false,
+                textxalign: 'center',
+                // textfont: 'Arial',     // 设置文本字体
+            },
+            function (err, png) {
+                if (err) {
+                    console.error('Error generating barcode:', err);
+                    return;
+                }
+
+                address = address.replace(/(.)/g, '$1  ');
+                // Write content to tempHtmlPath
+                const content = `
+       <html>
+<head>
+        <style>
+        .container {
+            display: flex;
+            width: 200mm;
+            /*height: 12mm;*/
+            margin-top: 78px;
+            /*  margin-top: 67px;       !*放低*!*/
+            margin-left:70px;
+        }
+        .label1 {
+            /*width: 50mm;*/
+            margin-top: 10px;
+            margin-left: 106px;
+        }
+        .label2 {
+            width: 80mm;
+  
+        }
+        .barcode-container1 {
+            /*width: 30mm;*/
+            margin-top: 3mm;
+            margin-left: 6px;
+            height: 5mm;
+        }
+           .info-container1{
+           width: 34mm;
+            font-size: 3mm;  
+            /*margin-left: 62px;*/
+        }
+         .barcode-container2 {
+           width: 34mm;
+            margin-top:1mm;
+            margin-left: -5px;
+        }
+        .info-container2 {  
+         width: 34mm;
+            /*margin-left:60px;*/
+        }
+               .info-container1, .info-container2 {
+        font-family: 'Microsoft YaHei', sans-serif;
+    }
+        
+    </style>
+
+</head>
+<body >
+    <div class="container">
+        <div class="label1">
+            <div class="info-container1">
+                 <p  style="line-height:0.3mm ;margin-left: 7px; font-weight: 600;font-size: 3.7mm;">${address}</p>
+                 <p  style="line-height:1mm ;margin-left: 12px;  font-weight: bold;font-size: 3.7mm;">${model}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+        `;
+                // fs.writeFileSync(tempHtmlPath, content);
+                printWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(content)}`);
+                // printWindow.loadURL(`file://${tempHtmlPath}`);
+                /*控制纸张大小*/
+                const pageSize = {
+                    width: 13 * 1000, // 转换为微米
+                    // width: 86 * 1000, // 转换为微米
+                    height: 8 * 1000
+                    // height: 22 * 1000
+                };
+                // printWindow.openDevTools();
+                printWindow.webContents.once('did-finish-load', () => {
+                    printWindow.webContents.print({
+                        silent: true,
+                        printBackground: false,
+                        deviceName: deviceName,
+                        copies: 1,
+                        landscape: false
+                        , pageSize: pageSize
+                    }, (success, failureReason) => {
+                        const channel = 'controller.hardware.printStatus';
+                        event.reply(`${channel}`, {success, failureReason});
+                        // printWindow.close();
                     });
                 });
             });

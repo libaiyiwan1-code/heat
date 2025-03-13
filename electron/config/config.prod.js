@@ -24,7 +24,7 @@ module.exports = (appInfo) => {
   config.windowsOption = {
     title: '生产软件V1.0参数设置',
     width: 450,
-    height: 500,
+    height: 530,
     webPreferences: {
       //webSecurity: false,
       contextIsolation: false, // false -> 可在渲染进程中使用electron的api，true->需要bridge.js(contextBridge)

@@ -6,7 +6,7 @@
       name="basic"
       ref="formRef"
       layout="horizontal"
-      style=" padding-left: 10px"
+      style="padding-left: 10px"
     >
 
       <a-form-item
@@ -56,11 +56,10 @@
           </a-select-option>
         </a-select>
       </a-form-item>
-
       <a-form-item
-        label="压力探头："
-        name="selectPressureProbes"
-        :rules="[{ required: true, message: '请选压力度探头' }]"
+        label="温度探头："
+        name="selectTemperatureProbes"
+        :rules="[{ required: true, message: '请选择温度探头' }]"
       >
         <a-select v-model:value="formData.selectPressureProbes" placeholder="请选压力度探头" style="width: 200px;">
           <a-select-option v-for="pressureProbes in Enum.pressureProbesList" :value="pressureProbes">
@@ -94,8 +93,8 @@
 import {message} from 'ant-design-vue';
 import {ipc} from "@/utils/ipcRenderer";
 import {ipcApiRoute, specialIpcRoute} from "@/api/main";
-const Log = require('ee-core/log');
 
+const Log = require('ee-core/log');
 const path = require('path');
 export default {
   name: 'LoginPage',
@@ -106,53 +105,36 @@ export default {
     return {
       formData: {
         password: undefined,
-        selectDeviceMode: 'WAC710C',
+        selectDeviceMode: 'VAC710S',
         selectOperator: '移动',
-        selectPrintModel: 'WAC710C',
+        selectPrintModel: 'VAC710S',
         selectTemperatureProbes: '无探头',
-        selectPressureProbes:'无探头',
+        selectPressureProbes: '无探头',
         selectPassword: undefined,
-        protocolId: undefined,
       },
       Enum: {
-        deviceModelList: ['WAC710C'],
+        deviceModelList: ['VAC710S'],
         operators: ['移动', '电信'],
-        printModelList: ['WAC710C'],
+        printModelList: ['VAC710S'],
         temperatureProbesList: ['无探头', '蓝色-回温探头', '红色-进温探头', '红蓝-双探头'],
-        pressureProbesList: ['无探头', '回压探头', '进压探头', '进回压双探头'],
+        pressureProbesList: ['无探头'],
       },
       defaultPassword: "cqq",
       newWcId: undefined,
-      viewChildren: [
-        {
-          type: 'vue',
-          windowName: 'login',
-          windowTitle: '登录',
-          content: '#/special/login',
-        },
-      ],
-      viewCurrent: [
-        {
-          windowsName: 'main',
-          currentWindowsId: undefined,
-        }
-      ],
+      currentWindowName:'main',
+      routerInfo:{
+        type: 'vue',
+        windowName: 'login',
+        windowTitle: '登录',
+        content: '#/login',
+        childrenWindowId: undefined,
+      },
+      currentWindowsId: undefined,
     };
   },
   methods: {
     async init() {
-      // ipc.on('paramToLoginSettings', (event, arg) => {
-      //   //消息提示 监听 其它渲染进程sendTo方法
-      //   this.$message.info(arg);
-      // })
-
-      // ipc.on(specialIpcRoute.loginWindowToParamSettingsWindow, (event, arg) => {
-      //   //消息提示 监听 其它渲染进程sendTo方法
-      //   this.$message.info(arg);
-      // })
-      this.viewCurrent[0].currentWindowsId = await ipc.invoke(ipcApiRoute.getWCid, this.viewCurrent[0].windowsName);
-      Log.info('初始化->参数选择页面', this.viewCurrent[0].currentWindowsId);
-      console.log('初始化->参数选择页面', this.viewCurrent[0].currentWindowsId);
+      this.currentWindowsId = await ipc.invoke(ipcApiRoute.getWCid,this.currentWindowName);
     },
     async confirming() {
       const formRef = this.$refs.formRef;
@@ -161,35 +143,33 @@ export default {
           if (this.formData.selectPassword !== this.defaultPassword) {
             message.error('密码错误');
             Log.error('密码输入错误', this.formData.selectPassword);
-            console.warn('密码输入错误', this.formData.selectPassword);
             return;
           }
-          const formDataString = JSON.stringify(this.formData);
-          console.log('参数选择页面路由参数:', formDataString)
-          Log.info('参数选择页面路由参数:', formDataString);
-          ipc.invoke(ipcApiRoute.loginRouter,
+          //密码输入成功
+          let param={
+            selectDeviceMode: this.formData.selectDeviceMode,
+            selectPrintModel: this.formData.selectPrintModel,
+            selectOperator: this.formData.selectOperator,
+            selectTemperatureProbes: this.formData.selectTemperatureProbes,
+            selectPressureProbes: this.formData.selectPressureProbes,
+          }
+          await ipc.invoke(ipcApiRoute.loginRouter,
             {
               width: 450, height: 500,
-              content: this.viewChildren[0].content,
-              windowName: this.viewChildren[0].windowName,
-              windowTitle: this.viewChildren[0].windowTitle,
-              type: this.viewChildren[0].type,
-              windowsId: this.viewCurrent[0].currentWindowsId
+              content: this.routerInfo.content,
+              windowName: this.routerInfo.windowName,
+              windowTitle: this.routerInfo.windowTitle,
+              type: this.routerInfo.type,
+              windowsId: this.currentWindowsId,
+              param:JSON.stringify(param),
             },
-          ).then(id => {
-            this.newWcId = id;
-            console.log('创建登录子窗口成功 子窗口id:', id)
-            Log.info('创建登录子窗口成功  子窗口id:', id);
-            // 这里设置延迟 1s 消息延迟 因为ipc 消息通信是异步 ,要给子窗口创建时间
-            setTimeout(() => {
-              this.sendMessageToTwoWindow(this.newWcId, formDataString)
-            }, 2000)
-
+          ).then( id => {
+            this.routerInfo.childrenWindowId = id
+            console.log('paramPage children window id:',id)
           }).catch((error) => {
-            console.error('创建登录子窗口失败', error)
-            Log.error('创建登录子窗口失败', error);
+            console.error('paramPage error', error)
+            Log.error('paramPage error', error);
           });
-
 
         });
       } else {
@@ -197,21 +177,7 @@ export default {
         Log.error('Form reference not found.');
       }
     },
-    async sendMessageToTwoWindow(newWcId, formDataString) {
-      console.log('选择参数页面路由参数发送-->', formDataString)
-      Log.info('选择参数页面路由参数发送', formDataString)
-      ipc.sendTo(newWcId, specialIpcRoute.paramSettingsWindowToLoginWindow, formDataString);
-    },
-    // async sendMessage() {
-    //   // const formDataString = JSON.stringify(this.formData);
-    //   console.log(this.newWcId)
-    //   // console.log(formDataString)
-    //   const formDataString = JSON.stringify(this.formData);
-    //   console.log(this.newWcId)
-    //   ipc.sendTo(this.newWcId, 'loginToParamSettings', formDataString);
-    // }
-  },
-
+  }
 };
 </script>
 
@@ -224,7 +190,6 @@ export default {
   }
 }
 
-
 .param-setting-button {
   width: 150%;
   background-color: #007bff;
@@ -233,8 +198,6 @@ export default {
   cursor: pointer; /**/
   margin-left: 130px; /*左移130px*/
   top: -5px; /*上移10px*/
-
-
 }
 
 </style>

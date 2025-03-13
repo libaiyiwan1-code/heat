@@ -118,10 +118,11 @@ export function countProductQuantityCountByUserId(userId, date) {
       }
       // 执行查询
       connection.query(
-        `SELECT count(1) as quantity
+        `SELECT SUBSTRING(macaddr, - 3) AS quantity
          FROM arc_nbvalveproduce
          WHERE userid = ?
-           and DATE_FORMAT(produceDate, '%Y-%m-%d') = DATE_FORMAT(?, '%Y-%m-%d')`,
+           AND DATE_FORMAT(produceDate, '%Y-%m-%d') = DATE_FORMAT(?, '%Y-%m-%d')
+         ORDER BY macaddr DESC LIMIT 1;`,
         [userId, date],
         (error, results) => {
           // 释放连接
@@ -129,6 +130,10 @@ export function countProductQuantityCountByUserId(userId, date) {
           if (error) {
             reject(error);
           } else {
+            // 将第一个结果的quantity转换为数字类型
+            if (results.length > 0) {
+              results[0].quantity = parseInt(results[0].quantity, 10);
+            }
             resolve(results);
           }
         }

@@ -48,6 +48,7 @@ const ipcApiRoute = {
   getPrinterList: 'controller.hardware.getPrinterList',
   print: 'controller.hardware.print',
   printStatus: 'controller.hardware.printStatus',
+  printAddressAndModel: 'controller.hardware.printAddressAndModel',
 
   // effect
   selectFile: 'controller.effect.selectFile',

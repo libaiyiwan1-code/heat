@@ -80,7 +80,7 @@ class EffectController extends Controller {
     // 创建子窗口的函数
     loginRouter(args) {
         // 路由 并创建新的子窗口
-        const {width, height, content, windowName, windowTitle, type, windowsId} = args;
+        const {width, height, content, windowName, windowTitle,param ,type, windowsId} = args;
         if (windowsId === null || windowsId === undefined) {
             Log.error('router windows id is null');
         }
@@ -99,8 +99,11 @@ class EffectController extends Controller {
                     addr = mainServer.protocol + mainServer.host + ':' + mainServer.port;
                 }
             }
-
-            contentUrl = addr + content;
+            Log.info(param);
+            const queryString = new URLSearchParams(JSON.parse(param)).toString();
+            contentUrl = `${addr + content}?${queryString}`;
+            Log.info(contentUrl);
+            Log.info(queryString);
         } else {
             // some
         }
@@ -109,7 +112,6 @@ class EffectController extends Controller {
             title: windowTitle,
         }
         const win = Addon.get('window').create(windowName, opt);
-
         const winContentsId = win.webContents.id;
         win.setSize(width, height);
         win.setResizable(false);
@@ -120,20 +122,16 @@ class EffectController extends Controller {
         win.focus();
         // 将窗口引用保存到数组中
         // windows.push(win);
-        win.webContents.openDevTools()   //控制台
+        // win.webContents.openDevTools()   //控制台
         // 关闭当前主窗口
         // const mainWindow = CoreWindow.getMainWindow();
         // mainWindow.close();
-        Log.info('windowsId',windowsId)
+
         // 关闭指定 ID 的窗口
         const allWindows = BrowserWindow.getAllWindows();
-        Log.info('all windows id ：', allWindows.map(window => window.webContents.id));
         allWindows.forEach((window) => {
             if (window.webContents.id === windowsId) {
-                Log.info('closed windows id:',window.webContents.id)
-                setTimeout(() => {
-                    window.close();
-                }, 3500)
+                window.close();
             }
         });
         // 关闭指定 ID 的窗口
