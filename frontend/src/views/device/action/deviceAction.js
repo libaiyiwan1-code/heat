@@ -93,10 +93,12 @@ export const writeConfigParam = async (context) => {
     context.globalReceivedData = '';
     return notPass;
   }
-  Log.info('写硬件配置参数成功 稍后写压力探头，开启自检');
-  console.log('写硬件配置参数成功 稍后写压力探头，开启自检');
-  context.receptionText = context.receptionText + '写硬件配置参数成功 稍后写压力探头，开启自检' + '\n';
-  context.globalReceivedData = '';
+  if(!notPass){
+    Log.info('写硬件配置参数成功 稍后写压力探头，开启自检');
+    console.log('写硬件配置参数成功 稍后写压力探头，开启自检');
+    context.receptionText = context.receptionText + '写硬件配置参数成功 稍后写压力探头，开启自检' + '\n';
+    context.globalReceivedData = '';
+  }
   return notPass;
 }
 
@@ -165,10 +167,12 @@ export const writeWritePressureProbe = async (context) => {
     context.globalReceivedData = '';
     return notPass;
   }
-  Log.info('写压力探头成功 稍后开启自检');
-  console.log('写压力探头成功 稍后开启自检');
-  context.receptionText = context.receptionText + '写压力探头成功 稍后开启自检' + '\n';
-  context.globalReceivedData = '';
+  if(!notPass){
+    Log.info('写压力探头成功 稍后开启自检');
+    console.log('写压力探头成功 稍后开启自检');
+    context.receptionText = context.receptionText + '写压力探头成功 稍后开启自检' + '\n';
+    context.globalReceivedData = '';
+  }
   return notPass;
 }
 
@@ -235,10 +239,12 @@ export const selfTest = async (context) => {
     context.globalReceivedData = '';
     return notPass;
   }
-  Log.info('线路验证成功 稍后写硬件配置参数、开启自检');
-  console.log('线路验证成功 稍后写硬件配置参数、开启自检');
-  context.receptionText += '线路验证成功 稍后写硬件配置参数、开启自检' + '\n';
-  context.globalReceivedData = '';
+  if(!notPass){
+    Log.info('线路验证成功 稍后写硬件配置参数、开启自检');
+    console.log('线路验证成功 稍后写硬件配置参数、开启自检');
+    context.receptionText += '线路验证成功 稍后写硬件配置参数、开启自检' + '\n';
+    context.globalReceivedData = '';
+  }
   return notPass;
 }
 
@@ -357,11 +363,13 @@ export const readSelfTestStatusAction = async (context) => {
     context.globalReceivedData = '';
     return {notPass, protocolId, version, productName, netprovider};
   }
-  context.receptionText += '自检状态通过，准备写地址 ' + '\n';
-  console.log('读自检通过')
-  Log.info('读自检通过')
-  context.globalReceivedData = '';
-  console.warn('protocolId:', protocolId, 'version:', version, 'productName:', productName, 'netprovider:', netprovider);
+  if(!notPass){
+    context.receptionText += '自检状态通过，准备写地址 ' + '\n';
+    console.log('读自检通过')
+    Log.info('读自检通过')
+    context.globalReceivedData = '';
+    console.warn('protocolId:', protocolId, 'version:', version, 'productName:', productName, 'netprovider:', netprovider);
+  }
   return {notPass, protocolId, version, productName, netprovider};
 }
 
@@ -424,10 +432,12 @@ export const writeAddress = async (context) => {
     context.globalReceivedData = '';
     return notPass;
   }
-  context.receptionText = context.receptionText + '写地址通过' + '\n';
-  Log.info('写地址通过')
-  console.log('写地址通过')
-  context.globalReceivedData = '';
+  if(!notPass){
+    context.receptionText = context.receptionText + '写地址通过' + '\n';
+    Log.info('写地址通过')
+    console.log('写地址通过')
+    context.globalReceivedData = '';
+  }
   return notPass;
 
 }
@@ -556,10 +566,12 @@ export const readData = async (context) => {
   context.readDataAddress = address
   context.deviceInTemperature = inTemperature;
   context.deviceOutTemperature = outTemperature;
-  Log.info('读数据成功 进温：' + inTemperature + ' 回温：' + outTemperature);
-  console.log('读数据成功 进温：' + inTemperature + ' 回温：' + outTemperature);
-  context.receptionText = context.receptionText + '读数据成功' + '\n';
-  context.globalReceivedData = '';
+  if(!notPass){
+    Log.info('读数据成功 进温：' + inTemperature + ' 回温：' + outTemperature);
+    console.log('读数据成功 进温：' + inTemperature + ' 回温：' + outTemperature);
+    context.receptionText = context.receptionText + '读数据成功' + '\n';
+    context.globalReceivedData = '';
+  }
   return notPass;
 }
 
