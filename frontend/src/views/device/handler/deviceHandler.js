@@ -256,6 +256,17 @@ export async function doWriteAddress(context) {
   }
   context.operationMessage = ''
   context.receptionText = ''; //初始化 文本框.receptionText
+  let {address:readValueAddress, notPass: readAddressNotPass} = await readAddress(context)
+  if (readAddressNotPass) {
+    return
+  }
+  let response = await getIdByMacAddr(readValueAddress);
+  if (response.length > 0) {
+    context.updateOperationMessage('写地址失败', 'red');
+    context.receptionText += '该设备已写过地址： '+readValueAddress + '\n';
+    Log.error('该设备已写过地址', readValueAddress)
+    return
+  }
 
   let {address, notPass} = await generateAddress(context)
   if (notPass) {

@@ -461,6 +461,7 @@ export const readAddress = async (context) => {
     } catch {
       Log.error('读地址-写入串口失败');
       console.error('读地址-写入串口失败');
+      context.receptionText += '读地址-写入串口失败' + '\n';
       break;
     }
     //记录重试前开始的时间戳
@@ -487,6 +488,7 @@ export const readAddress = async (context) => {
   }
 
   if (retries >= maxRetries) {
+    context.receptionText += '读地址-重试次数达到上限，操作失败' + '\n';
     Log.error('读地址 失败-重试次数达到上限，操作失败');
     console.error('读地址 失败-重试次数达到上限，操作失败');
     context.globalReceivedData = '';
