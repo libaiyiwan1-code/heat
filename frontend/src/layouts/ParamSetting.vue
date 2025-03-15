@@ -57,8 +57,8 @@
         </a-select>
       </a-form-item>
       <a-form-item
-        label="温度探头："
-        name="selectTemperatureProbes"
+        label="压力探头："
+        name="selectPressureProbes"
         :rules="[{ required: true, message: '请选择温度探头' }]"
       >
         <a-select v-model:value="formData.selectPressureProbes" placeholder="请选压力度探头" style="width: 200px;">
