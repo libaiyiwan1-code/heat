@@ -51,7 +51,7 @@
     "electron-egg",
     "ElectronEgg"
   ],
-  "author": "哆啦好梦, Inc <530353222@qq.com>",
+  "author": "青岛海龙马电子",
   "license": "Apache",
   "devDependencies": {
     "@electron/rebuild": "^3.6.0",

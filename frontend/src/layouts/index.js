@@ -1,5 +1,5 @@
-import ParamSetting from '@/layouts/ParamSetting.vue'
+import Login from '@/views/login/Login.vue'
 
 export {
-  ParamSetting,
+  Login,
 }

@@ -4,21 +4,22 @@
  */
 
 const constantRouterMap = [
-  {
-    path: '/',
-    component: () => import('@/layouts/ParamSetting.vue'),
-    children: []
-  },
+  // {
+  //   path: '/',
+  //   component: () => import('@/layouts/ParamSetting.vue'),
+  //   children: []
+  // },
 
   {
-    path: '/login',
+    path: '/',
     name: 'login',
     component: () => import('@/views/login/Login.vue'),
+    children: []
   },
   {
     path: '/device',
     name: 'device',
-    component: () => import('@/views/device/VAC710S.vue'),
+    component: () => import('@/views/device/Device.vue'),
   },
 ]
 

@@ -52,6 +52,9 @@ class Index extends Application {
    * electron app ready
    */
   async electronAppReady () {
+    // 配置update 服务器
+
+
     // do some things
   }
 

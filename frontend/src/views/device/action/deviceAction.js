@@ -1,583 +1,156 @@
-import {
-  packReadData,
-  packReadIMEI,
-  packReadSelfTestStatus,
-  packSelfTest,
-  packSelfTestInquiry,
-  packWriteAddress,
-  packWritePressureProbe,
-  packWriteTemperatureProbe
-} from "@/utils/packBuffer/vac710s/encode/vac710s";
+import {nbExecute, outlineExecute} from "@/packBuffer/commander";
+import {arrayBuffer2Hex, checkSpontaneous} from "@/packBuffer/common/comUtil";
 import {doWritePort} from "@/views/device/handler/portHandler";
-import {
-  checkWriteNotPass,
-  decodeCheckAFNAndFN,
-  decodeCheckAgreementID,
-  decodeCheckFrame,
-  decodeCheckInquireSelfTest,
-  decodeCheckReadData,
-  decodeCheckSelfTest,
-  decodeCheckSumLength,
-  decodeGetProductModel,
-  decodeGetProtocolId,
-  decodeGetVersion,
-  decodeNetProvider,
-  decodeReadAddress,
-  decodeTemperature,
-  decodeWriteConfigParam,
-  decodeWritePressureProbe
-} from "@/utils/packBuffer/vac710s/decode/vac710s";
-import {arrayBuffer2Hex} from "@/utils/util";
+import {playErrorAudio, playSuccessAudio} from "@/utils/audioUtils";
 
 const Log = require('ee-core/log');
 
-export const writeConfigParam = async (context) => {
-  const maxRetries = 3;  // 最大重试次数
-  const expectedPacketLength = 34;  // byte length
-  const writeTimeout = 3000; // Timeout
-  let retries = 0;  //已重试次数
+/**
+ * 通用的串口通信组件
+ * @param {Object} context - 上下文对象
+ * @param {Object} config - 配置对象
+ * @returns {Promise<boolean>} - 操作是否失败
+ */
+export const serialPortOperation = async (context, config) => {
+
+  const {
+    actionType,                      // 操作类型
+    operationName = '操作',           // 操作名称，用于日志和提示
+    cmdType,                         // outlineExecute 的命令类型
+    cmdCode,                         // outlineExecute 的命令码
+    protocolId,                      // 协议ID
+    maxRetries = 3,                  // 最大重试次数
+    expectedLength,                  // 预期响应长度(byte)
+    timeout = 3000,                  // 超时时间(ms)
+    validateResponse = () => true,   // 自定义响应验证函数
+    preprocess = () => {
+    },           // 预处理函数
+    isInfraredDevice = false,         // 是否为红外设备
+    isTransparentTransmissionProtocol = false // 是否为透传协议
+  } = config;
+
+  context.buttonDisabled()
+  let retries = 0;
   let notPass = true;
-  let packBuffer = packWriteTemperatureProbe(context.routerParam.selectTemperatureProbes);
-  console.log('[请求报文]   写硬件配置参数 ,探头:' + context.routerParam.selectTemperatureProbes, arrayBuffer2Hex(packBuffer));
-  Log.info('[请求报文]   写硬件配置参数 ,探头:' + context.routerParam.selectTemperatureProbes, arrayBuffer2Hex(packBuffer));
-  context.globalReceivedData = ''
-  while (notPass && retries < maxRetries) {
-    context.globalReceivedData = ''
-    try {
-      await doWritePort(context.serialPort, packBuffer)
-    } catch {
-      Log.error('写硬件配置参数-写入串口失败');
-      console.error('写硬件配置参数-写入串口失败');
-      context.updateOperationMessage('自检失败', 'red');
-      context.receptionText = context.receptionText + '写硬件配置参数-写入串口失败' + '\n';
-      context.globalReceivedData = ''
-      retries++;
-      break;
-    }
-    //记录重试前开始的时间戳
-    const startWaitTime = Date.now();
-    while (Date.now() - startWaitTime < writeTimeout) {
-      console.warn('写硬件配置参数报文:', context.globalReceivedData);
-      console.warn('写硬件配置参数报文长度:', context.globalReceivedData.length);
-      if (context.globalReceivedData !== '' && context.globalReceivedData.length / 2 === expectedPacketLength) {
-        break;
-      }
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    console.log('[响应报文]  写硬件配置参数=>  ', context.globalReceivedData);
-    Log.info('[响应报文]  写硬件配置参数=>  ', context.globalReceivedData)
-    // 超时重新发包
-    if (context.globalReceivedData === '' || context.globalReceivedData.length / 2 < expectedPacketLength) {
-      retries++;
-      Log.warn('写硬件配置参数失败 进行重试 次数:', retries);
-      console.warn('写硬件配置参数失败 进行重试 次数:', retries);
-      context.receptionText += '写硬件配置参数 失败进行重试 次数:' + retries + '\n';
-      continue; // Retry
-    }
-    if (decodeWriteConfigParam(context.globalReceivedData)) {
-      retries++;
-      Log.warn('写硬件配置参数失败 进行重试 次数:', retries);
-      console.warn('写硬件配置参数失败 进行重试 次数:', retries);
-      context.receptionText += '写硬件配置参数失败 进行重试 次数:' + retries + '\n';
-      continue; // Retry
-    }
-
-    notPass = false;
+  let packBuffer
+  if (isTransparentTransmissionProtocol) {
+    packBuffer = outlineExecute(cmdType, cmdCode, protocolId, context);
+  } else {
+    packBuffer = nbExecute(cmdType, cmdCode, protocolId, context);
   }
 
-  if (retries >= maxRetries) {
-    context.updateOperationMessage('自检失败', 'red');
-    Log.error('写硬件配置参数失败');
-    console.log('写硬件配置参数失败');
-    context.receptionText = context.receptionText + '写硬件配置参数失败' + '\n';
-    context.globalReceivedData = '';
-    return notPass;
-  }
-  if(!notPass){
-    Log.info('写硬件配置参数成功 稍后写压力探头，开启自检');
-    console.log('写硬件配置参数成功 稍后写压力探头，开启自检');
-    context.receptionText = context.receptionText + '写硬件配置参数成功 稍后写压力探头，开启自检' + '\n';
-    context.globalReceivedData = '';
-  }
-  return notPass;
-}
+  console.log(`[请求报文] ${operationName}`, arrayBuffer2Hex(packBuffer));
+  Log.info(`[请求报文] ${operationName}`, arrayBuffer2Hex(packBuffer));
 
-
-export const writeWritePressureProbe = async (context) => {
-  const maxRetries = 3;  // 最大重试次数
-  const expectedPacketLength = 34;  // byte length
-  const writeTimeout = 3000; // Timeout
-  let retries = 0;  //已重试次数
-  let notPass = true;
-  // let packBuffer = packWriteTemperatureProbe(context.routerParam.selectTemperatureProbes);
-  let packBuffer = packWritePressureProbe();
-  console.log('[请求报文]   写压力探头:' + context.routerParam.selectPressureProbes, arrayBuffer2Hex(packBuffer));
-  Log.info('[请求报文]   写压力探头:' + context.routerParam.selectPressureProbes, arrayBuffer2Hex(packBuffer));
-  context.globalReceivedData = ''
-  while (notPass && retries < maxRetries) {
-    context.globalReceivedData = ''
-    try {
-      await doWritePort(context.serialPort, packBuffer)
-    } catch {
-      Log.error('写压力探头-写入串口失败');
-      console.error('写压力探头-写入串口失败');
-      context.updateOperationMessage('自检失败', 'red');
-      context.receptionText = context.receptionText + '写压力探头-写入串口失败' + '\n';
-      context.globalReceivedData = ''
-      retries++;
-      break;
-    }
-    //记录重试前开始的时间戳
-    const startWaitTime = Date.now();
-    while (Date.now() - startWaitTime < writeTimeout) {
-      console.warn('写压力探头报文:', context.globalReceivedData);
-      console.warn('写压力探头报文长度:', context.globalReceivedData.length);
-      if (context.globalReceivedData !== '' && context.globalReceivedData.length / 2 === expectedPacketLength) {
-        break;
-      }
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    // 超时重新发包
-    if (context.globalReceivedData === '' || context.globalReceivedData.length / 2 < expectedPacketLength) {
-      retries++;
-      Log.warn('写压力探头失败 进行重试 次数:', retries);
-      console.warn('写压力探头失败 进行重试 次数:', retries);
-      context.receptionText += '写压力探头失败 失败进行重试 次数:' + retries + '\n';
-      continue; // Retry
-    }
-    if (decodeWritePressureProbe(context.globalReceivedData)) {
-      retries++;
-      Log.warn('写压力探头失败 进行重试 次数:', retries);
-      console.warn('写压力探头失败 进行重试 次数:', retries);
-      context.receptionText += '写压力探头失败 进行重试 次数:' + retries + '\n';
-      continue; // Retry
-    }
-    console.log('[响应报文]  写压力探头=>  ', context.globalReceivedData);
-    Log.info('[响应报文]  写压力探头=>  ', context.globalReceivedData)
-
-    notPass = false;
-  }
-
-  if (retries >= maxRetries) {
-    context.updateOperationMessage('自检失败', 'red');
-    Log.error('写压力探头失败');
-    console.log('写压力探头失败');
-    context.receptionText = context.receptionText + '写压力探头失败' + '\n';
-    context.globalReceivedData = '';
-    return notPass;
-  }
-  if(!notPass){
-    Log.info('写压力探头成功 稍后开启自检');
-    console.log('写压力探头成功 稍后开启自检');
-    context.receptionText = context.receptionText + '写压力探头成功 稍后开启自检' + '\n';
-    context.globalReceivedData = '';
-  }
-  return notPass;
-}
-
-
-export const selfTest = async (context) => {
-  const maxRetries = 3;  // 最大重试次数
-  const expectedPacketLength = 34;  // byte length
-  const writeTimeout = 3000; // Timeout
-  let retries = 0;  //已重试次数
-  let notPass = true;
-  let packBuffer = packSelfTestInquiry();
-  console.log('[请求报文]   自检询问', arrayBuffer2Hex(packBuffer));
-  Log.info('[请求报文]   自检询问', arrayBuffer2Hex(packBuffer));
-  context.globalReceivedData = ''
-  while (notPass && retries < maxRetries) {
-    context.globalReceivedData = ''
-    try {
-      await doWritePort(context.serialPort, packBuffer)
-    } catch {
-      Log.error('自检询问-写入串口失败');
-      console.error('自检询问-写入串口失败');
-      context.updateOperationMessage('自检失败', 'red');
-      context.receptionText = context.receptionText + '自检询问-写入串口失败' + '\n';
-      context.globalReceivedData = ''
-      retries++;
-      break;
-    }
-    //记录重试前开始的时间戳
-    const startWaitTime = Date.now();
-    while (Date.now() - startWaitTime < writeTimeout) {
-      console.warn('自检询问报文:', context.globalReceivedData);
-      console.warn('自检询问报文长度:', context.globalReceivedData.length);
-      if (context.globalReceivedData !== '' && context.globalReceivedData.length / 2 === expectedPacketLength) {
-        break;
-      }
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    console.log('[响应报文]  自检询问=>  ', context.globalReceivedData);
-    Log.info('[响应报文]  自检询问=>  ', context.globalReceivedData)
-    // 超时重新发包
-    if (context.globalReceivedData === '' || context.globalReceivedData.length / 2 < expectedPacketLength) {
-      retries++;
-      Log.warn('线路验证失败  进行重试 次数:', retries);
-      console.warn('线路验证失败  进行重试 次数:', retries);
-      context.receptionText += '线路验证失败  失败进行重试 次数:' + retries + '\n';
-      continue; // Retry
-    }
-    if (decodeCheckInquireSelfTest(context.globalReceivedData)) {
-      retries++;
-      Log.warn('线路验证失败 进行重试 次数:', retries);
-      console.warn('线路验证失败 进行重试 次数:', retries);
-      context.receptionText += '线路验证失败 进行重试 次数:' + retries + '\n';
-      continue; // Retry
-    }
-
-    notPass = false;
-  }
-
-  if (retries >= maxRetries) {
-    context.updateOperationMessage('自检失败', 'red');
-    Log.error('线路验证失败');
-    console.log('线路验证失败');
-    context.receptionText += '线路验证失败' + '\n';
-    context.globalReceivedData = '';
-    return notPass;
-  }
-  if(!notPass){
-    Log.info('线路验证成功 稍后写硬件配置参数、开启自检');
-    console.log('线路验证成功 稍后写硬件配置参数、开启自检');
-    context.receptionText += '线路验证成功 稍后写硬件配置参数、开启自检' + '\n';
-    context.globalReceivedData = '';
-  }
-  return notPass;
-}
-
-
-export const selfTestStartAction = async (context) => {
-  context.globalReceivedData = ''
-  let selfTestBuffer = packSelfTest(context.routerParam.selectTemperatureProbes, context.routerParam.selectPressureProbes);
-  console.log('[请求报文]   开启自检=>  ', arrayBuffer2Hex(selfTestBuffer));
-  Log.info('[请求报文]   开启自检=>  ', arrayBuffer2Hex(selfTestBuffer))
-  try {
-    await doWritePort(context.serialPort, selfTestBuffer)
-  } catch {
-    Log.error('开启自检-写入串口失败');
-    console.error('开启自检-写入串口失败');
-    context.updateOperationMessage('自检失败', 'red');
-    context.receptionText += '开启自检-写入串口失败' + '\n';
-    context.globalReceivedData = '';
-    return
-  }
-  Log.info('开启自检成功');
-  console.log('开启自检成功');
-  context.receptionText = context.receptionText + '开启自检' + '\n';
-  context.updateOperationMessage('自检成功', 'green');
   context.globalReceivedData = '';
-}
 
-
-export const readSelfTestStatusAction = async (context) => {
-  const maxRetries = 3;  // 最大重试次数
-  const expectedPacketLength = 73;  // byte length
-  const writeTimeout = 3000; // Timeout
-  let retries = 0;  //已重试次数
-  let notPass = true;
-  let protocolId = '', version = '', productName = '', netprovider = 2
-  let packBuffer = packReadSelfTestStatus()
-  console.log('[请求报文]  读自检状态=>  ', arrayBuffer2Hex(packBuffer));
-  Log.info('[请求报文]  读自检状态=>  ', arrayBuffer2Hex(packBuffer))
   while (notPass && retries < maxRetries) {
-    context.globalReceivedData = ''
+    context.globalReceivedData = '';
+
+    // 写入串口
     try {
-      await doWritePort(context.serialPort, packBuffer)
-    } catch {
-      Log.error('读自检状态-写入串口失败');
-      console.error('读自检状态-写入串口失败');
-      context.updateOperationMessage('写地址失败', 'red');
-      context.receptionText += '读自检状态-写入串口失败' + '\n';
+      await doWritePort(context.portAttributes.serialPort, packBuffer);
+    } catch (error) {
+      await handleLeftError(context, operationName, '写入串口失败', actionType);
+      console.error('Failed to write port:', error.message);
       break;
     }
-    //记录重试前开始的时间戳
-    const startWaitTime = Date.now();
-    while (Date.now() - startWaitTime < writeTimeout) {
-      if (context.globalReceivedData !== '' && context.globalReceivedData.length / 2 === expectedPacketLength) {
-        break;
+
+    // 等待响应
+    let response = false
+    console.log(operationName)
+    if (operationName !== '自检开启') {
+      response = await waitForResponse(context, timeout, expectedLength);
+      // 验证响应
+      if (!response) {
+        console.log(`[响应报文] ${operationName}=>`, context.globalReceivedData);
+        Log.info(`[响应报文] ${operationName}=>`, context.globalReceivedData);
+        retries++;
+        context.createLeftSpanMessage(`${operationName}失败-进行重试 次数:${retries}`, 'red');
+        continue;
       }
-      await new Promise(resolve => setTimeout(resolve, 100));
+
     }
 
-    // 超时重新发包
-    if (context.globalReceivedData === '' || context.globalReceivedData.length / 2 < expectedPacketLength) {
+
+    // 红外设备额外验证
+    if (operationName !== '自检开启' && isInfraredDevice && checkSpontaneous(context.globalReceivedData, arrayBuffer2Hex(packBuffer))) {
       retries++;
-      Log.warn('读自检状态进行重试 次数:', retries);
-      console.warn('读自检状态进行重试 次数:', retries);
-      context.receptionText += '读自检状态失败进行重试 次数:' + retries + '\n';
-      continue; // Retry
+      context.createLeftSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'red');
+      continue;
     }
 
-    console.log('[响应报文]  读自检状态=>  ', context.globalReceivedData);
-    Log.info('[响应报文]  读自检状态=>  ', context.globalReceivedData)
-    //基础报文验证
-    let checkSumLengthNotPass = decodeCheckSumLength(context.globalReceivedData);
-    let checkStartFrameNotPass = decodeCheckFrame(context.globalReceivedData);
-    // let checkControlCodeNotPass = decodeCheckControlCode(context.globalReceivedData);
-    let checkAgreementIDNotPass = decodeCheckAgreementID(context.globalReceivedData);
-    let checkAFNAndFNNotPass = decodeCheckAFNAndFN(context.globalReceivedData);
-    if (checkSumLengthNotPass || checkStartFrameNotPass || checkAgreementIDNotPass || checkAFNAndFNNotPass) {
-      context.receptionText = context.receptionText + '自检-报文验证不通过 ' + '\n';
-      console.error('自检 报文验证不通过 ' +
-        'checkSumLengthNotPass:' + checkSumLengthNotPass
-        + 'checkStartFrameNotPass:' + checkStartFrameNotPass
-        + 'checkAgreementIDNotPass:' + checkAgreementIDNotPass
-        + 'checkAFNAndFNNotPass:' + checkAFNAndFNNotPass);
-      Log.error('自检 报文验证不通过 ' +
-        'checkSumLengthNotPass:' + checkSumLengthNotPass
-        + 'checkStartFrameNotPass:' + checkStartFrameNotPass
-        + 'checkAgreementIDNotPass:' + checkAgreementIDNotPass
-        + 'checkAFNAndFNNotPass:' + checkAFNAndFNNotPass);
-      context.updateOperationMessage('写地址失败', 'red');
-      context.receptionText += '自检-报文验证不通过 ' + '\n';
-      context.globalReceivedData = '';
-      break
+    // 自定义验证
+    if (validateResponse(context.globalReceivedData)) {
+      retries++;
+      context.createLeftSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'red');
+      continue;
     }
 
-    //EEP、联网网络、电压、进回温标定、阀门开关标定
-    //自检判断
-    let {selfTestState, msg} = decodeCheckSelfTest(context.globalReceivedData);
-    if (selfTestState) {
-      Log.error('自检不通过')
-      console.error('自检不通过')
-      context.updateOperationMessage('写地址失败', 'red');
-      context.receptionText += '自检不通过:' + msg + '\n';
-      context.globalReceivedData = ''
-      break
-    }
-
-    protocolId = decodeGetProtocolId(context.globalReceivedData)
-    version = decodeGetVersion(context.globalReceivedData)
-    netprovider = decodeNetProvider(context.globalReceivedData)
-    productName = decodeGetProductModel(context.globalReceivedData)
     notPass = false;
   }
+
+  // 处理结果
   if (retries >= maxRetries) {
-    Log.error('读自检状态 失败-重试次数达到上限，操作失败');
-    console.error('读自检状态 失败-重试次数达到上限，操作失败');
-    context.updateOperationMessage('写地址失败', 'red');
-    context.receptionText += '读自检状态 失败-重试次数达到上限，操作失败' + '\n';
-    context.globalReceivedData = '';
-    return {notPass, protocolId, version, productName, netprovider};
+    await handleLeftError(context, operationName, '操作超时', actionType);
+    context.badProductQuantity += 1;
+    context.uploadMes(context.generateAddress === '' ? context.readAddress : context.generateAddress, 0, '设备重试失败:' + operationName)
+    return true;
   }
-  if(!notPass){
-    context.receptionText += '自检状态通过，准备写地址 ' + '\n';
-    console.log('读自检通过')
-    Log.info('读自检通过')
-    context.globalReceivedData = '';
-    console.warn('protocolId:', protocolId, 'version:', version, 'productName:', productName, 'netprovider:', netprovider);
-  }
-  return {notPass, protocolId, version, productName, netprovider};
-}
 
-
-export const writeAddress = async (context) => {
-  const maxRetries = 3;  // 最大重试次数
-  const expectedPacketLength = 16;  // byte length
-  const writeTimeout = 3000; // Timeout
-  let retries = 0;  //已重试次数
-  let notPass = true;
-  let packBuffer = packWriteAddress(context.valveAddress)
-  console.log('[请求报文]   写地址=>  ', arrayBuffer2Hex(packBuffer));
-  Log.info('[请求报文]   写地址=>  ', arrayBuffer2Hex(packBuffer))
-  while (notPass && retries < maxRetries) {
-    context.globalReceivedData = ''
-    try {
-      await doWritePort(context.serialPort, packBuffer)
-    } catch {
-      Log.error('写地址-写入串口失败');
-      console.error('写地址-写入串口失败');
-      context.receptionText += '写地址-写入串口失败' + '\n';
-      context.updateOperationMessage('写地址失败', 'red');
-      break;
-    }
-    //记录重试前开始的时间戳
-    const startWaitTime = Date.now();
-    while (Date.now() - startWaitTime < writeTimeout) {
-      if (context.globalReceivedData !== '' && context.globalReceivedData.length / 2 === expectedPacketLength) {
-        break;
-      }
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    // 超时重新发包
-    if (context.globalReceivedData === '' || context.globalReceivedData.length / 2 < expectedPacketLength) {
-      retries++;
-      Log.warn('写地址进行重试 次数:', retries);
-      console.warn('写地址进行重试 次数:', retries);
-      context.receptionText += '写地址进行重试 次数:' + retries + '\n';
-      continue; // Retry
-    }
-    console.log('[响应报文]   写地址=>  ', context.globalReceivedData);
-    Log.info('[响应报文]   写地址=>  ', context.globalReceivedData)
-
-    let writeAddressNotPass = checkWriteNotPass(context.valveAddress, context.globalReceivedData)
-    if (writeAddressNotPass) {
-      Log.error('写地址不通过');
-      console.log('写地址不通过');
-      context.receptionText += '写地址失败' + '\n';
-      context.globalReceivedData = '';
-      break;
-    }
-    notPass = false;
-  }
-  if (retries >= maxRetries) {
-    Log.error('写地址-重试次数达到上限，操作失败');
-    console.error('写地址-重试次数达到上限，操作失败');
-    context.receptionText += '写地址-重试次数达到上限，操作失败' + '\n';
-    context.updateOperationMessage('写地址失败', 'red');
+  if (!notPass) {
     context.globalReceivedData = '';
-    return notPass;
+    context.createLeftSpanMessage(operationName + '-操作成功', 'green')
   }
-  if(!notPass){
-    context.receptionText = context.receptionText + '写地址通过' + '\n';
-    Log.info('写地址通过')
-    console.log('写地址通过')
-    context.globalReceivedData = '';
-  }
+
   return notPass;
+};
 
+// 等待响应辅助函数
+async function waitForResponse(context, timeout, expectedLength) {
+  const startTime = Date.now();
+  while (Date.now() - startTime < timeout) {
+    console.log('报文长度', context.globalReceivedData.length)
+    console.log('报文', context.globalReceivedData)
+    if (context.globalReceivedData && context.globalReceivedData.length / 2 === expectedLength) {
+      return true;
+    }
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  return false;
 }
 
-
-export const readAddress = async (context) => {
-  const maxRetries = 3;  // 最大重试次数
-  const expectedPacketLength = 84;  // byte length
-  const writeTimeout = 3000; // Timeout
-  let retries = 0;  //已重试次数
-  let notPass = true;
-  let address = '';
-  let packBuffer = packReadData();
-  console.log('[请求报文]   读地址', arrayBuffer2Hex(packBuffer));
-  Log.info('[请求报文]   读地址', arrayBuffer2Hex(packBuffer));
-  context.globalReceivedData=''
-  while (notPass && retries < maxRetries) {
-    context.globalReceivedData = ''
-    try {
-      await doWritePort(context.serialPort, packBuffer)
-    } catch {
-      Log.error('读地址-写入串口失败');
-      console.error('读地址-写入串口失败');
-      context.receptionText += '读地址-写入串口失败' + '\n';
-      break;
-    }
-    //记录重试前开始的时间戳
-    const startWaitTime = Date.now();
-    while (Date.now() - startWaitTime < writeTimeout) {
-      console.warn('读地址报文:', context.globalReceivedData);
-      console.warn('读地址报文长度:', context.globalReceivedData.length);
-      if (context.globalReceivedData !== '' && context.globalReceivedData.length / 2 === expectedPacketLength) {
-        break;
-      }
-      await new Promise(resolve => setTimeout(resolve, 300));
-    }
-    console.log('[响应报文]  读地址=>  ', context.globalReceivedData);
-    Log.info('[响应报文]  读地址=>  ', context.globalReceivedData)
-    // 超时重新发包
-    if (context.globalReceivedData === '' || context.globalReceivedData.length / 2 < expectedPacketLength) {
-      retries++;
-      Log.warn('读地址 进行重试 次数:', retries);
-      console.warn('读地址 进行重试 次数:', retries);
-      continue; // Retry
-    }
-
-    notPass = false;
-  }
-
-  if (retries >= maxRetries) {
-    context.receptionText += '读地址-重试次数达到上限，操作失败' + '\n';
-    Log.error('读地址 失败-重试次数达到上限，操作失败');
-    console.error('读地址 失败-重试次数达到上限，操作失败');
-    context.globalReceivedData = '';
-    return {notPass, address};
-  }
-  //
-  address = decodeReadAddress(context.globalReceivedData);
+export async function handleLeftError(context, operationName, message, actionType) {
+  context.leftWorkPrompt = `${operationName}-操作失败`;
+  context.buttonError('leftWorkPrompt')
+  context.buttonError(actionType)
+  context.createLeftSpanMessage(`${operationName}-${message}`, 'red');
   context.globalReceivedData = '';
-  return {notPass, address};
+  await playErrorAudio(context)
+
 }
 
 
-export const readData = async (context) => {
-  const maxRetries = 3;  // 最大重试次数
-  const expectedPacketLength = 84;  // byte length
-  const writeTimeout = 3000; // Timeout
-  let retries = 0;  //已重试次数
-  let notPass = true;
-  let packBuffer = packReadData();
-  console.log('[请求报文]   读数据', arrayBuffer2Hex(packBuffer));
-  Log.info('[请求报文]   读数据', arrayBuffer2Hex(packBuffer));
-  context.globalReceivedData = ''
-  while (notPass && retries < maxRetries) {
-    context.globalReceivedData = ''
-    try {
-      await doWritePort(context.serialPort, packBuffer)
-    } catch {
-      context.updateOperationMessage('验证温度失败', 'red');
-      Log.error('读数据-写入串口失败');
-      console.error('读数据-写入串口失败');
-      context.receptionText = context.receptionText + '读数据-写入串口失败' + '\n';
-      context.globalReceivedData = ''
-      retries++;
-      break;
-    }
-    //记录重试前开始的时间戳
-    const startWaitTime = Date.now();
-    while (Date.now() - startWaitTime < writeTimeout) {
-      if (context.globalReceivedData !== '' && context.globalReceivedData.length / 2 === expectedPacketLength) {
-        break;
-      }
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    // 超时重新发包
-    if (context.globalReceivedData === '' || context.globalReceivedData.length / 2 < expectedPacketLength) {
-      retries++;
-      Log.warn('读数据失败 进行重试 次数:', retries);
-      console.warn('读数据失败 进行重试 次数:', retries);
-      context.receptionText += '读数据失败 失败进行重试 次数:' + retries + '\n';
-      continue; // Retry
-    }
-    if (decodeCheckReadData(context.globalReceivedData)) {
-      retries++;
-      Log.warn('读数据失败进行重试 次数:', retries);
-      console.warn('读数据失败进行重试 次数:', retries);
-      context.receptionText += '读数据失败进行重试 次数:' + retries + '\n';
-      continue; // Retry
-    }
-    console.log('[响应报文]  读数据=>  ', context.globalReceivedData);
-    Log.info('[响应报文]  读数据=>  ', context.globalReceivedData)
-
-    notPass = false;
+export async function handleRightError(context, operationName, message, actionType) {
+  context.rightWorkPrompt = `${operationName}-操作失败（${message}）`;
+  context.buttonError('rightWorkPrompt')
+  context.buttonError(actionType)
+  context.createRightSpanMessage(`${operationName}-${message}`, 'red');
+  context.globalReceivedData = '';
+  if (operationName !== 'MES') {
+    await playErrorAudio(context)
   }
-
-  if (retries >= maxRetries) {
-    context.updateOperationMessage('验证温度失败', 'red');
-    Log.error('读数据失败，已超出最大重试次数');
-    console.log('读数据失败，已超出最大重试次数');
-    context.receptionText = context.receptionText + '读数据失败，已超出最大重试次数' + '\n';
-    context.globalReceivedData = '';
-    return notPass;
-  }
-
-  //解析进回温
-  let {address, inTemperature, outTemperature} = decodeTemperature(context.globalReceivedData);
-  context.readDataAddress = address
-  context.deviceInTemperature = inTemperature;
-  context.deviceOutTemperature = outTemperature;
-  if(!notPass){
-    Log.info('读数据成功 进温：' + inTemperature + ' 回温：' + outTemperature);
-    console.log('读数据成功 进温：' + inTemperature + ' 回温：' + outTemperature);
-    context.receptionText = context.receptionText + '读数据成功' + '\n';
-    context.globalReceivedData = '';
-  }
-  return notPass;
 }
 
 
+export async function handleRightSuccess(context, operationName, message, actionType) {
+  context.rightWorkPrompt = `${operationName}-操作成功`;
+  context.buttonSuccess('rightWorkPrompt')
+  context.buttonSuccess(actionType)
+  context.createRightSpanMessage(`${operationName}-${message}`, 'green');
+  context.globalReceivedData = '';
+  if (operationName !== 'MES') {
+    await playSuccessAudio(context)
+  }
 
-
-
+}

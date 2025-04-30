@@ -1,1 +1,0 @@
-const e=require("mysql").createPool({connectionLimit:10,host:"114.115.179.61",user:"valve_mbus",password:"qdhlm",database:"valve_produce",port:3306});function o(o,r){return new Promise(((s,n)=>{e.getConnection(((e,t)=>{e?n(e):t.query("SELECT name, pwd FROM sys_user WHERE name = ? AND pwd = ?",[o,r],((e,o)=>{t.release(),e?n(e):s(o)}))}))}))}export{o as g};

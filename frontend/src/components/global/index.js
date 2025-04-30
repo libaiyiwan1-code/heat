@@ -1,4 +1,3 @@
-import iconFont from './iconFont'
 const modules = import.meta.globEager('./*.vue')
 const map = {}
 Object.keys(modules).forEach(file => {
@@ -7,6 +6,5 @@ Object.keys(modules).forEach(file => {
 })
 const globalComponents = {
   ...map,
-  iconFont,
 }
 export default globalComponents

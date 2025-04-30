@@ -38,7 +38,7 @@ class HardwareController extends Controller {
     print(args, event) {
         const deviceName = args.deviceName;
         let address = args.address;
-        // const model = 'WAC300LH_LORA';
+        const model = args.selectPrintModel;
         // const date = args.date;
         const opt = {
             title: 'printer window',
@@ -53,13 +53,13 @@ class HardwareController extends Controller {
         const tempHtmlPath = path.join(Ps.getHomeDir(), '/public/html/view_example.html');
 
         bwipjs.toBuffer({
-                bcid: 'code128',
-                text: address,
-                scale: 4,
+                bcid: 'code128',       // Barcode type
+                text: address,         // Text to encode
+                scale: 4,              // Scaling factor
                 width: 11, // 宽度
                 height: 1.5, // 高度
-                includetext: false,
-                textxalign: 'center',
+                includetext: false,    // Show human-readable text
+                textxalign: 'center',  // Text horizontal alignment
                 // textfont: 'Arial',     // 设置文本字体
             },
             function (err, png) {
@@ -76,38 +76,41 @@ class HardwareController extends Controller {
         <style>
         .container {
             display: flex;
-            width: 200mm;
+            width: 170mm;
             /*height: 12mm;*/
-            margin-top: 78px;
+            margin-top: 75px;
             /*  margin-top: 67px;       !*放低*!*/
-            margin-left:70px;
+            margin-left:57px;
         }
         .label1 {
-            /*width: 50mm;*/
-            margin-left: 106px;
+            width: 50mm;
+            margin-top: -3px;
+            /*margin-left: 80px;*/
         }
         .label2 {
+          margin-top: -3px;
             width: 80mm;
   
         }
         .barcode-container1 {
-            /*width: 30mm;*/
-            margin-top: 3mm;
-            margin-left: 6px;
-            height: 5mm;
+            width: 30mm;
+            margin-top: 1mm;
+            margin-left: -1mm;
         }
            .info-container1{
-           width: 34mm;
-            font-size: 3mm;  
-            /*margin-left: 62px;*/
+           width: 43mm;
+           margin-top: -3px;
+            margin-left: -7mm;
         }
          .barcode-container2 {
            width: 34mm;
             margin-top:1mm;
-            margin-left: -5px;
+             margin-left: -2.5mm;
         }
         .info-container2 {  
-         width: 34mm;
+                 width: 43mm;
+         margin-top: -3px;
+                  margin-left: -7mm;
             /*margin-left:60px;*/
         }
                .info-container1, .info-container2 {
@@ -115,8 +118,8 @@ class HardwareController extends Controller {
     }
 
     .png{
-    width: 27mm;    /*调整标签整体大小*/
-    height: 6mm;
+    width: 39mm;    /*调整标签整体大小*/
+    height: 5.5mm;
     }
         
     </style>
@@ -129,7 +132,17 @@ class HardwareController extends Controller {
                 <img class="png" src="data:image/jpg;base64,${png.toString('base64')}" >
             </div>
             <div class="info-container1">
-                 <p  style="line-height:0.3mm ;margin-left: 9px; font-weight: bold;font-size: 3.4mm;">${address}</p>
+                      <p  style="line-height:0.2mm ;margin-left: 24px; font-weight: bold;font-size: 3.4mm;">地址：    ${address}</p>
+                 <p  style="line-height:0.4mm ;margin-left: 24px; font-weight: bold;font-size: 3.5mm;">型号：       ${model}</p>
+            </div>
+        </div>
+        <div class="label2">
+            <div class="barcode-container2">
+                <img  class="png" src="data:image/jpg;base64,${png.toString('base64')}" >
+            </div>
+            <div class="info-container2">
+       <p  style="line-height:0.2mm ;margin-left: 24px; font-weight: bold;font-size: 3.4mm;">地址：    ${address}</p>
+                 <p  style="line-height:0.4mm ;margin-left: 24px; font-weight: bold;font-size: 3.5mm;">型号：       ${model}</p>
             </div>
         </div>
     </div>
@@ -142,15 +155,15 @@ class HardwareController extends Controller {
                 // printWindow.loadURL(`file://${tempHtmlPath}`);
                 /*控制纸张大小*/
                 const pageSize = {
-                    width: 13 * 1000, // 转换为微米
+                    width: 30 * 1000, // 转换为微米
                     // width: 86 * 1000, // 转换为微米
-                    height: 8 * 1000
+                    height: 12 * 1000
                     // height: 22 * 1000
                 };
                 // printWindow.openDevTools();
                 printWindow.webContents.once('did-finish-load', () => {
                     printWindow.webContents.print({
-                        silent: true,
+                        silent: true, //展示windows打印对话框
                         printBackground: false,
                         deviceName: deviceName,
                         copies: 1,

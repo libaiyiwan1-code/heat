@@ -23,9 +23,9 @@ module.exports = (appInfo) => {
    * 主窗口
    */
   config.windowsOption = {
-    title: '生产软件V1.0参数设置',
+    title: '登录',
     width: 450,
-    height: 530,
+    height: 400,
     webPreferences: {
       //webSecurity: false,
       contextIsolation: false, // false -> 可在渲染进程中使用electron的api，true->需要bridge.js(contextBridge)

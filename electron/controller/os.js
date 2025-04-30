@@ -74,8 +74,10 @@ class OsController extends Controller {
     }
 
     return filePaths[0];
-  } 
-
+  }
+  getAppPath(){
+    return electronApp.getAppPath();
+  }
   /**
    * 打开目录
    */

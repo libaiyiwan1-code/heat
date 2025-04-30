@@ -11,6 +11,8 @@ const binModule = require("../config/bin");
 const Ps = require("ee-core/ps");
 const Conf = require("ee-core/config");
 const Log = require('ee-core/log');
+const { screen } = require('electron');
+const os = require('os');
 // const windows = []; //保存窗口引用
 /**
  * 特效 - 功能demo
@@ -80,7 +82,9 @@ class EffectController extends Controller {
     // 创建子窗口的函数
     loginRouter(args) {
         // 路由 并创建新的子窗口
-        const {width, height, content, windowName, windowTitle,param ,type, windowsId} = args;
+        const {width, height, content, windowName, windowTitle,param ,type,
+            windowsId,setResizable=false,minWidth,minHeight,fullScreenIsAllowed = false
+        } = args;
         if (windowsId === null || windowsId === undefined) {
             Log.error('router windows id is null');
         }
@@ -110,11 +114,19 @@ class EffectController extends Controller {
         console.log('contentUrl: ', contentUrl);
         let opt = {
             title: windowTitle,
+            minWidth,
+            minHeight,
         }
         const win = Addon.get('window').create(windowName, opt);
         const winContentsId = win.webContents.id;
         win.setSize(width, height);
-        win.setResizable(false);
+        win.setResizable(setResizable);
+        if (fullScreenIsAllowed) {
+            const { bounds } = screen.getPrimaryDisplay();
+            win.setBounds(bounds);
+        } else {
+            win.setSize(width, height);
+        }
         // load page
         win.loadURL(contentUrl);
         win.center();
@@ -122,7 +134,7 @@ class EffectController extends Controller {
         win.focus();
         // 将窗口引用保存到数组中
         // windows.push(win);
-        // win.webContents.openDevTools()   //控制台
+        win.webContents.openDevTools()   //控制台
         // 关闭当前主窗口
         // const mainWindow = CoreWindow.getMainWindow();
         // mainWindow.close();
@@ -143,6 +155,21 @@ class EffectController extends Controller {
         // }
 
         return winContentsId;
+    }
+    getMacAddress() {
+        const networkInterfaces = os.networkInterfaces();
+        Log.info(networkInterfaces)
+        console.log(networkInterfaces)
+        const ethAdapter = networkInterfaces['以太网']  || [];
+        console.log(ethAdapter)
+        Log.info(ethAdapter)
+        let macAddr = ethAdapter.find(info => info.family === 'IPv4')?.mac;
+        if (macAddr===undefined||macAddr===null){
+             macAddr = ethAdapter.find(info => info.family === 'IPv6')?.mac;
+
+        }
+        Log.info(macAddr)
+        return macAddr || '';
     }
 
 }

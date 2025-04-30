@@ -41,6 +41,38 @@ export function getIdByUsername(username) {
   });
 }
 
+
+export function getDefaultPassword(type) {
+  return new Promise((resolve, reject) => {
+    // 从连接池中获取连接
+    pool.getConnection((err, connection) => {
+      if (err) {
+        console.log(err)
+        reject(err);
+        return;
+      }
+
+      // 执行查询
+      connection.query(
+        `SELECT pass_word as passWord
+         FROM arc_produce_password
+         WHERE type = ?`,
+        [type],
+        (error, results) => {
+          // 释放连接
+          connection.release();
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
+          }
+        }
+      );
+    });
+  });
+}
+
+
 export function getIdByMacAddr(macaddr) {
   return new Promise((resolve, reject) => {
     // 从连接池中获取连接
@@ -71,6 +103,34 @@ export function getIdByMacAddr(macaddr) {
   });
 }
 
+export function findMacAddr() {
+  return new Promise((resolve, reject) => {
+    // 从连接池中获取连接
+    pool.getConnection((err, connection) => {
+      if (err) {
+        console.log(err)
+        reject(err);
+        return;
+      }
+
+      // 执行查询
+      connection.query(
+        `SELECT mac_addr as macAddr,machine_number as machineNumber,produce_machine as produceMachine
+         FROM arc_computer_mac
+        `,
+        (error, results) => {
+          // 释放连接
+          connection.release();
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
+          }
+        }
+      );
+    });
+  });
+}
 
 export function insertNBValueProduce(data) {
   return new Promise((resolve, reject) => {
