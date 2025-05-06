@@ -11,7 +11,6 @@ import {
   decodeCheckValveClose,
   decodeCheckValveOpen,
   decodeGetNetprovider,
-  decodeGetProductName,
   decodeGetProtocolId,
   decodeGetVersion,
   decodeReadSelfTestAddress,
@@ -38,6 +37,8 @@ import {
   getDeviceProtocolIdWAC710CD,
   notHasSelfTestCompletedWAC710CD
 } from "@/packBuffer/decode/readselftest/wac710cd/readSelfTestStatus";
+import {decodeGetProductNameWAC230CF} from "@/packBuffer/decode/readselftest/wac230cf/readSelfTestStatus";
+import {decodeGetProductNameWAC300CD} from "@/packBuffer/decode/readselftest/wac300cd/readSelfTestStatus";
 
 export function decodeCheckReadSelfTestStatusWAC230CF(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
@@ -131,7 +132,11 @@ export function decodeCheckReadSelfTestStatusWAC230CF(context, responseMessage) 
   }
   //解析通过
   context.readAddress = decodeReadSelfTestAddress(context, context.globalReceivedData); //读设备地址
-  context.productName = decodeGetProductName(context.globalReceivedData); //产品名称
+  context.productName = decodeGetProductNameWAC230CF(context.globalReceivedData); //产品名称
+  if (!context.productName.toLowerCase().includes('WAC230CF')){
+    context.createLeftSpanMessage('产品名称错误：'+context.productName, 'red');
+    return true
+  }
   context.protocolId = decodeGetProtocolId(context.globalReceivedData);//协议id
   context.version = decodeGetVersion(context.globalReceivedData)//版本号
   context.netprovider = decodeGetNetprovider(context.globalReceivedData) //运营商
@@ -305,7 +310,11 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   }
   //解析通过
   context.readAddress = decodeReadSelfTestAddressWAC710CD(context.globalReceivedData); //读设备地址
-  context.productName = decodeGetProductNameWAC710CD(context.globalReceivedData); //产品名称
+  context.productName = decodeGetProductNameWAC710CD(false,context.globalReceivedData); //产品名称
+  if (!context.productName.toLowerCase().includes('WAC710CD')){
+    context.createLeftSpanMessage('产品名称错误：'+context.productName, 'red');
+    return true
+  }
   context.protocolId = getDeviceProtocolIdWAC710CD(context.globalReceivedData);//协议id
   context.version = decodeGetVersionWAC710CD(context.globalReceivedData)//版本号
   context.netprovider = decodeGetNetProviderWAC710CD(context.globalReceivedData) //运营商
@@ -405,7 +414,7 @@ export function decodeCheckReadSelfTestStatusWAC300CD(context, responseMessage) 
   }
   //解析通过
   context.readAddress = decodeReadSelfTestAddress(context, context.globalReceivedData); //读设备地址
-  context.productName = decodeGetProductName(context.globalReceivedData); //产品名称
+  context.productName = decodeGetProductNameWAC300CD(context.globalReceivedData); //产品名称
   context.protocolId = decodeGetProtocolId(context.globalReceivedData);//协议id
   context.version = decodeGetVersion(context.globalReceivedData)//版本号
   context.netprovider = decodeGetNetprovider(context.globalReceivedData) //运营商

@@ -3,8 +3,6 @@ import {hex2arrayBuffer, hexToAscii} from "@/packBuffer/common/comUtil";
 const Log = require('ee-core/log');
 
 
-
-
 export function notHasSelfTestCompleted(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
@@ -69,19 +67,6 @@ export function decodeCheckBatteryVoltage(responseMessage) {
 
 }
 
-export function decodeGetProductName(responseMessage) {
-  let model = '';
-  let messageBuffer = hex2arrayBuffer(responseMessage);
-  let dataView = new DataView(messageBuffer)
-  // 判断型号
-  for (let i = 63; i <= 86; i++) {
-    model += dataView.getUint8(i).toString(16);
-  }
-  const productName = hexToAscii(model);
-  console.log('产品名称:', productName);
-  return productName
-}
-
 export function decodeGetProtocolId(responseMessage) {
   let responseBuffer = hex2arrayBuffer(responseMessage)
   let responseDataView = new DataView(responseBuffer)
@@ -101,18 +86,16 @@ export function decodeGetNetprovider(responseMessage) {
 }
 
 
-
-
-export function decodeGetIMEI(responseMessage,selfCollecting) {
+export function decodeGetIMEI(responseMessage, selfCollecting) {
   responseMessage = responseMessage.replace(/\s/g, '');
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let imei = '';
-  if (selfCollecting){
+  if (selfCollecting) {
     for (let i = 30; i <= 44; i++) {
       imei += dataView.getUint8(i).toString(16).padStart(2, '0')
     }
-  }else{
+  } else {
     for (let i = 14; i <= 28; i++) {
       imei += dataView.getUint8(i).toString(16).padStart(2, '0')
     }
@@ -126,16 +109,17 @@ export function decodeGetTorque(responseMessage) {
   let dataView = new DataView(messageBuffer)
   return dataView.getUint8(30) === 0x00 ? '25Nm' : '50Nm'
 }
-export function decodeGetICCID(responseMessage,selfCollecting) {
+
+export function decodeGetICCID(responseMessage, selfCollecting) {
   responseMessage = responseMessage.replace(/\s/g, '');
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let iccid = '';
-  if (selfCollecting){
+  if (selfCollecting) {
     for (let i = 30; i <= 49; i++) {
       iccid += dataView.getUint8(i).toString(16).padStart(2, '0')
     }
-  }else{
+  } else {
     for (let i = 14; i <= 33; i++) {
       iccid += dataView.getUint8(i).toString(16).padStart(2, '0')
     }
@@ -144,19 +128,19 @@ export function decodeGetICCID(responseMessage,selfCollecting) {
 }
 
 
-export function decodeReadAddress(responseMessage,isCover=false,selfCollecting) {
+export function decodeReadAddress(responseMessage, isCover = false, selfCollecting) {
   responseMessage = responseMessage.replace(/\s/g, '');
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  if (selfCollecting){
+  if (selfCollecting) {
     return dataView.getUint32(22, isCover).toString(16)
-  }else{
+  } else {
     return dataView.getUint32(6, isCover).toString(16)
   }
 }
 
 
-export function decodeReadSelfTestAddress(context,messageStr) {
+export function decodeReadSelfTestAddress(context, messageStr) {
   let messageBuffer = hex2arrayBuffer(messageStr);
   let dataView = new DataView(messageBuffer);
   let result = '';
