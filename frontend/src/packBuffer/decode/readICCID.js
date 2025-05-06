@@ -1,4 +1,4 @@
-import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
+import {checkICCID, checkIMEI, hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 import {decodeGetICCID} from "@/packBuffer/decode/decode";
 
 export function decodeCheckReadICCIDWAC230CF(context, responseMessage) {
@@ -7,7 +7,12 @@ export function decodeCheckReadICCIDWAC230CF(context, responseMessage) {
   let notPass = dataView.getUint8(16) !== 0x68 || dataView.getUint8(19) !== 0x68 || dataView.getUint8(20) !== 0x80 || dataView.getUint8(21) !== 0x8B
     || dataView.getUint8(26) !== 0x05 || dataView.getUint8(28) !== 0x08
   if (!notPass) {
-    context.iccid = decodeGetICCID(responseMessage, true)
+    let iccid = decodeGetICCID(responseMessage, true)
+    if (checkICCID(iccid)) {
+      context.createLeftSpanMessage('ICCID不合法', 'red')
+      notPass = true
+    }
+    context.iccid = iccid
   }
   return notPass
 }
@@ -23,8 +28,14 @@ export function decodeCheckReadICCIDWAC710CD(context, responseMessage) {
     dataView.getUint8(10) !== 0x05 ||
     dataView.getUint8(12) !== 0x08
   if (!notPass) {
-    context.iccid = decodeGetICCID(responseMessage, false)
+    let iccid = decodeGetICCID(responseMessage, false)
+    if (checkICCID(iccid)) {
+      context.createLeftSpanMessage('ICCID不合法', 'red')
+      notPass = true
+    }
+    context.iccid = iccid
   }
+
   return notPass
 }
 

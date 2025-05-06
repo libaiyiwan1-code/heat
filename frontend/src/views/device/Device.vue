@@ -188,14 +188,14 @@
                 </a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="客户">
+<!--            <a-form-item label="客户">
               <a-select v-model:value="this.workNumberForm .customer" style="width: 7vw;margin-left: 2.65vw">
                 <a-select-option v-for="item in this.customerList"
                                  :value="item">
                   {{ item }}
                 </a-select-option>
               </a-select>
-            </a-form-item>
+            </a-form-item>-->
             <a-form-item label="密码">
               <a-input-password style="width: 8vw;margin-left: 2.65vw" v-model:value="this.password"
                                 placeholder="请输入密码"/>
@@ -280,9 +280,9 @@
             <div class="info-line"><span class="label">当前选择厂商代码:</span>: <span
               class="value">{{ workDetail.vendorCode }}</span>
             </div>
-            <div class="info-line"><span class="label">当前客户:</span>: <span
+<!--            <div class="info-line"><span class="label">当前客户:</span>: <span
               class="value">{{ workDetail.customerName }}</span>
-            </div>
+            </div>-->
 
           </div>
 
@@ -724,7 +724,7 @@
                 layout="inline"
                 style="display: flex; align-items: center;"
               >
-                <a-form-item label="误差限额50℃ ±" :colon="false" style="margin-left: 3.4vw;">
+<!--                <a-form-item label="误差限额50℃ ±" :colon="false" style="margin-left: 3.4vw;">
                   <a-input v-model:value="diffTemperatureValue" style="width: 140px"/>
                 </a-form-item>
                 <a-form-item label="设备进温" :colon="true" style="margin-left: 0.5vw">
@@ -736,7 +736,7 @@
                   <p style="width: 5vw; margin: 0 0 0 -40px; color: #0080FF; font-weight: bold;">
                     {{ deviceInTemperature }}
                   </p>
-                </a-form-item>
+                </a-form-item>-->
               </a-form>
             </div>
           </div>
@@ -860,7 +860,7 @@ export default {
       workNumberForm: {
         workNumber: undefined,
         precautions: undefined,
-        vendorCode: undefined,
+        vendorCode: '000000',
         customer: undefined,
       },
       modalShow: {
@@ -1160,7 +1160,7 @@ export default {
             this.workDetail.workNumber = this.workNumberForm.workNumber;
             this.workDetail.memo = this.workNumberForm.precautions;
             this.workDetail.vendorCode = this.workNumberForm.vendorCode;
-            this.workDetail.customerName = this.workNumberForm.customer;
+            // this.workDetail.customerName = this.workNumberForm.customer;
             this.modalShow.configInputDetailModalShow = true;
             this.modalShow.workNumberDetailModalShow = false;
             this.$message.success('工单录入成功');
