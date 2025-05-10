@@ -169,7 +169,7 @@ module.exports = (appInfo) => {
     },
     tray: {
       enable: true,
-      title: '生产软件VAC710S',
+      title: '海龙马生产软件',
       icon: '/public/images/tray.png'
     },
     security: {

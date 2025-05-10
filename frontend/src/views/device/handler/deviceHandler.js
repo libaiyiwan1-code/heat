@@ -34,9 +34,9 @@ export const doTogglePrinterSelection = async (context, printer) => {
 }
 
 
-export const doSelfTest = async (context, protocolId) => {
+export const doSelfTest = async (context, protocolId,type) => {
   context.messageClean()
-  if (!checkPort(context)) {
+  if (!checkPort(context,type)) {
     return
   }
   let requireSelfTestResult = await serialPortOperation(context, {
@@ -48,12 +48,12 @@ export const doSelfTest = async (context, protocolId) => {
     maxRetries: context.maxRetries,
     expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['inquireSelfTest'],
     timeout: context.timeout,
-    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.inquireSelfTest(context.globalReceivedData),
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.inquireSelfTest(context.receivedData.globalReceivedOneData),
     preprocess: () => {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
     isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.inquireSelfTest,
-  })
+  },type)
   if (requireSelfTestResult) {
     return
   }
@@ -68,12 +68,12 @@ export const doSelfTest = async (context, protocolId) => {
       maxRetries: context.maxRetries,
       expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['writeTorqueConfig'],
       timeout: context.timeout,
-      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.writeTorqueConfig(context.globalReceivedData),
+      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.writeTorqueConfig(context.receivedData.globalReceivedOneData),
       preprocess: () => {
       },
       isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
       isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.writeTorqueConfig,
-    })
+    },type)
     if (writeTorqueConfigResult) {
       return
     }
@@ -89,12 +89,12 @@ export const doSelfTest = async (context, protocolId) => {
       maxRetries: context.maxRetries,
       expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['writeTemperatureProbesConfig'],
       timeout: context.timeout,
-      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.writeTemperatureProbesConfig(context.globalReceivedData),
+      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.writeTemperatureProbesConfig(context.receivedData.globalReceivedOneData),
       preprocess: () => {
       },
       isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
       isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.writeTemperatureProbesConfig,
-    })
+    },type)
     if (writeTemperatureProbesConfigResult) {
       return
     }
@@ -110,12 +110,12 @@ export const doSelfTest = async (context, protocolId) => {
       maxRetries: context.maxRetries,
       expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['writePressureProbesConfig'],
       timeout: context.timeout,
-      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.writePressureProbesConfig(context.globalReceivedData),
+      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.writePressureProbesConfig(context.receivedData.globalReceivedOneData),
       preprocess: () => {
       },
       isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
       isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.writePressureProbesConfig,
-    })
+    },type)
     if (writeTemperatureProbesConfigResult) {
       return
     }
@@ -139,17 +139,17 @@ export const doSelfTest = async (context, protocolId) => {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
     isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.selfTest,
-  })
+  },type)
 
   context.leftWorkPrompt = `自检开启成功`;
   await playSuccessAudio(context)
   context.buttonSuccess('selfTest')
-  context.buttonSuccess('leftWorkPrompt')
+  context.buttonSuccess('leftWorkPromptColor')
 }
 
-export const doAwaken = async (context, protocolId) => {
+export const doAwaken = async (context, protocolId,type) => {
   context.messageClean()
-  if (!checkPort(context)) {
+  if (!checkPort(context,type)) {
     return
   }
   let result = await serialPortOperation(context, {
@@ -161,26 +161,26 @@ export const doAwaken = async (context, protocolId) => {
     maxRetries: context.maxRetries,
     expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['awaken'],
     timeout: context.timeout,
-    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.awaken(context.globalReceivedData),
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.awaken(context.receivedData.globalReceivedOneData),
     preprocess: () => {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
     isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.awaken,
-  })
+  },type)
   if (result) {
     return
   }
   context.leftWorkPrompt = `唤醒成功`;
   await playSuccessAudio(context)
-  context.buttonSuccess('leftWorkPrompt')
+  context.buttonSuccess('leftWorkPromptColor')
   context.buttonSuccess('awaken')
 
 }
 
 
-export const doBreakSelfTest = async (context, protocolId) => {
+export const doBreakSelfTest = async (context, protocolId,type) => {
   context.messageClean()
-  if (!checkPort(context)) {
+  if (!checkPort(context,type)) {
     return
   }
   let result = await serialPortOperation(context, {
@@ -197,13 +197,13 @@ export const doBreakSelfTest = async (context, protocolId) => {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
     isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.returnSelfTestStatus,
-  })
+  },type)
   if (result) {
     return
   }
   context.leftWorkPrompt = `退出自检成功`;
   await playSuccessAudio(context)
-  context.buttonSuccess('leftWorkPrompt')
+  context.buttonSuccess('leftWorkPromptColor')
   context.buttonSuccess('breakSelfTest')
 
 }
@@ -334,53 +334,53 @@ async function generateAddress(context) {
     Log.error('当前登录用户:' + context.routerParam.userId + '每日生产的地址数量超过999', productQuantity[0].quantity)
     context.leftWorkPrompt = `地址写入失败(当前账户超量生产)`;
     context.createLeftSpanMessage('当前登录用户:' + context.routerParam.userId + '每日生产的地址数量超过999', productQuantity[0].quantity, 'red');
-    context.buttonError('leftWorkPrompt')
+    context.buttonError('leftWorkPromptColor')
     context.buttonError('selfTest')
     await playErrorAudio(context)
-    context.badProductQuantity += 1;
+    context.GoodProductQuantity += 1;
     context.uploadMes(undefined, 0, '无法超量生产')
     return {notPass, address}
   }
   address = generateAddressByTerminal(context.routerParam.userId, productQuantity[0].quantity)
   console.log('生成的设备地址', address)
   Log.info('生成的设备地址', address)
-  context.generateAddress = address
+  context.leftGenerateAddress = address
   context.createLeftSpanMessage('生成的地址:' + address, 'green');
-  if ((context.generateAddress === undefined || context.generateAddress === null)) {
+  if ((context.leftGenerateAddress === undefined || context.leftGenerateAddress === null)) {
     console.error('生成地址不合格', address)
     Log.error('生成地址不合格', address)
     context.leftWorkPrompt = `地址写入失败(生成地址非法)`;
     context.createLeftSpanMessage('生成地址非法:' + address, 'red');
-    context.buttonError('leftWorkPrompt')
+    context.buttonError('leftWorkPromptColor')
     context.buttonError('writeAddress')
-    context.badProductQuantity += 1;
+    context.leftBadProductQuantity += 1;
     context.uploadMes(address, 0, '生成地址非法')
 
     await playErrorAudio(context)
     return {notPass, address}
   }
-  if (context.generateAddress.length !== 8) {
+  if (context.leftGenerateAddress.length !== 8) {
     console.error('生成地址非8位', address)
     Log.error('生成地址非8位', address)
     context.leftWorkPrompt = `地址写入失败(生成地址非法)`;
     context.createLeftSpanMessage('生成地址非法:' + address, 'red');
-    context.buttonError('leftWorkPrompt')
+    context.buttonError('leftWorkPromptColor')
     context.buttonError('writeAddress')
-    context.badProductQuantity += 1;
+    context.leftBadProductQuantity += 1;
     context.uploadMes(address, 0, '生成地址非法')
     await playErrorAudio(context)
     return notPass
   }
   //地址重复查询
-  let response = await getIdByMacAddr(context.generateAddress);
+  let response = await getIdByMacAddr(context.leftGenerateAddress);
   if (response.length > 0) {
     context.leftWorkPrompt = `地址写入失败(生成地址非法,生产库已存在该地址)`;
     context.createLeftSpanMessage('生产库已存在该地址 ,请重新写地址 :' + address, 'red');
-    context.buttonError('leftWorkPrompt')
+    context.buttonError('leftWorkPromptColor')
     context.buttonError('writeAddress')
-    if (!context.uploadAddressList.includes(context.generateAddress)) {
-      context.uploadAddressList.push(context.generateAddress)
-      context.badProductQuantity += 1;
+    if (!context.uploadAddressList.includes(context.leftGenerateAddress)) {
+      context.uploadAddressList.push(context.leftGenerateAddress)
+      context.leftBadProductQuantity += 1;
       context.uploadMes(address, 0, '生产库已存在该地址')
     }
     await playErrorAudio(context)
@@ -392,9 +392,9 @@ async function generateAddress(context) {
 }
 
 
-export async function doWriteAddress(context, protocolId) {
+export async function doWriteAddress(context, protocolId,type) {
   context.messageClean()
-  if (!checkPort(context)) {
+  if (!checkPort(context,type)) {
     return
   }
 
@@ -412,12 +412,12 @@ export async function doWriteAddress(context, protocolId) {
       maxRetries: context.maxRetries,
       expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readSelfTestStatus'],
       timeout: context.timeout,
-      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readSelfTestStatus(context,context.globalReceivedData),
+      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readSelfTestStatus(context,context.receivedData.globalReceivedOneData),
       preprocess: () => {
       },
       isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
       isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readSelfTestStatus,
-    })
+    },type)
     if (readSelfTestStatusResult) {
       return
     }
@@ -431,12 +431,12 @@ export async function doWriteAddress(context, protocolId) {
       maxRetries: context.maxRetries,
       expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readSelfTestStatus'],
       timeout: context.timeout,
-      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readSelfTestStatus(context, context.globalReceivedData),
+      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readSelfTestStatus(context, context.receivedData.globalReceivedOneData),
       preprocess: () => {
       },
       isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
       isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readSelfTestStatus,
-    })
+    },type)
     if (readSelfTestStatusResult) {
       return
     }
@@ -451,12 +451,12 @@ export async function doWriteAddress(context, protocolId) {
     maxRetries: context.maxRetries,
     expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readIMEI'],
     timeout: context.timeout,
-    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readIMEI(context, context.globalReceivedData),
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readIMEI(context, context.receivedData.globalReceivedOneData),
     preprocess: () => {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
     isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readIMEI,
-  })
+  },type)
   if (readIMEIResult) {
     return
   }
@@ -474,12 +474,12 @@ export async function doWriteAddress(context, protocolId) {
     maxRetries: context.maxRetries,
     expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readICCID'],
     timeout: context.timeout,
-    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readICCID(context, context.globalReceivedData),
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readICCID(context, context.receivedData.globalReceivedOneData),
     preprocess: () => {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
     isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readICCID,
-  })
+  },type)
   if (readICCIDResult) {
     return
   }
@@ -495,12 +495,12 @@ export async function doWriteAddress(context, protocolId) {
       maxRetries: context.maxRetries,
       expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readTorqueConfig'],
       timeout: context.timeout,
-      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readTorqueConfig(context, context.globalReceivedData),
+      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readTorqueConfig(context, context.receivedData.globalReceivedOneData),
       preprocess: () => {
       },
       isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
       isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readTorqueConfig,
-    })
+    },type)
     if (readTorqueConfigResult) {
       return
     }
@@ -517,12 +517,12 @@ export async function doWriteAddress(context, protocolId) {
     maxRetries: context.maxRetries,
     expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['writeAddress'],
     timeout: context.timeout,
-    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.writeAddress(context.generateAddress, context.globalReceivedData),
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.writeAddress(context.leftGenerateAddress, context.receivedData.globalReceivedOneData),
     preprocess: () => {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
     isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.writeAddress,
-  })
+  },type)
   if (writeAddressResult) {
     return
   }
@@ -530,7 +530,7 @@ export async function doWriteAddress(context, protocolId) {
   await nbDeviceRegister(context);
   context.leftWorkPrompt = `地址写入成功`;
   await playSuccessAudio(context)
-  context.buttonSuccess('leftWorkPrompt')
+  context.buttonSuccess('leftWorkPromptColor')
   context.buttonSuccess('writeAddress')
 
 }
@@ -542,13 +542,13 @@ const checkIMEI = async (context) => {
   if (imeiExist.length > 0) {
     if (imeiExist[0].imei !== '' || imeiExist[0].imei !== undefined) {
       context.leftWorkPrompt = '地址写入失败(此设备已写入过地址)'
-      context.buttonError('leftWorkPrompt')
+      context.buttonError('leftWorkPromptColor')
       context.createLeftSpanMessage('平台注册失败 IMEI已存在: ' + context.imei, 'red');
       context.buttonError('writeAddress')
       context.uploadMes(undefined, 0, '平台注册失败,重复注册')
-      if (!context.uploadAddressList.includes(context.generateAddress)) {
-        context.uploadAddressList.push(context.generateAddress)
-        context.badProductQuantity += 1;
+      if (!context.uploadAddressList.includes(context.leftGenerateAddress)) {
+        context.uploadAddressList.push(context.leftGenerateAddress)
+        context.leftBadProductQuantity += 1;
       }
       await playErrorAudio(context)
       Log.error('平台注册失败 IMEI已存在: ' + context.imei);
@@ -564,7 +564,7 @@ const checkIMEI = async (context) => {
 
 async function nbDeviceRegister(context) {
   // let registerResponse = await axios.post(`http://hems.chaobiao.qdhlm.cn:20206/produce/imei/${context.generateAddress}?joinMode=2&model=${protocolIDMap[context.configForm.produceModel].model}&imei=${context.imei}&protocolCode=${protocolIDMap[context.configForm.produceModel].protocolCode}&simNumber=${context.iccid}`, null, {
-  let registerResponse = await axios.post(`http://124.70.68.52:20206/produce/imei/${context.generateAddress}?joinMode=2&model=${protocolIDMap[context.configForm.produceModel].model}&imei=${context.imei}&protocolCode=${protocolIDMap[context.configForm.produceModel].protocolCode}&simNumber=${context.iccid}`, null, {
+  let registerResponse = await axios.post(`http://124.70.68.52:20206/produce/imei/${context.leftGenerateAddress}?joinMode=2&model=${protocolIDMap[context.configForm.produceModel].model}&imei=${context.imei}&protocolCode=${protocolIDMap[context.configForm.produceModel].protocolCode}&simNumber=${context.iccid}`, null, {
     headers: {
       // Authorization: '3a80979e67318eea69f03e65fe9a8e49' //正式
       Authorization: '18fce9806e6a99feebf5a7d034eebbd3' //dev
@@ -581,7 +581,7 @@ async function nbDeviceRegister(context) {
       protocolid: context.protocolId, // 协议ID号
       IMEI: context.imei,
       netprovider: context.netprovider, // 运营商（00：无 01：电信，02：移动）
-      macaddr: context.generateAddress, // 设备8位地址
+      macaddr: context.leftGenerateAddress, // 设备8位地址
       produceDate: new Date(), // 生产日期
       deliverDate: null, // 出库日期
       description: null, // 描述
@@ -600,12 +600,12 @@ async function nbDeviceRegister(context) {
     } else {
       if (!context.uploadAddressList.includes(context.readAddress)) {
         context.uploadAddressList.push(context.readAddress)
-        context.badProductQuantity += 1;
+        context.leftBadProductQuantity += 1;
         context.uploadMes(context.readAddress, 0, '生产入库失败')
       }
       context.createLeftSpanMessage('生产入库失败', 'red');
       context.leftWorkPrompt = '地址写入失败(生产入库失败)';
-      context.buttonError('leftWorkPrompt')
+      context.buttonError('leftWorkPromptColor')
       context.buttonError('writeAddress')
       await playErrorAudio(context)
       Log.error('生产入库失败');
@@ -614,12 +614,12 @@ async function nbDeviceRegister(context) {
   } else {
     if (!context.uploadAddressList.includes(context.readAddress)) {
       context.uploadAddressList.push(context.readAddress)
-      context.badProductQuantity += 1;
+      context.leftBadProductQuantity += 1;
       context.uploadMes(context.readAddress, 0, '平台注册失败')
     }
     context.createLeftSpanMessage('平台注册失败', 'red');
     context.leftWorkPrompt = '地址写入失败(平台注册失败)';
-    context.buttonError('leftWorkPrompt')
+    context.buttonError('leftWorkPromptColor')
     context.buttonError('writeAddress')
     await playErrorAudio(context)
     Log.error('平台注册失败');
@@ -627,18 +627,18 @@ async function nbDeviceRegister(context) {
   }
 }
 
-export const doPrintLabel = async (context, flag, protocolId) => {
+export const doPrintLabel = async (context, flag, protocolId,type) => {
 
   let printAddress
   let printNotPass = true
   if (flag) {
     //写地址成功
-    printAddress = context.generateAddress
+    printAddress = context.leftGenerateAddress
     printNotPass = false
   } else {
     context.messageClean()
     //手动打印，需要读地址
-    if (!checkPort(context)) {
+    if (!checkPort(context,type)) {
       return
     }
 
@@ -651,12 +651,12 @@ export const doPrintLabel = async (context, flag, protocolId) => {
       maxRetries: context.maxRetries,
       expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readAddress'],
       timeout: context.timeout,
-      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readAddress(context, context.globalReceivedData),
+      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readAddress(context, context.receivedData.globalReceivedOneData),
       preprocess: () => {
       },
       isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
       isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readAddress,
-    })
+    },type)
     printAddress = context.readAddress
     printNotPass = readAddressResult
   }
@@ -674,13 +674,13 @@ export const doPrintLabel = async (context, flag, protocolId) => {
   await ipc.send(ipcApiRoute.print, params)
   context.buttonSuccess('labelPrint')
   context.createLeftSpanMessage('打印成功，设备地址:' + printAddress, 'green');
-  context.buttonSuccess('leftWorkPrompt')
+  context.buttonSuccess('leftWorkPromptColor')
   await playSuccessAudio(context)
   context.leftWorkPrompt = '打印成功'
 }
 
 
-export const checkNetWork = async (context, protocolId) => {
+export const checkNetWork = async (context, protocolId,type) => {
   let notPass = true;
   //根据型号区分走不同扫码验证逻辑
   if (context.configDetail.printLabel === 'WAC230CF'||context.configDetail.printLabel === 'WAC710CD') {
@@ -693,12 +693,12 @@ export const checkNetWork = async (context, protocolId) => {
       maxRetries: context.maxRetries,
       expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readAddress'],
       timeout: context.timeout,
-      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readAddress(context, context.globalReceivedData),
+      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readAddress(context, context.receivedData.globalReceivedOneData),
       preprocess: () => {
       },
       isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
       isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readAddress,
-    })
+    },type)
     if (readAddressResult) {
       context.scanAddress = ''
       return notPass
@@ -707,7 +707,7 @@ export const checkNetWork = async (context, protocolId) => {
     if (context.readAddress !== context.scanAddress) {
       if (!context.uploadAddressList.includes(context.readAddress)) {
         context.uploadAddressList.push(context.readAddress)
-        context.badProductQuantity += 1;
+        context.leftBadProductQuantity += 1;
         context.uploadMes(context.scanAddress, 0, '扫码地址与设备地址不匹配')
       }
       await handleRightError(context, '扫码地址验证 联网|温度', '扫码地址与设备地址不匹配', undefined)
@@ -725,7 +725,7 @@ export const checkNetWork = async (context, protocolId) => {
     if (data[0] === undefined || data [0] === null) {
       if (!context.uploadAddressList.includes(context.readAddress)) {
         context.uploadAddressList.push(context.readAddress)
-        context.badProductQuantity += 1;
+        context.leftBadProductQuantity += 1;
         context.uploadMes(context.scanAddress, 0, '网络未上传')
       }
       await handleRightError(context, '扫码地址验证 联网|温度', '地址：' + context.scanAddress + ' 网络未上传', undefined)

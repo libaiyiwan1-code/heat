@@ -7,10 +7,7 @@ import {
   decodeCheckWriteTemperatureProbesConfigWAC300CD,
   decodeCheckWriteTemperatureProbesConfigWAC710CD
 } from "@/packBuffer/decode/writeTemperatureProbesConfig";
-import {
-  decodeCheckReadSelfTestStatusWAC230CF, decodeCheckReadSelfTestStatusWAC300CD,
-  decodeCheckReadSelfTestStatusWAC710CD
-} from "@/packBuffer/decode/readSelfTestStatus";
+
 import {
   decodeCheckAwakenWAC230CF,
   decodeCheckAwakenWAC300CD,
@@ -34,6 +31,9 @@ import {
 } from "@/packBuffer/decode/writeAddress";
 import {decodeCheckWritePressureProbesConfigWAC710CD} from "@/packBuffer/decode/writePressureProbesConfig";
 import {decodeCheckReadAddressWAC230CF, decodeCheckReadAddressWAC710CD} from "@/packBuffer/decode/readAddress";
+import {decodeCheckReadSelfTestStatusWAC300CD} from "@/packBuffer/decode/readselftest/wac300cd/readSelfTestStatus";
+import {decodeCheckReadSelfTestStatusWAC710CD} from "@/packBuffer/decode/readselftest/wac710cd/readSelfTestStatus";
+import {decodeCheckReadSelfTestStatusWAC230CF} from "@/packBuffer/decode/readselftest/wac230cf/readSelfTestStatus";
 
 
 /**
@@ -83,8 +83,8 @@ export const protocolIDMap = {
       awaken: (data) => {
         return decodeCheckAwakenWAC230CF(data);
       },
-      writeAddress: (generateAddress,data) => {
-        return decodeCheckWriteAddressWAC230CF(generateAddress,data);
+      writeAddress: (leftGenerateAddress,data) => {
+        return decodeCheckWriteAddressWAC230CF(leftGenerateAddress,data);
       },
       readIMEI: (context,data) => {
         return decodeCheckReadIMEIWAC230CF(context,data);
@@ -167,8 +167,8 @@ export const protocolIDMap = {
       readTorqueConfig: (context,data) => {
         return decodeCheckReadTorqueConfigWAC710CD(context,data);
       },
-      writeAddress: (generateAddress,data) => {
-        return decodeCheckWriteAddressWAC710CD(generateAddress,data);
+      writeAddress: (leftGenerateAddress,data) => {
+        return decodeCheckWriteAddressWAC710CD(leftGenerateAddress,data);
       },
       readAddress: (context,data) => {
         return decodeCheckReadAddressWAC710CD(context,data);
@@ -237,5 +237,6 @@ export const protocolIDMap = {
       }
     },
   },
-  'WAC710C': {}
+  // 'WAC710C': {},
+  // 'VAC200': {}
 }

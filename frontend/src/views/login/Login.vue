@@ -81,7 +81,7 @@ export default {
     await this.init();
     this.macList = await findMacAddr()
     console.log(this.macList)
-    await ipc.invoke(ipcApiRoute.getMacAddress).then(res => {
+    await ipc.invoke(ipcApiRoute.getCpuIdentifier).then(res => {
       let result = this.macList.find(x => x.macAddr === res)
       console.log(result)
       this.routerParam.machineNumber = result.machineNumber
@@ -98,7 +98,11 @@ export default {
       this.currentWindowsId = await ipc.invoke(ipcApiRoute.getWCid, this.currentWindowName);
     },
     async login() {
-      await ipc.invoke(ipcApiRoute.getMacAddress).then(async res => {
+      // cmd get cpuID: wmic cpu get ProcessorId
+      // cmd get bios :wmic bios get serialnumber
+      await ipc.invoke(ipcApiRoute.getCpuIdentifier).then(async res => {
+        console.log(res)
+        console.log(this.dataForm.macAddr)
           if (res === this.dataForm.macAddr) {
             const formRef = this.$refs.formRef;
             try {

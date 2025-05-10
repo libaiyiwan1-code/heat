@@ -13,6 +13,9 @@ const Conf = require("ee-core/config");
 const Log = require('ee-core/log');
 const { screen } = require('electron');
 const os = require('os');
+const { exec } = require('child_process');
+const util = require('util');
+const execPromise = util.promisify(exec);
 // const windows = []; //保存窗口引用
 /**
  * 特效 - 功能demo
@@ -171,6 +174,38 @@ class EffectController extends Controller {
         Log.info(macAddr)
         return macAddr || '';
     }
+
+    async getCpuIdentifier() {
+        try {
+            //  获取 CPU 处理器 ID
+            const {stdout} = await execPromise('wmic cpu get ProcessorId');
+            const lines = stdout.trim().split('\n');
+            let identifier = '';
+
+            if (lines.length > 1) {
+                identifier = lines[1].trim();
+                if (identifier) {
+                    Log.info(`当前 CPU 处理器 ID: ${identifier}`);
+                    return identifier;
+                }
+            }
+
+            //  获取 BIOS 序列号
+            const {stdout: biosStdout} = await execPromise('wmic bios get serialnumber');
+            identifier = biosStdout.trim().split('\n')[1].trim();
+            if (identifier) {
+                Log.info(`回退 BIOS 序列号: ${identifier}`);
+                return identifier;
+            }
+
+            Log.error('未找到 CPU 或 BIOS 标识符');
+            return null;
+        } catch (err) {
+            Log.error(`获取 CPU 标识符时出错: ${err.message}`);
+            return null;
+        }
+    }
+
 
 }
 

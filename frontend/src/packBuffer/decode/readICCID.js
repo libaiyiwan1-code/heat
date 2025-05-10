@@ -29,6 +29,7 @@ export function decodeCheckReadICCIDWAC710CD(context, responseMessage) {
     dataView.getUint8(12) !== 0x08
   if (!notPass) {
     let iccid = decodeGetICCID(responseMessage, false)
+    console.warn('iccid', iccid)
     if (checkICCID(iccid)) {
       context.createLeftSpanMessage('ICCID不合法', 'red')
       notPass = true

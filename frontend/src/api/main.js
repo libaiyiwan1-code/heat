@@ -44,6 +44,7 @@ const ipcApiRoute = {
   setTheme: 'controller.os.setTheme',
   getTheme: 'controller.os.getTheme',
   getAppPath: 'controller.os.getAppPath',
+  getPath: 'controller.os.getPath',
 
   // hardware
   getPrinterList: 'controller.hardware.getPrinterList',
@@ -57,6 +58,7 @@ const ipcApiRoute = {
   restoreWindow: 'controller.effect.restoreWindow',
   loginRouter: 'controller.effect.loginRouter',
   getMacAddress:'controller.effect.getMacAddress',
+  getCpuIdentifier:'controller.effect.getCpuIdentifier',
 
   // cross
   crossInfo: 'controller.cross.info',

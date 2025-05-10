@@ -9,9 +9,10 @@ const Log = require('ee-core/log');
  * 通用的串口通信组件
  * @param {Object} context - 上下文对象
  * @param {Object} config - 配置对象
+ * @param {string} type -  左或右侧工装
  * @returns {Promise<boolean>} - 操作是否失败
  */
-export const serialPortOperation = async (context, config) => {
+export const serialPortOperation = async (context, config,type) => {
 
   const {
     actionType,                      // 操作类型
@@ -42,14 +43,18 @@ export const serialPortOperation = async (context, config) => {
   console.log(`[请求报文] ${operationName}`, arrayBuffer2Hex(packBuffer));
   Log.info(`[请求报文] ${operationName}`, arrayBuffer2Hex(packBuffer));
 
-  context.globalReceivedData = '';
-
+  context.receivedData.globalReceivedOneData = '';
+  console.warn('deviceAction-Type：',type)
   while (notPass && retries < maxRetries) {
-    context.globalReceivedData = '';
+    context.receivedData.globalReceivedOneData = '';
 
     // 写入串口
     try {
-      await doWritePort(context.portAttributes.serialPort, packBuffer);
+      if (type==='one'){
+        await doWritePort(context.portAttributes.serialPortOne, packBuffer,type);
+      }else{
+        await doWritePort(context.portAttributes.serialPortTwo, packBuffer,type);
+      }
     } catch (error) {
       await handleLeftError(context, operationName, '写入串口失败', actionType);
       console.error('Failed to write port:', error.message);
@@ -63,8 +68,8 @@ export const serialPortOperation = async (context, config) => {
       response = await waitForResponse(context, timeout, expectedLength);
       // 验证响应
       if (!response) {
-        console.log(`[响应报文] ${operationName}=>`, context.globalReceivedData);
-        Log.info(`[响应报文] ${operationName}=>`, context.globalReceivedData);
+        console.log(`[响应报文] ${operationName}=>`, context.receivedData.globalReceivedOneData);
+        Log.info(`[响应报文] ${operationName}=>`, context.receivedData.globalReceivedOneData);
         retries++;
         context.createLeftSpanMessage(`${operationName}失败-进行重试 次数:${retries}`, 'red');
         continue;
@@ -74,14 +79,14 @@ export const serialPortOperation = async (context, config) => {
 
 
     // 红外设备额外验证
-    if (operationName !== '自检开启' && isInfraredDevice && checkSpontaneous(context.globalReceivedData, arrayBuffer2Hex(packBuffer))) {
+    if (operationName !== '自检开启' && isInfraredDevice && checkSpontaneous(context.receivedData.globalReceivedOneData, arrayBuffer2Hex(packBuffer))) {
       retries++;
       context.createLeftSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'red');
       continue;
     }
 
     // 自定义验证
-    if (validateResponse(context.globalReceivedData)) {
+    if (validateResponse(context.receivedData.globalReceivedOneData)) {
       retries++;
       context.createLeftSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'red');
       continue;
@@ -93,13 +98,13 @@ export const serialPortOperation = async (context, config) => {
   // 处理结果
   if (retries >= maxRetries) {
     await handleLeftError(context, operationName, '操作超时', actionType);
-    context.badProductQuantity += 1;
-    context.uploadMes(context.generateAddress === '' ? context.readAddress : context.generateAddress, 0, '设备重试失败:' + operationName)
+    context.leftBadProductQuantity += 1;
+    context.uploadMes(context.leftGenerateAddress === '' ? context.readAddress : context.leftGenerateAddress, 0, '设备重试失败:' + operationName)
     return true;
   }
 
   if (!notPass) {
-    context.globalReceivedData = '';
+    context.receivedData.globalReceivedOneData = '';
     context.createLeftSpanMessage(operationName + '-操作成功', 'green')
   }
 
@@ -110,9 +115,9 @@ export const serialPortOperation = async (context, config) => {
 async function waitForResponse(context, timeout, expectedLength) {
   const startTime = Date.now();
   while (Date.now() - startTime < timeout) {
-    console.log('报文长度', context.globalReceivedData.length)
-    console.log('报文', context.globalReceivedData)
-    if (context.globalReceivedData && context.globalReceivedData.length / 2 === expectedLength) {
+    console.log('报文长度', context.receivedData.globalReceivedOneData.length)
+    console.log('报文', context.receivedData.globalReceivedOneData)
+    if (context.receivedData.globalReceivedOneData && context.receivedData.globalReceivedOneData.length / 2 === expectedLength) {
       return true;
     }
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -122,10 +127,10 @@ async function waitForResponse(context, timeout, expectedLength) {
 
 export async function handleLeftError(context, operationName, message, actionType) {
   context.leftWorkPrompt = `${operationName}-操作失败`;
-  context.buttonError('leftWorkPrompt')
+  context.buttonError('leftWorkPromptColor')
   context.buttonError(actionType)
   context.createLeftSpanMessage(`${operationName}-${message}`, 'red');
-  context.globalReceivedData = '';
+  context.receivedData.globalReceivedOneData = '';
   await playErrorAudio(context)
 
 }
@@ -133,10 +138,10 @@ export async function handleLeftError(context, operationName, message, actionTyp
 
 export async function handleRightError(context, operationName, message, actionType) {
   context.rightWorkPrompt = `${operationName}-操作失败（${message}）`;
-  context.buttonError('rightWorkPrompt')
+  context.buttonError('rightWorkPromptColor')
   context.buttonError(actionType)
   context.createRightSpanMessage(`${operationName}-${message}`, 'red');
-  context.globalReceivedData = '';
+  context.receivedData.globalReceivedOneData = '';
   if (operationName !== 'MES') {
     await playErrorAudio(context)
   }
@@ -145,10 +150,10 @@ export async function handleRightError(context, operationName, message, actionTy
 
 export async function handleRightSuccess(context, operationName, message, actionType) {
   context.rightWorkPrompt = `${operationName}-操作成功`;
-  context.buttonSuccess('rightWorkPrompt')
+  context.buttonSuccess('rightWorkPromptColor')
   context.buttonSuccess(actionType)
   context.createRightSpanMessage(`${operationName}-${message}`, 'green');
-  context.globalReceivedData = '';
+  context.receivedData.globalReceivedOneData = '';
   if (operationName !== 'MES') {
     await playSuccessAudio(context)
   }

@@ -176,7 +176,7 @@ export function packDataDomains(afn, fn, protocolID, context) {
           break;
         case '06':
           arrayBuffer = createBuffer(5, [0x03, 0xff, 0x06, 0x00, 0x8B]);
-          arrayBuffer = mergeArrayBuffer(arrayBuffer, hex2arrayBuffer(context.generateAddress))
+          arrayBuffer = mergeArrayBuffer(arrayBuffer, hex2arrayBuffer(context.leftGenerateAddress))
           break;
         default:
         // Log.error("packages: afn[{}] match fail", afn);

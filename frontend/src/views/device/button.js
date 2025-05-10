@@ -12,8 +12,7 @@ export default {
       awaken: 'yellow',
       breakSelfTest: 'yellow',
       labelPrint: 'yellow',
-      leftWorkPrompt: 'yellow',
-      rightWorkPrompt: 'yellow',
+
     },
     disabledStatus: {
       selfTest: false,
@@ -23,4 +22,40 @@ export default {
       labelPrint: false,
     }
   },
+  wireDeviceButton: {
+    color: {
+      configureWriteOne: 'yellow',
+      versionMatchOne:'yellow',
+      writeAddressOne: 'yellow',
+      closeCalibrationOne:'yellow',
+      openCalibrationOne:'yellow',
+      panelCommunicationOne:'yellow',
+      swipeCardFunctionOne:'yellow',
+      separationAlarmOne:'yellow',
+      mainAuxiliaryValveOne:'yellow',
+      temperatureCalibrationOne:'yellow',
+      factoryStatusWriteOne:'yellow',
+      scanVerificationOne:'yellow',
+      processOne:'yellow',
+      configureWriteTwo: 'yellow',
+      versionMatchTwo:'yellow',
+      writeAddressTwo: 'yellow',
+      closeCalibrationTwo:'yellow',
+      openCalibrationTwo:'yellow',
+      panelCommunicationTwo:'yellow',
+      swipeCardFunctionTwo:'yellow',
+      separationAlarmTwo:'yellow',
+      mainAuxiliaryValveTwo:'yellow',
+      temperatureCalibrationTwo:'yellow',
+      factoryStatusWriteTwo:'yellow',
+      scanVerificationTwo:'yellow',
+      processTwo:'yellow',
+
+    },
+    disabledStatus: {
+
+    }
+  },
+  leftWorkPromptColor: 'yellow',
+  rightWorkPromptColor: 'yellow',
 };

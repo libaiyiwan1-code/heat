@@ -248,11 +248,11 @@ export function addressCover(address) {
 }
 
 export function checkIMEI(imei) {
-  return !imei || imei.length !== 15 || !/^[8]\d{14}$/.test(imei);
+  return !imei || imei.length !== 15 || !/^8/.test(imei);
 
 }
 
 export function checkICCID(iccid) {
-  return !iccid || iccid.length !== 20 || !/^[8]\d{19}$/.test(iccid);
+  return !iccid || iccid.length !== 20 || !/^8/.test(iccid)
 
 }
