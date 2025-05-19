@@ -5,7 +5,7 @@ const Log = require('ee-core/log');
 export function notHasSelfTestCompletedWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(54) === 0XFF || dataView.getUint8(54) === 0X00;
+  return dataView.getUint8(54) !== 0X01 ;
 }
 
 
@@ -30,105 +30,104 @@ export function decodeGetVersionWAC710CD(responseMessage) {
 export function decodeCheckEEPWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(58) === 0x00 || dataView.getUint8(58) === 0xFF;
+  return dataView.getUint8(58) !== 0x01 && dataView.getUint8(58)!== 0x02;
 
 }
 
 export function decodeCheckNetworkWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(59) === 0x00 || dataView.getUint8(59) === 0xFF;
+  return dataView.getUint8(59) !== 0x01 && dataView.getUint8(59) !== 0x02;
 
 }
 
 export function decodeCheckMinimumValveOpeningWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(60) === 0x00 || dataView.getUint8(60) === 0xFF;
+  return dataView.getUint8(60) !== 0x01 && dataView.getUint8(60) !== 0x02;
 
 }
 
 export function decodeCheckMaximumValveOpeningWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(61) === 0x00 || dataView.getUint8(61) === 0xFF;
+  return dataView.getUint8(61) !== 0x01 && dataView.getUint8(61) !== 0x02;
 
 }
 
 export function decodeCheckOutTemperatureCalibrationWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(62) === 0x00 || dataView.getUint8(62) === 0xFF;
+  return dataView.getUint8(62) !== 0x01 && dataView.getUint8(62) !==0x02;
 
 }
 
 export function decodeCheckInTemperatureCalibrationWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(63) === 0x00 || dataView.getUint8(63) === 0xFF;
+  return dataView.getUint8(63) !== 0x01 && dataView.getUint8(63) !== 0x02;
 
 }
 
 export function decodeCheckVoltageWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(64) === 0x00 || dataView.getUint8(64) === 0xFF;
+  return dataView.getUint8(64) !== 0x01 && dataView.getUint8(64) !== 0x02;
 
 }
 
 export function decodeCheckBarometricPressureSensorWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(65) === 0x00 || dataView.getUint8(65) === 0xFF;
+  return dataView.getUint8(65) !==0x01 && dataView.getUint8(65) !==0x02;
 
 }
 
 export function decodeCheckInPressureWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(66) === 0x00 || dataView.getUint8(66) === 0xFF;
+  return dataView.getUint8(66) !== 0x01 && dataView.getUint8(66) !== 0x02;
 
 }
 
 export function decodeCheckOutPressureWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(67) === 0x00 || dataView.getUint8(67) === 0xFF;
+  return dataView.getUint8(67) !== 0x01 && dataView.getUint8(67) !== 0x02;
 
 }
 
 export function decodeCheckMagneticSensorsWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(68) === 0x00 || dataView.getUint8(68) === 0xFF;
+  return dataView.getUint8(68) !==0x01 && dataView.getUint8(68) !== 0x02;
 
 }
 
 export function decodeCheckOutTemperatureMatchWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(69) === 0x00 || dataView.getUint8(69) === 0xFF;
+  return dataView.getUint8(69) !== 0x01 && dataView.getUint8(69) !== 0x02;
 
 }
 
 export function decodeCheckInTemperatureMatchWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(70) === 0x00 || dataView.getUint8(70) === 0xFF;
+  return dataView.getUint8(70) !== 0x01 && dataView.getUint8(70) !== 0x02;
 
 }
 
 export function decodeCheckOutPressureMatchWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(71) === 0x00 || dataView.getUint8(71) === 0xFF;
-
+  return dataView.getUint8(71) !== 0x01 && dataView.getUint8(71) !== 0x02;
 }
 
 export function decodeCheckInPressureMatchWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(72) === 0x00 || dataView.getUint8(72) === 0xFF;
+  return dataView.getUint8(72) !== 0x01 && dataView.getUint8(72) !== 0x02;
 
 }
 export function decodeReadSelfTestAddressWAC710CD(responseMessage) {
@@ -182,115 +181,131 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
     context.createLeftSpanMessage('未进行过自检', 'red');
     Log.error('未进行过自检');
     console.log('未进行过自检');
-  } else {
-    context.createLeftSpanMessage('已自检过', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('已自检过', 'green');
+  // }
 
   if (eepNotPass) {
     context.createLeftSpanMessage('eep 不正常', 'red');
     Log.error('eep 不正常');
     console.log('eep 不正常');
-  } else {
-    context.createLeftSpanMessage('eep 正常', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('eep 正常', 'green');
+  // }
   if (networkNotPass) {
     context.createLeftSpanMessage('联网 不正常', 'red');
     Log.error('联网 不正常');
     console.log('联网 不正常');
-  } else {
-    context.createLeftSpanMessage('联网 正常', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('联网 正常', 'green');
+  // }
   if (minimumValveOpeningNotPass) {
     context.createLeftSpanMessage('阀门最小开度标定 不正常', 'red');
     Log.error('阀门最小开度标定 不正常');
     console.log('阀门最小开度标定 不正常');
-  } else {
-    context.createLeftSpanMessage('阀门最小开度标定 正常', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('阀门最小开度标定 正常', 'green');
+  // }
   if (maximumValveOpeningNotPass) {
     context.createLeftSpanMessage('阀门最大开度标定 不正常', 'red');
     Log.error('阀门最大开度标定 不正常');
     console.log('阀门最大开度标定 不正常');
-  } else {
-    context.createLeftSpanMessage('阀门最大开度标定 正常', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('阀门最大开度标定 正常', 'green');
+  // }
   if (outTemperatureCalibrationNotPass) {
     context.createLeftSpanMessage('回温标定 不正常', 'red');
     Log.error('回温标定 不正常');
     console.log('回温标定 不正常');
-  } else {
-    context.createLeftSpanMessage('回温标定 正常', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('回温标定 正常', 'green');
+  // }
   if (inTemperatureCalibrationNotPass) {
     context.createLeftSpanMessage('进温标定 不正常', 'red');
     Log.error('进温标定 不正常');
     console.log('进温标定 不正常');
-  } else {
-    context.createLeftSpanMessage('进温标定 正常', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('进温标定 正常', 'green');
+  // }
   if (voltageNotPass) {
     context.createLeftSpanMessage('电压 不正常', 'red');
     Log.error('电压 不正常');
     console.log('电压 不正常');
-  } else {
-    context.createLeftSpanMessage('电压 正常', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('电压 正常', 'green');
+  // }
   if (barometricPressureSensorNotPass) {
     context.createLeftSpanMessage('气压传感器 不正常', 'red');
     Log.error('气压传感器 不正常');
     console.log('气压传感器 不正常');
-  } else {
-    context.createLeftSpanMessage('气压传感器 正常', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('气压传感器 正常', 'green');
+  // }
   if (inPressureNotPass) {
     context.createLeftSpanMessage('进水压力 不正常', 'red');
     Log.error('进水压力 不正常');
     console.log('进水压力 不正常');
-  } else {
-    context.createLeftSpanMessage('进水压力 正常', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('进水压力 正常', 'green');
+  // }
   if (outPressureNotPass) {
     context.createLeftSpanMessage('回水压力 不正常', 'red');
     Log.error('回水压力 不正常');
     console.log('回水压力 不正常');
-  } else {
-    context.createLeftSpanMessage('回水压力 正常', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('回水压力 正常', 'green');
+  // }
   if (magneticSensorsNotPass) {
     context.createLeftSpanMessage('磁传感器 不正常', 'red');
     Log.error('磁传感器 不正常');
     console.log('磁传感器 不正常');
-  } else {
-    context.createLeftSpanMessage('磁传感器 正常', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('磁传感器 正常', 'green');
+  // }
   if (outTemperatureMatchNotPass) {
     context.createLeftSpanMessage('回温探头 与实物不匹配', 'red');
     Log.error('回温探头 与实物不匹配');
     console.log('回温探头 与实物不匹配');
-  } else {
-    context.createLeftSpanMessage('回温探头 与实物匹配', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('回温探头 与实物匹配', 'green');
+  // }
   if (inTemperatureMatchNotPass) {
     context.createLeftSpanMessage('进温探头 与实物不匹配', 'red');
     Log.error('进温探头 与实物不匹配');
     console.log('进温探头 与实物不匹配');
-  } else {
-    context.createLeftSpanMessage('进温探头 与实物匹配', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('进温探头 与实物匹配', 'green');
+  // }
   if (outPressureMatchNotPass) {
     context.createLeftSpanMessage('回压探头 与实物不匹配', 'red');
     Log.error('回压探头 与实物不匹配');
     console.log('回压探头 与实物不匹配');
-  } else {
-    context.createLeftSpanMessage('回压探头 与实物匹配', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('回压探头 与实物匹配', 'green');
+  // }
   if (inPressureMatchNotPass) {
     context.createLeftSpanMessage('进压探头 与实物不匹配', 'red');
     Log.error('进压探头 与实物不匹配');
     console.log('进压探头 与实物不匹配');
-  } else {
-    context.createLeftSpanMessage('进压探头 与实物匹配', 'green');
   }
+  // else {
+  //   context.createLeftSpanMessage('进压探头 与实物匹配', 'green');
+  // }
   if (baseCheck||selfTestCompletedNotPass ||
     eepNotPass ||
     networkNotPass ||
@@ -314,9 +329,12 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
     context.leftWorkPrompt = '自检失败(读自检状态不通过)'
     context.receivedData.globalReceivedOneData = '';
     return true
+  }else{
+    context.createLeftSpanMessage('自检通过', 'red');
+    context.leftWorkPrompt = '自检通过'
   }
   //解析通过
-  context.readAddress = decodeReadSelfTestAddressWAC710CD(context.receivedData.globalReceivedOneData); //读设备地址
+  context.leftReadAddress = decodeReadSelfTestAddressWAC710CD(context.receivedData.globalReceivedOneData); //读设备地址
   context.productName = decodeGetProductNameWAC710CD( context.receivedData.globalReceivedOneData); //产品名称
   if (!context.productName.includes('WAC710CD')) {
     context.createLeftSpanMessage('产品名称错误：' + context.productName, 'red');

@@ -120,7 +120,7 @@ export function decodeCheckReadSelfTestStatusWAC300CD(context, responseMessage) 
     return true
   }
   //解析通过
-  context.readAddress = decodeReadSelfTestAddress(context, context.receivedData.globalReceivedOneData); //读设备地址
+  context.leftReadAddress = decodeReadSelfTestAddress(context, context.receivedData.globalReceivedOneData); //读设备地址
   context.productName = decodeGetProductNameWAC300CD(context.receivedData.globalReceivedOneData); //产品名称
   context.protocolId = decodeGetProtocolId(context.receivedData.globalReceivedOneData);//协议id
   context.version = decodeGetVersion(context.receivedData.globalReceivedOneData)//版本号

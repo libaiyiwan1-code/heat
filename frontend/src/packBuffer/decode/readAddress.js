@@ -6,7 +6,7 @@ export function decodeCheckReadAddressWAC230CF(context, responseMessage) {
   let notPass = dataView.getUint8(16) !== 0x68 || dataView.getUint8(19) !== 0x68 || dataView.getUint8(20) !== 0x80 || dataView.getUint8(21) !== 0x8B
     || dataView.getUint8(26) !== 0x05 || dataView.getUint8(28) !== 0x06
   if (!notPass) {
-    context.readAddress = decodeReadAddress(responseMessage,false,true)
+    context.leftReadAddress = decodeReadAddress(responseMessage,false,true)
   }
   return notPass
 }
@@ -24,7 +24,10 @@ export function decodeCheckReadAddressWAC710CD(context, responseMessage) {
     dataView.getUint8(10) !== 0x05 ||
     dataView.getUint8(12) !== 0x06
   if (!notPass) {
-    context.readAddress = decodeReadAddress(responseMessage,false,false)
+    context.leftReadAddress = decodeReadAddress(responseMessage,false,false)
   }
   return notPass
 }
+
+
+

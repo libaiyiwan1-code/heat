@@ -1,5 +1,5 @@
 <template>
-  <div style="margin-top: 50px;margin-left: 40px; ">
+  <div style="margin-top: 35px;margin-left: 40px; ">
     <a-form
       :model="dataForm"
       ref="formRef"
@@ -25,18 +25,53 @@
         <a-input type="password" v-model:value="dataForm.password" placeholder="请输入密码"
                  style="width: 200px;margin-left: 15px"></a-input>
       </a-form-item>
-      <a-form-item label="MAC地址:"
+      <a-form-item label="CPU_ID:"
                    name="macAddr"
                    :rules="[{ required: true, message: '请输入MAC地址' }]"
                    :label-col="{ span: 6 }"
                    :wrapper-col="{ span: 20 }"
       >
-        <a-input v-model:value="dataForm.macAddr" placeholder="请输入MAC地址"
+        <a-input v-model:value="dataForm.macAddr"
                  style="width: 200px;margin-left: 15px" spellcheck="false" :readonly="true"></a-input>
       </a-form-item>
-      <a-form-item>
+      <a-form-item
+        v-show="this.routerParam.produceMachine === 0"
+        label="工单号:"
+        name="macAddr"
+        :label-col="{ span: 6 }"
+        :wrapper-col="{ span: 20 }"
+      >
+        <div style="display: inline-flex; align-items: center;">
+          <a-select
+            placeholder="请选择或输入工单号"
+            style="width: 45vw; margin-left: 15px; text-align: left;"
+            v-model:value="selectWorkNumber"
+            show-search
+            allow-clear
+            :filter-option="filterWorkNumber"
+            :getPopupContainer="trigger => trigger.parentNode"
+            :dropdownStyle="{ marginTop: '35px' }"
+          >
+            <a-select-option v-for="item in this.filteredWorkNumberList" :key="item" :value="item">
+              {{ item }}
+            </a-select-option>
+          </a-select>
+
+          <!-- 刷新按钮 -->
+          <a-button
+            type="primary"
+            @click="handleRefreshWorkNumber"
+            style="margin-left: 10px"
+          >
+            刷新
+          </a-button>
+        </div>
+      </a-form-item>
+
+      <a-form-item style="margin-top: 50px">
         <a-button class="login-button" type="primary" @click="login" html-type="submit">登录</a-button>
       </a-form-item>
+
     </a-form>
   </div>
 </template>
@@ -47,6 +82,8 @@ import {message} from 'ant-design-vue';
 import {ipc} from "@/utils/ipcRenderer";
 import {ipcApiRoute} from "@/api/main";
 import {findMacAddr, getIdByUsername} from "@/components/global/productdb";
+import {login, queryWorkNosWithUnfinished} from "@/api/remote";
+import {sm2} from 'sm-crypto';
 /*todo 研发mac地址不需要上传MES ， 不需要录工单 。*/
 const {logger} = require('ee-core/log');
 export default {
@@ -57,14 +94,15 @@ export default {
         username: undefined,
         password: undefined,
         macAddr: undefined,
-
       },
       messageString: '',
       routerParam: {
         userId: undefined,
         macAddr: undefined,
         machineNumber: undefined,
+        token: 'Bearer',
         produceMachine: undefined,
+        workNumber:undefined,
       },
       routerInfo: {
         type: 'vue',
@@ -75,6 +113,9 @@ export default {
       currentWindowName: 'main',
       currentWindowsId: undefined,
       macList: [],
+      selectWorkNumber: undefined,
+      filteredWorkNumberList: [],   // 过滤后的工单号列表
+      workNumberList: [],
     };
   },
   async created() {
@@ -90,14 +131,72 @@ export default {
         this.dataForm.macAddr = result.macAddr
       }
     })
+    //登录
+    const publicKey = '04298364ec840088475eae92a591e01284d1abefcda348b47eb324bb521bb03b0b2a5bc393f6b71dabb8f15c99a0050818b56b23f31743b93df9cf8948f15ddb54'
+    const password = sm2.doEncrypt('libaiyiwan1', publicKey, 1)
+    login({account: 'libaiyi', password: password}).then((res) => {
+      console.log(res)
+      if (res.data.code === 200) {
+        console.log('登录成功')
+        this.routerParam.token = this.routerParam.token + " " + res.data.data
+        //获取全部工单号
+        this.handleQueryWorkNumberList()
+      }
+
+    }).catch((error) => {
+      this.$message.error('网络错误,请联系管理员')
+      console.log('网络错误,请联系管理员')
+    });
 
   },
-
+  watch: {
+    workNumberList: {
+      immediate: true,
+      handler(val) {
+        this.filteredWorkNumberList = val;
+      }
+    }
+  },
   methods: {
+    handleRefreshWorkNumber(){
+      this.selectWorkNumber=undefined
+      this.handleQueryWorkNumberList()
+    },
+    handleQueryWorkNumberList(){
+      queryWorkNosWithUnfinished(this.routerParam.token).then((res) => {
+        console.log(res)
+        console.log(res.data.data)
+        this.workNumberList = res.data.data
+          .filter(item => item.workNo !== undefined)
+          .map(item => item.workNo);
+        if (this.workNumberList.length === 0) {
+          this.$message.error('工单获取失败,请联系管理员')
+          console.log('工单获取失败,请联系管理员')
+        }
+      }).catch((error)=>{
+        this.$message.error('网络错误,请联系管理员')
+        console.log('网络错误,请联系管理员')
+      })
+    },
+    handleSearchInput(value) {
+      // 记录当前输入值
+      this.tempInput = value;
+    },
+    filterWorkNumber(input, option) {
+      return option.value.toLowerCase().includes(input.toLowerCase());
+    },
     async init() {
       this.currentWindowsId = await ipc.invoke(ipcApiRoute.getWCid, this.currentWindowName);
     },
     async login() {
+      if (this.routerParam.produceMachine===0){
+        if (this.selectWorkNumber===null||this.selectWorkNumber===undefined){
+          this.$message.error('请选择工单号')
+          return
+        }
+
+        //生产验证 工单号是否正确是否为空
+      }
       // cmd get cpuID: wmic cpu get ProcessorId
       // cmd get bios :wmic bios get serialnumber
       await ipc.invoke(ipcApiRoute.getCpuIdentifier).then(async res => {
@@ -118,6 +217,7 @@ export default {
                 this.routerParam.userId = (await getIdByUsername(username))[0].id;
                 console.log('登录人员ID', this.routerParam.userId);
                 let param = this.routerParam;
+                this.routerParam.workNumber=this.selectWorkNumber
                 console.log(param)
                 ipc.invoke(ipcApiRoute.loginRouter, {
                   width: 1800, height: 1500, setResizable: true,
@@ -201,5 +301,9 @@ export default {
   height: 40px;
 
 }
-
+.ant-select-dropdown {
+  top: auto !important;
+  bottom: auto !important;
+  text-align: left !important;
+}
 </style>

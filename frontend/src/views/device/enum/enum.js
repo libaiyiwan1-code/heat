@@ -34,6 +34,24 @@ import {decodeCheckReadAddressWAC230CF, decodeCheckReadAddressWAC710CD} from "@/
 import {decodeCheckReadSelfTestStatusWAC300CD} from "@/packBuffer/decode/readselftest/wac300cd/readSelfTestStatus";
 import {decodeCheckReadSelfTestStatusWAC710CD} from "@/packBuffer/decode/readselftest/wac710cd/readSelfTestStatus";
 import {decodeCheckReadSelfTestStatusWAC230CF} from "@/packBuffer/decode/readselftest/wac230cf/readSelfTestStatus";
+import {
+  decodeCheckReadAddress, decodeCreditCardVerify, decodeFaceplateCommunicationVerify,
+  decodeFactoryConditionFullyCloseVerify,
+  decodeFactoryConditionFullyOpenVerify,
+  decodeInTemperatureCalibrationVerify,
+  decodeMainAndAuxiliaryValvesVerify,
+  decodeOutTemperatureCalibrationVerify,
+  decodeReadVersionVerify,
+  decodeWriteAllConfigConfigurationVerify,
+  decodeWriteHeatingDateVerify,
+  decodeWritePowerOutagesAndWirelessAnomaliesVerify,
+  decodeWriteProbeConfigurationVerify,
+  decodeWriteUpperAndLowerTemperatureLimitsVerify
+} from "@/packBuffer/decode/wire/wireDevice";
+import {
+  factoryConditionFullyOpen, mainAndAuxiliaryValvesVerify,
+  writeUpperAndLowerTemperatureLimits
+} from "@/views/device/operations/wireDeviceOperations";
 
 
 /**
@@ -77,23 +95,23 @@ export const protocolIDMap = {
       inquireSelfTest: (data) => {
         return decodeCheckInquireSelfTestWAC230CF(data);
       },
-      readSelfTestStatus: (context,data) => {
-        return decodeCheckReadSelfTestStatusWAC230CF(context,data);
+      readSelfTestStatus: (context, data) => {
+        return decodeCheckReadSelfTestStatusWAC230CF(context, data);
       },
       awaken: (data) => {
         return decodeCheckAwakenWAC230CF(data);
       },
-      writeAddress: (leftGenerateAddress,data) => {
-        return decodeCheckWriteAddressWAC230CF(leftGenerateAddress,data);
+      writeAddress: (leftGenerateAddress, data) => {
+        return decodeCheckWriteAddressWAC230CF(leftGenerateAddress, data);
       },
-      readIMEI: (context,data) => {
-        return decodeCheckReadIMEIWAC230CF(context,data);
+      readIMEI: (context, data) => {
+        return decodeCheckReadIMEIWAC230CF(context, data);
       },
-      readICCID: (context,data) => {
-        return decodeCheckReadICCIDWAC230CF(context,data);
+      readICCID: (context, data) => {
+        return decodeCheckReadICCIDWAC230CF(context, data);
       },
-      readAddress: (context,data) => {
-        return decodeCheckReadAddressWAC230CF(context,data);
+      readAddress: (context, data) => {
+        return decodeCheckReadAddressWAC230CF(context, data);
       },
     }
   },
@@ -152,26 +170,26 @@ export const protocolIDMap = {
       writePressureProbesConfig: (data) => {
         return decodeCheckWritePressureProbesConfigWAC710CD(data);
       },
-      readSelfTestStatus: (context,data) => {
-        return decodeCheckReadSelfTestStatusWAC710CD(context,data);
+      readSelfTestStatus: (context, data) => {
+        return decodeCheckReadSelfTestStatusWAC710CD(context, data);
       },
       awaken: (data) => {
         return decodeCheckAwakenWAC710CD(data);
       },
-      readIMEI: (context,data) => {
-        return decodeCheckReadIMEIWAC710CD(context,data);
+      readIMEI: (context, data) => {
+        return decodeCheckReadIMEIWAC710CD(context, data);
       },
-      readICCID: (context,data) => {
-        return decodeCheckReadICCIDWAC710CD(context,data);
+      readICCID: (context, data) => {
+        return decodeCheckReadICCIDWAC710CD(context, data);
       },
-      readTorqueConfig: (context,data) => {
-        return decodeCheckReadTorqueConfigWAC710CD(context,data);
+      readTorqueConfig: (context, data) => {
+        return decodeCheckReadTorqueConfigWAC710CD(context, data);
       },
-      writeAddress: (leftGenerateAddress,data) => {
-        return decodeCheckWriteAddressWAC710CD(leftGenerateAddress,data);
+      writeAddress: (leftGenerateAddress, data) => {
+        return decodeCheckWriteAddressWAC710CD(leftGenerateAddress, data);
       },
-      readAddress: (context,data) => {
-        return decodeCheckReadAddressWAC710CD(context,data);
+      readAddress: (context, data) => {
+        return decodeCheckReadAddressWAC710CD(context, data);
       },
     },
   },
@@ -238,5 +256,108 @@ export const protocolIDMap = {
     },
   },
   // 'WAC710C': {},
-  // 'VAC200': {}
+  'VAC200': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'faceplateCommunication': 55,
+      'creditCard': 84,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type) => {
+        return decodeCheckReadAddress(context, data, type);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return decodeWriteUpperAndLowerTemperatureLimitsVerify(data);
+      },
+      writePowerOffAndWirelessError: (data) => {
+        return decodeWritePowerOutagesAndWirelessAnomaliesVerify(data);
+      },
+      writeHeatingDate: (data) => {
+        return decodeWriteHeatingDateVerify(data);
+      },
+      writeProbesConfig: (data) => {
+        return decodeWriteProbeConfigurationVerify(data);
+      },
+      writeAllConfig: (data) => {
+        return decodeWriteAllConfigConfigurationVerify(data);
+      },
+      readVersion : (context,data) => {
+        return decodeReadVersionVerify(context,data);
+      },
+      factoryConditionFullyClose : (data) => {
+        return decodeFactoryConditionFullyCloseVerify(data);
+      },
+      factoryConditionFullyOpen : (data) => {
+        return decodeFactoryConditionFullyOpenVerify(data);
+      },
+      outTemperatureCalibration : (data) => {
+        return decodeOutTemperatureCalibrationVerify(data);
+      },
+      inTemperatureCalibration : (data) => {
+        return decodeInTemperatureCalibrationVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify : (data) => {
+        return decodeMainAndAuxiliaryValvesVerify(data);
+      },
+      faceplateCommunication : (data) => {
+        return decodeFaceplateCommunicationVerify(data);
+      },
+      creditCard : (data) => {
+        return decodeCreditCardVerify(data);
+      },
+      fullOpenCalibration : (data) => {
+        return decodeFullOpenCalibrationVerify(data);
+      },
+      fullOffCalibration : (data) => {
+        return decodeFullOffCalibrationVerify(data);
+      },
+    }
+  }
 }

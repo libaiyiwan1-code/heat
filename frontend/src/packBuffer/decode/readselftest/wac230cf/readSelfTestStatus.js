@@ -120,7 +120,7 @@ export function decodeCheckReadSelfTestStatusWAC230CF(context, responseMessage) 
     return true
   }
   //解析通过
-  context.readAddress = decodeReadSelfTestAddress(context, context.receivedData.globalReceivedOneData); //读设备地址
+  context.leftReadAddress = decodeReadSelfTestAddress(context, context.receivedData.globalReceivedOneData); //读设备地址
   context.productName = decodeGetProductNameWAC230CF(context.receivedData.globalReceivedOneData); //产品名称
   if (!context.productName.toLowerCase().includes('WAC230CF')){
     context.createLeftSpanMessage('产品名称错误：'+context.productName, 'red');

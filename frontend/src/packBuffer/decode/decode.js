@@ -147,7 +147,7 @@ export function decodeReadSelfTestAddress(context, messageStr) {
   for (let i = 39; i < 43; i++) {
     result += dataView.getUint8(i).toString(16).padStart(2, '0');
   }
-  context.readAddress = result
+  context.leftReadAddress = result
   return false;
 }
 

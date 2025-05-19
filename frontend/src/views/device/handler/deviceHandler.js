@@ -595,13 +595,13 @@ async function nbDeviceRegister(context) {
     let insertResult = await insertNBValueProduce(productionData);
     if (insertResult) {
       context.createLeftSpanMessage('生产入库成功', 'green');
-      context.uploadMes(context.readAddress, 1, '成功')
+      context.uploadMes(context.leftReadAddress, 1, '成功')
       await context.printLabel(true)
     } else {
-      if (!context.uploadAddressList.includes(context.readAddress)) {
-        context.uploadAddressList.push(context.readAddress)
+      if (!context.uploadAddressList.includes(context.leftReadAddress)) {
+        context.uploadAddressList.push(context.leftReadAddress)
         context.leftBadProductQuantity += 1;
-        context.uploadMes(context.readAddress, 0, '生产入库失败')
+        context.uploadMes(context.leftReadAddress, 0, '生产入库失败')
       }
       context.createLeftSpanMessage('生产入库失败', 'red');
       context.leftWorkPrompt = '地址写入失败(生产入库失败)';
@@ -612,10 +612,10 @@ async function nbDeviceRegister(context) {
       console.error('生产入库失败')
     }
   } else {
-    if (!context.uploadAddressList.includes(context.readAddress)) {
-      context.uploadAddressList.push(context.readAddress)
+    if (!context.uploadAddressList.includes(context.leftReadAddress)) {
+      context.uploadAddressList.push(context.leftReadAddress)
       context.leftBadProductQuantity += 1;
-      context.uploadMes(context.readAddress, 0, '平台注册失败')
+      context.uploadMes(context.leftReadAddress, 0, '平台注册失败')
     }
     context.createLeftSpanMessage('平台注册失败', 'red');
     context.leftWorkPrompt = '地址写入失败(平台注册失败)';
@@ -657,7 +657,7 @@ export const doPrintLabel = async (context, flag, protocolId,type) => {
       isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
       isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readAddress,
     },type)
-    printAddress = context.readAddress
+    printAddress = context.leftReadAddress
     printNotPass = readAddressResult
   }
   if (printNotPass) {
@@ -704,9 +704,9 @@ export const checkNetWork = async (context, protocolId,type) => {
       return notPass
     }
     // 地址验证
-    if (context.readAddress !== context.scanAddress) {
-      if (!context.uploadAddressList.includes(context.readAddress)) {
-        context.uploadAddressList.push(context.readAddress)
+    if (context.leftReadAddress !== context.scanAddress) {
+      if (!context.uploadAddressList.includes(context.leftReadAddress)) {
+        context.uploadAddressList.push(context.leftReadAddress)
         context.leftBadProductQuantity += 1;
         context.uploadMes(context.scanAddress, 0, '扫码地址与设备地址不匹配')
       }
@@ -723,8 +723,8 @@ export const checkNetWork = async (context, protocolId,type) => {
     }
     console.log('hems最近上传的数据', data[0])
     if (data[0] === undefined || data [0] === null) {
-      if (!context.uploadAddressList.includes(context.readAddress)) {
-        context.uploadAddressList.push(context.readAddress)
+      if (!context.uploadAddressList.includes(context.leftReadAddress)) {
+        context.uploadAddressList.push(context.leftReadAddress)
         context.leftBadProductQuantity += 1;
         context.uploadMes(context.scanAddress, 0, '网络未上传')
       }
