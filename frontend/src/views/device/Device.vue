@@ -1714,7 +1714,7 @@ import {
   doPrintLabel, doQuadraticVerification,
   doSelfTest,
   doWriteAddress
-} from "@/views/device/operations/nb/nbDeviceOperations";
+} from "@/views/device/operations/nbDeviceOperations";
 import {executeWithAddress, executionProcess,} from "@/views/device/handler/wireHandler";
 import {handleLeftError} from "@/views/device/action/deviceAction";
 import {getProductImageList, getWorkConfigParam, getWorkDetail, saveVacDeviceProduceInfo,} from "@/api/remote";
