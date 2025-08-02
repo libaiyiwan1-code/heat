@@ -3,7 +3,7 @@ const mysql = require('mysql');
 // 创建连接池
 const pool = mysql.createPool({
   connectionLimit: 10, // 连接池最大连接数
-  host: '192.168.0.158',
+  host: '192.168.0.159',
   user: 'root',
   password: '1234.abcd',
   database: 'hmes',

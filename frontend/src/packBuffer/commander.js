@@ -1,4 +1,4 @@
-import {mergeArrayBuffer} from "@/packBuffer/common/comUtil";
+import {arrayBuffer2Hex, mergeArrayBuffer} from "@/packBuffer/common/comUtil";
 import {
   packCSTail,
   packDataDomains,
@@ -26,7 +26,6 @@ export function outlineExecute(afn, fn, protocolID, context) {
   let mergeBuffer2 = mergeArrayBuffer(packOutLineTransparentTransmission(protocolID, mergeBuffer1.byteLength), mergeBuffer1)
   const endBuffer = packCSTail(mergeBuffer2);
   const outLineHeadBuffer = packDoubleStartHead(protocolID, mergeBuffer2.byteLength);
-  console.warn('外包:', Buffer.from(mergeArrayBuffer(outLineHeadBuffer, mergeBuffer2, endBuffer)))
   return Buffer.from(mergeArrayBuffer(outLineHeadBuffer, mergeBuffer2, endBuffer));
 }
 
@@ -52,15 +51,18 @@ export function nbExecute(afn, fn, protocolID, context) {
  * @param {string} type 左或右侧工装
  * @param withStartFrame 是否包含起始帧
  * */
-export function wireExecute(afn, fn, protocolID, context, type, withStartFrame) {
+export function wireExecute(afn, fn, protocolID, context, type, withStartFrame=false) {
   Log.info("execute: wireExecute[", afn, "] fn[", fn, "], protocolID[", protocolID, "]");
   const bodyBuffer = packWireDeviceDataDomains(afn, fn, protocolID, context, type);
   const headBuffer = packWireDeviceStartHead(protocolID);
   const tailBuffer = packCSTail(mergeArrayBuffer(headBuffer, bodyBuffer));
   if (withStartFrame) {
-    return Buffer.from(mergeArrayBuffer(headBuffer, bodyBuffer, tailBuffer));
+    return Buffer.from(mergeArrayBuffer([0xfe, 0xfe, 0xfe], headBuffer, bodyBuffer, tailBuffer));
   } else {
-    return Buffer.from(mergeArrayBuffer([0xff, 0xff, 0xff], withStartFrame, bodyBuffer, tailBuffer));
+    return Buffer.from(mergeArrayBuffer(headBuffer, bodyBuffer, tailBuffer));
   }
 }
+
+
+
 

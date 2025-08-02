@@ -96,6 +96,12 @@ export function decodeCheckOutPressureWAC710CD(responseMessage) {
   return dataView.getUint8(67) !== 0x01 && dataView.getUint8(67) !== 0x02;
 
 }
+export function decodeCheckDifferentialPressureWAC710CD(responseMessage) {
+  let messageBuffer = hex2arrayBuffer(responseMessage);
+  let dataView = new DataView(messageBuffer)
+  return dataView.getUint8(68) !== 0x01 && dataView.getUint8(68) !== 0x02;
+
+}
 
 export function decodeCheckMagneticSensorsWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
@@ -128,6 +134,13 @@ export function decodeCheckInPressureMatchWAC710CD(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   return dataView.getUint8(72) !== 0x01 && dataView.getUint8(72) !== 0x02;
+
+}
+
+export function decodeCheckDifferentialPressureMatchWAC710CD(responseMessage) {
+  let messageBuffer = hex2arrayBuffer(responseMessage);
+  let dataView = new DataView(messageBuffer)
+  return dataView.getUint8(74) !== 0x01 && dataView.getUint8(74) !== 0x02;
 
 }
 export function decodeReadSelfTestAddressWAC710CD(responseMessage) {
@@ -172,11 +185,13 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   let barometricPressureSensorNotPass = decodeCheckBarometricPressureSensorWAC710CD(context.receivedData.globalReceivedOneData)     //             气压
   let inPressureNotPass = decodeCheckInPressureWAC710CD(context.receivedData.globalReceivedOneData)     //             进水压力
   let outPressureNotPass = decodeCheckOutPressureWAC710CD(context.receivedData.globalReceivedOneData)     //             回水压力
+  // let differentialPressureNotPass = decodeCheckDifferentialPressureWAC710CD(context.receivedData.globalReceivedOneData)     //             压差是否正常
   let magneticSensorsNotPass = decodeCheckMagneticSensorsWAC710CD(context.receivedData.globalReceivedOneData)     //             磁性传感器
   let outTemperatureMatchNotPass = decodeCheckOutTemperatureMatchWAC710CD(context.receivedData.globalReceivedOneData)     //             回温探头是否匹配
   let inTemperatureMatchNotPass = decodeCheckInTemperatureMatchWAC710CD(context.receivedData.globalReceivedOneData)     //             进温探头是否匹配
   let outPressureMatchNotPass = decodeCheckOutPressureMatchWAC710CD(context.receivedData.globalReceivedOneData)     //             回水压力探头是否匹配
   let inPressureMatchNotPass = decodeCheckInPressureMatchWAC710CD(context.receivedData.globalReceivedOneData)     //             进水压力探头是否匹配
+  // let differentialPressureMatchNotPass = decodeCheckDifferentialPressureMatchWAC710CD(context.receivedData.globalReceivedOneData)     //             压差探头是否匹配
   if (selfTestCompletedNotPass) {
     context.createLeftSpanMessage('未进行过自检', 'red');
     Log.error('未进行过自检');
@@ -263,6 +278,12 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
     Log.error('回水压力 不正常');
     console.log('回水压力 不正常');
   }
+
+  // if (differentialPressureNotPass) {
+  //   context.createLeftSpanMessage('压差', 'red');
+  //   Log.error('压差 不正常');
+  //   console.log('压差 不正常');
+  // }
   // else {
   //   context.createLeftSpanMessage('回水压力 正常', 'green');
   // }
@@ -303,6 +324,11 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
     Log.error('进压探头 与实物不匹配');
     console.log('进压探头 与实物不匹配');
   }
+  // if (differentialPressureMatchNotPass) {
+  //   context.createLeftSpanMessage('压差探头 与实物不匹配', 'red');
+  //   Log.error('压差探头 与实物不匹配');
+  //   console.log('压差探头 与实物不匹配');
+  // }
   // else {
   //   context.createLeftSpanMessage('进压探头 与实物匹配', 'green');
   // }
@@ -327,11 +353,13 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
     console.error('自检不通过');
     Log.error('自检不通过');
     context.leftWorkPrompt = '自检失败(读自检状态不通过)'
+    context.buttonError('leftWorkPromptColor')
     context.receivedData.globalReceivedOneData = '';
     return true
   }else{
-    context.createLeftSpanMessage('自检通过', 'red');
-    context.leftWorkPrompt = '自检通过'
+    context.createLeftSpanMessage('自检通过', 'green');
+    // context.leftWorkPrompt = '自检通过'
+    // context.buttonSuccess('leftWorkPromptColor')
   }
   //解析通过
   context.leftReadAddress = decodeReadSelfTestAddressWAC710CD(context.receivedData.globalReceivedOneData); //读设备地址

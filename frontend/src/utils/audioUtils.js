@@ -23,7 +23,6 @@ async function playErrorAudio(context) {
   console.warn('appPath:', res);
   const audioPath = path.join(res, "audio", "error.mp3");
   console.log('失败音频文件路径:', audioPath);
-  await new Promise(x => setTimeout(x, 1000));
   await playAudio(audioPath);
 }
 

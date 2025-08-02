@@ -7,10 +7,11 @@ export default {
     scanAddressTwo:undefined,
     leftTime:undefined,
     rightTime:undefined,
-    processTextOne:undefined,
-    processTextTwo:undefined
+    processTextOne:'开始测试',
+    processTextTwo:'开始测试'
   },
   leftGenerateAddress:undefined,
-  rightGenerateAddress:undefined
+  rightGenerateAddress:undefined,
+  secondaryInspectionGenerateAddress:undefined
 };
 

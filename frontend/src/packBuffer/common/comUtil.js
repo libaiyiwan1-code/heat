@@ -1,15 +1,11 @@
-export const ab2hex = (buffer) => {
-  const hexArr = Array.prototype.map.call(
-    new Uint8Array(buffer),
-    function (bit) {
-      return ('00' + bit.toString(16)).slice(-2);
-    }
-  );
-  return hexArr.join('');
-}
+/**
+ * 检查是否是自发送的数据
+ * @param {string} responseMessage - 响应消息
+ * @param {string} requestMessage - 请求消息
+ * @returns {boolean} - 如果是自发送的数据返回 true，否则返回 false
+ *
+ * */
 export function checkSpontaneous(responseMessage, requestMessage) {
-  console.warn('checkSpontaneous', responseMessage)
-  console.warn('requestMessage', requestMessage)
   responseMessage = responseMessage.replace(/\s/g, '');
   requestMessage = requestMessage.replace(/\s/g, '');
   return responseMessage.toLowerCase() === requestMessage.toLowerCase();
@@ -18,7 +14,7 @@ export function checkSpontaneous(responseMessage, requestMessage) {
 
 /**
  * 合并 ArrayBuffer
- * @param  {...any} arrays
+ * @param  {...any} arrays - 要合并的 ArrayBuffer
  */
 export const mergeArrayBuffer = (...arrays) => {
   let totalLen = 0;
@@ -42,12 +38,20 @@ export const mergeArrayBuffer = (...arrays) => {
 }
 
 /**
- * Array 2 Hex
- * @param {*} buffer
+ * ArrayBuffer 转换为十六进制字符串
+ * @param {buffer} buffer - 要转换的 ArrayBuffer
+ * @returns {string} - 转换后的十六进制字符串
  */
 export const arrayBuffer2Hex = (buffer) => {
   return Array.prototype.map.call(new Uint8Array(buffer), x => x.toString(16).padStart(2, '0')).join('');
 }
+
+
+/**
+ * 十六进制字符串转换为 ASCII 字符
+ * @param {string} hexString - 要转换的十六进制字符串
+ * @returns {string} - 转换后的 ASCII 字符串
+ * */
 export function hexToAscii(hexString) {
   let asciiString = '';
   for (let i = 0; i < hexString.length; i += 2) {
@@ -68,6 +72,10 @@ export function hexToAscii(hexString) {
   return asciiString;
 }
 
+/**
+ * 16进制字符串转换为 ArrayBuffer
+ * @param {hex} hex - 要转换的十六进制字符串
+ * */
 export const hex2arrayBuffer = function (hex) {
   var typedArray = new Uint8Array(hex.match(/[\da-f]{2}/gi).map(function (h) {
     return parseInt(h, 16);
@@ -75,133 +83,12 @@ export const hex2arrayBuffer = function (hex) {
   return typedArray.buffer;
 };
 
-export const fillZeroLeft = (str, length) => {
-  if (str || str === 0) {
-    if (typeof (str) !== 'string') {
-      str += '';
-    }
-
-    const strLength = str.length;
-    if (strLength < length) {
-      for (let i = 0, len = length - strLength; i < len; i++) {
-        str = '0' + str;
-      }
-    }
-  }
-  return str;
-}
 
 /**
- * 字节 转 hex字符串
- * @param b
- * @returns {string}
- */
-export const byte2HexStr = (b) => {
-  return ('00' + b.toString(16)).slice(-2);
-}
-
-/**
- * 左填充0
- * @param obj
- * @param len
- * @returns {string}
- */
-export const fillLeftZero = (obj, len) => {
-  return (new Array(len + 1).join('0') + obj).slice(-len);
-}
-
-/**
- * 小数
- * @param str
- * @returns {string}
- */
-export const clearDots = (str) => {
-  const num = Number(str).toFixed(2).toString()
-  return num.split('.')
-}
-
-/**
- * 日期 月-日
- * @param str
- * @returns {string}
- */
-export const clearLine = (str) => {
-  return str.replace(/-/g, "")
-}
-
-/**
- * 时间 时-分
- * @param str
- * @returns {string}
- */
-export const clearColon = (str) => {
-  return str.replace(/:/g, "")
-}
-
-// 深拷贝
-export const deepClone = (obj) => {
-  const objClone = Array.isArray(obj) ? [] : {}
-  if (obj && typeof obj === 'object') {
-    for (const key in obj) {
-      if (obj[key] && typeof obj[key] === 'object') {
-        objClone[key] = deepClone(obj[key])
-      } else {
-        objClone[key] = obj[key]
-      }
-    }
-  }
-  return objClone
-}
-
-// 判断数字是否有小数
-export const judgeDecimals = (num) => {
-  if (String(num).indexOf('.') == -1) {
-    return 0
-  } else {
-    let x = String(num).indexOf('.') + 1; // 小数点的位置
-    let y = String(num).length - x; // 小数的位数
-    // 返回小数点后的个数
-    return y
-  }
-}
-
-// 判断是否为BRF模块直连
-export const judgeBEF = (modelTxt) => {
-  return modelTxt == 'LRT400' || modelTxt == 'WAC300' || modelTxt == 'WAC300C' ||
-    modelTxt == 'WAC300NH' || modelTxt == 'WAC330NE' || modelTxt == 'WAC400' ||
-    modelTxt == 'NTC100' || modelTxt == 'NBT200' || modelTxt == 'WAC330N'
-}
-
-
-// Modbus 协议 计算CRC
-export const calculateCRC = (buffer) => {
-  let crc = 0xFFFF;
-  const length = buffer.byteLength;
-
-  for (let i = 0; i < length; i++) {
-    crc ^= buffer[i];
-    for (let j = 0; j < 8; j++) {
-      if ((crc & 0x0001) !== 0) {
-        crc >>= 1;
-        crc ^= 0xA001;
-      } else {
-        crc >>= 1;
-      }
-    }
-  }
-
-  return crc;
-}
-
-export const calculateCRCByte = (buffer, isHigh) => {
-  const crc = calculateCRC(new Uint8Array(buffer));
-  if (isHigh) {
-    return (crc >> 8) & 0xFF; // 返回CRC高位
-  } else {
-    return crc & 0xFF; // 返回CRC低位
-  }
-}
-
+ * 计算 CS 校验和
+ * @param buffer - 要计算的 ArrayBuffer
+ *
+ * */
 export const calculateCSByte = (buffer) => {
   let bodySum = 0
   let bodyDataView = new DataView(buffer)
@@ -211,33 +98,46 @@ export const calculateCSByte = (buffer) => {
   return bodySum;
 }
 
-export const calculateCSByteCover = (buffer) => {
-  let bodySum = 0
-  let bodyDataView = new DataView(buffer)
-  for (let i = 0; i < buffer.byteLength; i++) {
-    bodySum += bodyDataView.getUint8(i)
-  }
-  // 取校验和的低位字节
-  return bodySum & 0xFF;
-}
-
-/*
-*  十六进制字符串转换为 IEEE 754 浮点数
-* */
-export function hexToFloat(hexString) {
-  // 转换 Buffer
+/**
+ *  十六进制字符串转换为 IEEE 754 浮点数
+ *   @param {string} hexString - 要转换的十六进制字符串 长度必须为4字节（8个十六进制字符）
+ *   @param {boolean} isLittleEndian - 是否为小端序-逆序读
+ *   @returns {number} - 转换后的浮点数
+ * */
+export function hexToFloat(hexString, isLittleEndian = false) {
+  console.log(hexString)
   const buffer = Buffer.from(hexString, 'hex');
-
-  // 如果 Buffer 的长度不是 4，说明无法转换为 IEEE 754 浮点数
   if (buffer.length !== 4) {
-    throw new Error('Hex string must be 4 bytes long');
+    throw new Error('Hex string to float conversion failed: Input must be 4 bytes long');
   }
-  // 3EC2BA82
-  // C2BA82A5
-  // 使用 readFloatBE 从 Buffer 中读取 IEEE 754 浮点数
-  return buffer.readFloatBE(0);
+  if (isLittleEndian) {
+    return buffer.readFloatLE(0);
+  } else {
+    return buffer.readFloatBE(0);
+  }
 }
 
+/**
+ * 将 IEEE 754 float 浮点数转换为 4 字节十六进制 Buffer
+ * @param {number} floatValue - 要转换的浮点数
+ * @param {boolean} isLittleEndian - 是否为小端序-逆序读
+ * @returns {Buffer} - 表示该浮点数的 4 字节 Buffer（大端序）
+ */
+export function floatToHexBuffer(floatValue, isLittleEndian = false) {
+  const buffer = Buffer.alloc(4);
+  if (isLittleEndian) {
+    buffer.writeFloatLE(floatValue, 0);
+  } else {
+    buffer.writeFloatBE(floatValue, 0);
+  }
+  return buffer;
+}
+
+/**
+ * 地址转换
+ * @param {string} address - 16进制字符串地址
+ * @returns {Array} - 返回一个字节数组
+ * */
 export function addressCover(address) {
   let byteArray = [];
   for (let i = 0; i < address.length; i += 2) {
@@ -247,11 +147,27 @@ export function addressCover(address) {
 
 }
 
+/**
+ * 验证 IMEI 号
+ * @param {string} imei - 要验证的 IMEI 号
+ * 验证规则：
+ * 1. 长度必须为 15 位
+ * 2. 必须以 8 开头
+ *
+ * */
 export function checkIMEI(imei) {
   return !imei || imei.length !== 15 || !/^8/.test(imei);
 
 }
 
+/**
+ * 验证 ICCID 号
+ * @param {string} iccid - 要验证的 ICCID 号
+ * 验证规则：
+ * 1. 长度必须为 20 位
+ * 2. 必须以 8 开头
+ *
+ * */
 export function checkICCID(iccid) {
   return !iccid || iccid.length !== 20 || !/^8/.test(iccid)
 

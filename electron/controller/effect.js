@@ -11,11 +11,12 @@ const binModule = require("../config/bin");
 const Ps = require("ee-core/ps");
 const Conf = require("ee-core/config");
 const Log = require('ee-core/log');
-const { screen } = require('electron');
+const {screen} = require('electron');
 const os = require('os');
-const { exec } = require('child_process');
+const {exec} = require('child_process');
 const util = require('util');
 const execPromise = util.promisify(exec);
+
 // const windows = []; //保存窗口引用
 /**
  * 特效 - 功能demo
@@ -61,6 +62,16 @@ class EffectController extends Controller {
     }
 
     /**
+     *获取软件版本，渲染应用title使用。
+     *
+     * */
+    getVersion() {
+        Log.info('版本：：：',this.config.version)
+        return this.config.version
+    }
+
+
+    /**
      * restore window
      */
     restoreWindow(args) {
@@ -85,8 +96,9 @@ class EffectController extends Controller {
     // 创建子窗口的函数
     loginRouter(args) {
         // 路由 并创建新的子窗口
-        const {width, height, content, windowName, windowTitle,param ,type,
-            windowsId,setResizable=false,minWidth,minHeight,fullScreenIsAllowed = false
+        const {
+            width, height, content, windowName, windowTitle, param, type,
+            windowsId, setResizable = false, minWidth, minHeight, fullScreenIsAllowed = false
         } = args;
         if (windowsId === null || windowsId === undefined) {
             Log.error('router windows id is null');
@@ -119,13 +131,15 @@ class EffectController extends Controller {
             title: windowTitle,
             minWidth,
             minHeight,
+            frame: false,
+            titleBarStyle: 'hidden',
         }
         const win = Addon.get('window').create(windowName, opt);
         const winContentsId = win.webContents.id;
         win.setSize(width, height);
         win.setResizable(setResizable);
         if (fullScreenIsAllowed) {
-            const { bounds } = screen.getPrimaryDisplay();
+            const {bounds} = screen.getPrimaryDisplay();
             win.setBounds(bounds);
         } else {
             win.setSize(width, height);
@@ -135,9 +149,32 @@ class EffectController extends Controller {
         win.center();
         win.show();
         win.focus();
+        win.webContents.on('ipc-message', (event, channel, ...args) => {
+            const currentWindow = win;
+            //channel 接收主进程的操作通知。
+            if (channel === 'minimize-window') {
+                currentWindow.minimize();
+            } else if (channel === 'toggle-maximize') {
+                if (currentWindow.isMaximized()) {
+                    currentWindow.unmaximize();
+                    currentWindow.webContents.send('window-is-maximized', true);
+                } else {
+                    currentWindow.maximize();
+                    currentWindow.webContents.send('window-is-maximized', false);
+                }
+                win.webContents.send('maximize-change', currentWindow.isMaximized());
+            } else if (channel === 'close-window') {
+                currentWindow.close();
+            }
+        });
+        win.on('resize', () => {
+            const isMaximized = !win.isMaximized();
+            win.webContents.send('window-is-maximized', isMaximized);
+        });
+
         // 将窗口引用保存到数组中
         // windows.push(win);
-        win.webContents.openDevTools()   //控制台
+        // win.webContents.openDevTools()   //控制台
         // 关闭当前主窗口
         // const mainWindow = CoreWindow.getMainWindow();
         // mainWindow.close();
@@ -159,16 +196,17 @@ class EffectController extends Controller {
 
         return winContentsId;
     }
+
     getMacAddress() {
         const networkInterfaces = os.networkInterfaces();
-        Log.info(networkInterfaces)
+        Log.info('networkInterfaces:', networkInterfaces)
         console.log(networkInterfaces)
-        const ethAdapter = networkInterfaces['以太网']  || [];
+        const ethAdapter = networkInterfaces['以太网'] || [];
         console.log(ethAdapter)
         Log.info(ethAdapter)
         let macAddr = ethAdapter.find(info => info.family === 'IPv4')?.mac;
-        if (macAddr===undefined||macAddr===null){
-             macAddr = ethAdapter.find(info => info.family === 'IPv6')?.mac;
+        if (macAddr === undefined || macAddr === null) {
+            macAddr = ethAdapter.find(info => info.family === 'IPv6')?.mac;
 
         }
         Log.info(macAddr)

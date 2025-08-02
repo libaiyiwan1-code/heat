@@ -22,7 +22,7 @@ export function getIdByUsername(username) {
 
       // 执行查询
       connection.query(
-        `SELECT id
+        `SELECT id,pwd
          FROM sys_user
          WHERE name = ?
            and status = 1`,
@@ -146,12 +146,12 @@ export function insertNBValueProduce(data) {
       connection.query(
         `INSERT INTO arc_nbvalveproduce (userid, customerid, valveModel, valveVersion, protocolid,
                                          IMEI, netprovider, macaddr, produceDate, iccid, description, status,
-                                         customer, expireDate, TempProbeAddr)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                                         customer, expireDate, TempProbeAddr,PressProbe,TorqueNM)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)`,
         [data.userid, data.customerid, data.valveModel, data.valveVersion,
           data.protocolid, data.IMEI, data.netprovider, data.macaddr,
           data.produceDate, data.iccid, data.description, data.status,
-          data.customer, data.expireDate, data.TempProbeAddr],
+          data.customer, data.expireDate, data.TempProbeAddr,data.PressProbe,data.TorqueNM],
         (error, results) => {
           // 释放连接
           connection.release();

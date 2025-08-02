@@ -1,4 +1,12 @@
 <template>
+  <div style="height: 100vh; overflow: hidden;">
+    <!-- 自定义标题栏 -->
+    <custom-title-bar
+      :page="'login'"
+      :isMaximized="true"
+      @minimize-window="handleMinimizeWindow"
+      @close-window="handleCloseWindow"
+    />
   <div style="margin-top: 35px;margin-left: 40px; ">
     <a-form
       :model="dataForm"
@@ -11,6 +19,7 @@
                    :rules="[{ required: true, message: '请输入用户名' }]"
                    :label-col="{ span: 6 }"
                    :wrapper-col="{ span: 20 }"
+                   @input="handleUsernameChange()"
 
       >
         <a-input v-model:value="dataForm.username" placeholder="请输入用户名"
@@ -25,7 +34,7 @@
         <a-input type="password" v-model:value="dataForm.password" placeholder="请输入密码"
                  style="width: 200px;margin-left: 15px"></a-input>
       </a-form-item>
-      <a-form-item label="CPU_ID:"
+      <a-form-item label="MAC地址:"
                    name="macAddr"
                    :rules="[{ required: true, message: '请输入MAC地址' }]"
                    :label-col="{ span: 6 }"
@@ -35,9 +44,13 @@
                  style="width: 200px;margin-left: 15px" spellcheck="false" :readonly="true"></a-input>
       </a-form-item>
       <a-form-item
-        v-show="this.routerParam.produceMachine === 0"
-        label="工单号:"
-        name="macAddr"
+        v-show="this.routerParam.produceMachine === 0&&!this.startsWithJ"
+        :label="`工单号: (${this.ip==='158'?'演示':'正式'})`"
+        :rules="[{
+          required: this.routerParam.produceMachine === 0 &&!this.startsWithJ,
+          message: '请录入工单号'
+        }]"
+        name="selectWorkNumber"
         :label-col="{ span: 6 }"
         :wrapper-col="{ span: 20 }"
       >
@@ -45,7 +58,7 @@
           <a-select
             placeholder="请选择或输入工单号"
             style="width: 45vw; margin-left: 15px; text-align: left;"
-            v-model:value="selectWorkNumber"
+            v-model:value="dataForm.selectWorkNumber"
             show-search
             allow-clear
             :filter-option="filterWorkNumber"
@@ -68,11 +81,12 @@
         </div>
       </a-form-item>
 
-      <a-form-item style="margin-top: 50px">
+      <a-form-item style="margin-top: 10px">
         <a-button class="login-button" type="primary" @click="login" html-type="submit">登录</a-button>
       </a-form-item>
 
     </a-form>
+  </div>
   </div>
 </template>
 
@@ -82,18 +96,25 @@ import {message} from 'ant-design-vue';
 import {ipc} from "@/utils/ipcRenderer";
 import {ipcApiRoute} from "@/api/main";
 import {findMacAddr, getIdByUsername} from "@/components/global/productdb";
-import {login, queryWorkNosWithUnfinished} from "@/api/remote";
+import {getWorkConfigParam, getWorkDetail, login, queryWorkNosWithUnfinished} from "@/api/remote";
 import {sm2} from 'sm-crypto';
-/*todo 研发mac地址不需要上传MES ， 不需要录工单 。*/
 const {logger} = require('ee-core/log');
+import CustomTitleBar from '../device/CustomTitleBar.vue';
+import  ip from '@/api/remote';
 export default {
+  components: {
+    CustomTitleBar
+  },
   data() {
     return {
+      ip:ip,
       layout: 'horizontal',
       dataForm: {
-        username: undefined,
-        password: undefined,
+        username: 'YP-0',
+        password: '0',
         macAddr: undefined,
+        // selectWorkNumber:'SJ250516003/JG002',
+        selectWorkNumber:undefined,
       },
       messageString: '',
       routerParam: {
@@ -103,6 +124,9 @@ export default {
         token: 'Bearer',
         produceMachine: undefined,
         workNumber:undefined,
+        pwd:undefined,
+        startsWithJ:false,
+        userName: undefined, // 用户名
       },
       routerInfo: {
         type: 'vue',
@@ -113,16 +137,24 @@ export default {
       currentWindowName: 'main',
       currentWindowsId: undefined,
       macList: [],
-      selectWorkNumber: undefined,
       filteredWorkNumberList: [],   // 过滤后的工单号列表
       workNumberList: [],
+      startsWithJ:false,
     };
+  },
+  computed: {
+    workNumberRules() {
+      return [{
+        required: true,
+        message: '请录入工单号'
+      }];
+    }
   },
   async created() {
     await this.init();
     this.macList = await findMacAddr()
     console.log(this.macList)
-    await ipc.invoke(ipcApiRoute.getCpuIdentifier).then(res => {
+    await ipc.invoke(ipcApiRoute.getMacAddress).then(res => {
       let result = this.macList.find(x => x.macAddr === res)
       console.log(result)
       this.routerParam.machineNumber = result.machineNumber
@@ -158,8 +190,17 @@ export default {
     }
   },
   methods: {
+    handleMinimizeWindow() {
+      ipc.send('minimize-window');
+    },
+    handleCloseWindow() {
+      ipc.send('close-window');
+    },
+    handleUsernameChange() {
+      this.startsWithJ = this.dataForm.username && this.dataForm.username.trim().toUpperCase().startsWith('J');
+    },
     handleRefreshWorkNumber(){
-      this.selectWorkNumber=undefined
+      this.dataForm.selectWorkNumber=undefined
       this.handleQueryWorkNumberList()
     },
     handleQueryWorkNumberList(){
@@ -189,17 +230,40 @@ export default {
       this.currentWindowsId = await ipc.invoke(ipcApiRoute.getWCid, this.currentWindowName);
     },
     async login() {
-      if (this.routerParam.produceMachine===0){
-        if (this.selectWorkNumber===null||this.selectWorkNumber===undefined){
+      const startsWithJ = this.dataForm.username &&
+        this.dataForm.username.trim().toUpperCase().startsWith('J');
+      //生产验证 工单号是否正确是否为空
+      if (this.routerParam.produceMachine===0&&!startsWithJ){
+        if (this.dataForm.selectWorkNumber===null||this.dataForm.selectWorkNumber===undefined){
           this.$message.error('请选择工单号')
           return
         }
-
-        //生产验证 工单号是否正确是否为空
+        //解析产品型号如果是有线阀门,则验证配置是否存在
+        const res2 = await getWorkDetail(this.routerParam.token, this.dataForm.selectWorkNumber);
+        let data = res2.data;
+        console.log(data.data)
+        if (data.code !== 200) {
+          this.$message.error('网络错误请联系管理员');
+        }
+        let model = data.data.productModel;
+        if (model === undefined || model === null || model === '') {
+          this.$message.error('产品型号错误，请联系管理员');
+          return;
+        }
+        let productNamingConventionsList = model.split('-');
+        let productModel = productNamingConventionsList[0];
+        if (productModel==='VAC200'){
+          const res = await getWorkConfigParam(this.routerParam.token, this.dataForm.selectWorkNumber);
+          if (res.data.data===null&&this.routerParam.produceMachine===0){
+            this.$message.error('该工单未进行开工配置,请在MES先开工')
+            return
+          }
+        }
       }
+
       // cmd get cpuID: wmic cpu get ProcessorId
       // cmd get bios :wmic bios get serialnumber
-      await ipc.invoke(ipcApiRoute.getCpuIdentifier).then(async res => {
+      await ipc.invoke(ipcApiRoute.getMacAddress).then(async res => {
         console.log(res)
         console.log(this.dataForm.macAddr)
           if (res === this.dataForm.macAddr) {
@@ -215,9 +279,12 @@ export default {
               } else {
                 message.success('登录成功');
                 this.routerParam.userId = (await getIdByUsername(username))[0].id;
+                this.routerParam.pwd = (await getIdByUsername(username))[0].pwd;
+                this.routerParam.userName = this.dataForm.username;
                 console.log('登录人员ID', this.routerParam.userId);
+                this.routerParam.startsWithJ=this.startsWithJ
+                this.routerParam.workNumber=this.dataForm.selectWorkNumber
                 let param = this.routerParam;
-                this.routerParam.workNumber=this.selectWorkNumber
                 console.log(param)
                 ipc.invoke(ipcApiRoute.loginRouter, {
                   width: 1800, height: 1500, setResizable: true,
@@ -301,9 +368,6 @@ export default {
   height: 40px;
 
 }
-.ant-select-dropdown {
-  top: auto !important;
-  bottom: auto !important;
-  text-align: left !important;
-}
+
+
 </style>

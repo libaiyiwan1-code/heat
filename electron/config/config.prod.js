@@ -11,7 +11,7 @@ module.exports = (appInfo) => {
   /**
    * 开发者工具
    */
-  config.openDevTools = true;
+  config.openDevTools = false;
 
   /**
    * 应用程序顶部菜单
@@ -22,16 +22,16 @@ module.exports = (appInfo) => {
    * 主窗口
    */
   config.windowsOption = {
-    title: '生产软件V1.0参数设置',
+    title: '',
     width: 450,
-    height: 400,
+    height: 460,
     webPreferences: {
       //webSecurity: false,
       contextIsolation: false, // false -> 可在渲染进程中使用electron的api，true->需要bridge.js(contextBridge)
       nodeIntegration: true,
       //preload: path.join(appInfo.baseDir, 'preload', 'bridge.js'),
     },
-    frame: true,
+    frame: false,
     show: false,
     icon: path.join(appInfo.home, 'public', 'images', 'login.png'),
   };

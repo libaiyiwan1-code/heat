@@ -1,8 +1,10 @@
 import axios from "axios";
-export const queryWorkNosWithUnfinished=(token)=>{
+const ip='159'
 
+
+export const queryWorkNosWithUnfinished=(token)=>{
   return axios({
-    url: 'http://192.168.0.158:82/api/workNo',
+    url: 'http://192.168.0.'+ip+':82/api/workNo',
     method: 'get',
     timeout: 6000,
     headers: {
@@ -15,7 +17,7 @@ export const queryWorkNosWithUnfinished=(token)=>{
 
 export const login = (param) => {
   return axios({
-    url: 'http://192.168.0.158:82/login',
+    url: 'http://192.168.0.'+ip+':82/login',
     method: 'post',
     data: param,
     timeout: 6000
@@ -24,7 +26,7 @@ export const login = (param) => {
 
 export const getWorkDetail = (token, workNo) => {
   return axios({
-    url: 'http://192.168.0.158:82/preWork/detail',
+    url: 'http://192.168.0.'+ip+':82/preWork/detail',
     method: 'get',
     timeout: 6000,
     params: {
@@ -37,7 +39,7 @@ export const getWorkDetail = (token, workNo) => {
 }
 export const getProductImageList = (token, materialCode) => {
   return axios({
-    url: 'http://192.168.0.158:82/prdMaterial/info',
+    url: 'http://192.168.0.'+ip+':82/prdMaterial/info',
     method: 'get',
     timeout: 6000,
     params: {
@@ -50,7 +52,7 @@ export const getProductImageList = (token, materialCode) => {
 }
 export const getWorkConfigParam = (token, workNo) => {
   return axios({
-    url: 'http://192.168.0.158:82/pre-work/config-param',
+    url: 'http://192.168.0.'+ip+':82/pre-work/config-param',
     method: 'get',
     timeout: 6000,
     params: {
@@ -64,7 +66,7 @@ export const getWorkConfigParam = (token, workNo) => {
 
 export const saveVacDeviceProduceInfo = (token, data) => {
   return axios({
-    url: 'http://192.168.0.158:82/api/vac-device-produce-info',
+    url: 'http://192.168.0.'+ip+':82/api/vac-device-produce-info',
     method: 'post',
     timeout: 6000,
     data: data,
@@ -74,3 +76,4 @@ export const saveVacDeviceProduceInfo = (token, data) => {
     }
   });
 }
+export default ip;

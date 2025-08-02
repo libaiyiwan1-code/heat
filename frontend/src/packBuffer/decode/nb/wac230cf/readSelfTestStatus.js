@@ -16,12 +16,12 @@ import {
 } from "@/packBuffer/decode/decode";
 const Log = require('ee-core/log');
 
-export function decodeGetProductNameWAC300CD(responseMessage) {
+export function decodeGetProductNameWAC230CF(responseMessage) {
   let model = '';
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   // 判断型号
-  for (let i = 30; i <= 53; i++) {
+  for (let i = 63; i <= 86; i++) {
     model += dataView.getUint8(i).toString(16);
   }
   const productName = hexToAscii(model);
@@ -29,7 +29,7 @@ export function decodeGetProductNameWAC300CD(responseMessage) {
   return productName
 
 }
-export function decodeCheckReadSelfTestStatusWAC300CD(context, responseMessage) {
+export function decodeCheckReadSelfTestStatusWAC230CF(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   let dataView = new DataView(messageBuffer)
   let baseCheck = dataView.getUint8(37) !== 0x80
@@ -50,7 +50,7 @@ export function decodeCheckReadSelfTestStatusWAC300CD(context, responseMessage) 
     Log.error('未进行过自检');
     console.log('未进行过自检');
   } else {
-    context.createLeftSpanMessage('已自检过', 'green');
+    context.createLeftSpanMessage('已自检过', 'grey');
   }
 
   if (eepNotPass) {
@@ -58,7 +58,7 @@ export function decodeCheckReadSelfTestStatusWAC300CD(context, responseMessage) 
     Log.error('eep 不正常');
     console.log('eep 不正常');
   } else {
-    context.createLeftSpanMessage('eep 正常', 'green');
+    context.createLeftSpanMessage('eep 正常', 'grey');
   }
   if (networkNotPass) {
     context.createLeftSpanMessage('联网 不正常', 'red');
@@ -121,7 +121,11 @@ export function decodeCheckReadSelfTestStatusWAC300CD(context, responseMessage) 
   }
   //解析通过
   context.leftReadAddress = decodeReadSelfTestAddress(context, context.receivedData.globalReceivedOneData); //读设备地址
-  context.productName = decodeGetProductNameWAC300CD(context.receivedData.globalReceivedOneData); //产品名称
+  context.productName = decodeGetProductNameWAC230CF(context.receivedData.globalReceivedOneData); //产品名称
+  if (!context.productName.toLowerCase().includes('WAC230CF')){
+    context.createLeftSpanMessage('产品名称错误：'+context.productName, 'red');
+    return true
+  }
   context.protocolId = decodeGetProtocolId(context.receivedData.globalReceivedOneData);//协议id
   context.version = decodeGetVersion(context.receivedData.globalReceivedOneData)//版本号
   context.netprovider = decodeGetNetprovider(context.receivedData.globalReceivedOneData) //运营商

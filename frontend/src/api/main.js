@@ -6,6 +6,7 @@
 const ipcApiRoute = {
   // framework
   test: 'controller.example.test',
+  isMaximized: 'controller.framework.isMaximized',
   checkForUpdater: 'controller.framework.checkForUpdater',
   downloadApp: 'controller.framework.downloadApp',
   jsondbOperation: 'controller.framework.jsondbOperation',
@@ -47,10 +48,19 @@ const ipcApiRoute = {
   getPath: 'controller.os.getPath',
 
   // hardware
+  printDoubleRowLabel4020: 'controller.hardware.printDoubleRowLabel4020',
+  printAddressSingleRowLabelVAC5012: 'controller.hardware.printAddressSingleRowLabelVAC5012',
+  printAddressSingleRowLabelWAC5012: 'controller.hardware.printAddressSingleRowLabelWAC5012',
+  printSuccessSingleRowInspectLabel5012: 'controller.hardware.printSuccessSingleRowInspectLabel5012',
+  printErrorSingleRowInspectLabel5012: 'controller.hardware.printErrorSingleRowInspectLabel5012',
   getPrinterList: 'controller.hardware.getPrinterList',
   print: 'controller.hardware.print',
+  print4020: 'controller.hardware.print4020',
+  print3012: 'controller.hardware.print3012',
+  printErrorMessage: 'controller.hardware.printErrorMessage',
   printStatus: 'controller.hardware.printStatus',
   printAddressAndModel: 'controller.hardware.printAddressAndModel',
+  printSuccessMessage:'controller.hardware.printSuccessMessage',
 
   // effect
   selectFile: 'controller.effect.selectFile',
@@ -59,6 +69,7 @@ const ipcApiRoute = {
   loginRouter: 'controller.effect.loginRouter',
   getMacAddress:'controller.effect.getMacAddress',
   getCpuIdentifier:'controller.effect.getCpuIdentifier',
+  getVersion:'controller.effect.getVersion',
 
   // cross
   crossInfo: 'controller.cross.info',

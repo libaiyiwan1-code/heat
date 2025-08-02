@@ -103,11 +103,18 @@ export function decodeGetIMEI(responseMessage, selfCollecting) {
   return hexToAscii(imei)
 }
 
-export function decodeGetTorque(responseMessage) {
+export function decodeGetTorqueStr(responseMessage) {
   responseMessage = responseMessage.replace(/\s/g, '');
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   return dataView.getUint8(30) === 0x00 ? '25Nm' : '50Nm'
+}
+
+export function decodeGetTorque(responseMessage) {
+  responseMessage = responseMessage.replace(/\s/g, '');
+  let messageBuffer = hex2arrayBuffer(responseMessage);
+  let dataView = new DataView(messageBuffer)
+  return dataView.getUint8(30) === 0x00 ? 25 : 50
 }
 
 export function decodeGetICCID(responseMessage, selfCollecting) {
