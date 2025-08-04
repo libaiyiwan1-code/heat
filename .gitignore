@@ -6,7 +6,7 @@ run/
 package-lock.json
 data/
 .vscode/launch.json
-public/electron/
+public/*
 pnpm-lock.yaml
 .yalc/
 yalc.lock
@@ -18,3 +18,4 @@ python/.venv/
 python/*.spec
 python/build/
 python/dist/
+.gitignore
