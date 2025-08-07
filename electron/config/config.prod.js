@@ -33,7 +33,7 @@ module.exports = (appInfo) => {
     },
     frame: false,
     show: false,
-    icon: path.join(appInfo.home, 'public', 'images', 'login.png'),
+    icon: path.join(appInfo.home, 'build','icons', 'title-759x220.png'),
   };
   /**
    * ee框架日志
@@ -168,7 +168,7 @@ module.exports = (appInfo) => {
     tray: {
       enable: true,
       title: '生产软件',
-      icon: '/public/images/tray.png'
+      icon: '/public/images/tray.ico'
     },
     security: {
       enable: true,

@@ -67,26 +67,11 @@ module.exports = {
       dist: './frontend/dist',
       target: './public/dist'
     },
-    go_static: {
-      dist: './frontend/dist',
-      target: './go/public/dist'
+    defaults: {
+      dist: './build/icons',
+      target: './public/images'
     },
-    go_config: {
-      dist: './go/config',
-      target: './go/public/config'
-    },
-    go_package: {
-      dist: './package.json',
-      target: './go/public/package.json'
-    },
-    go_images: {
-      dist: './public/images',
-      target: './go/public/images'
-    },
-    python_dist: {
-      dist: './python/dist',
-      target: './build/extraResources/py'
-    },
+
   },  
 
   /**

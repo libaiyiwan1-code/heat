@@ -45,7 +45,7 @@ module.exports = (appInfo) => {
         frame: false,
         // transparent: true,// 透明窗口
         show: false,
-        icon: path.join(appInfo.home, 'public', 'images', 'title-759x220.png'),
+        icon: path.join(appInfo.home, 'build','icons', 'title-759x220.png'),
         // titleBarStyle: 'hidden', // 隐藏默认标题栏
 
     };
@@ -183,7 +183,7 @@ module.exports = (appInfo) => {
         tray: {
             enable: true,
             title: '海龙马生产软件',
-            icon: '/public/images/tray.icon'
+            icon: '/build/icons/tray.ico'
         },
         security: {
             enable: true,
