@@ -18,7 +18,7 @@ module.exports = (appInfo) => {
      *      无线：
      *          2.1.001 001累加    2.1起 包含VAC系列。
      * */
-    config.version = '2.1.004'
+    config.version = '2.1.005'
     /**
      * 开发者工具
      */
@@ -114,7 +114,7 @@ module.exports = (appInfo) => {
         },
         filterRequest: {
             uris: [
-                'favicon.ico'
+                'tray.ico'
             ],
             returnData: ''
         }
@@ -183,7 +183,7 @@ module.exports = (appInfo) => {
         tray: {
             enable: true,
             title: '海龙马生产软件',
-            icon: '/public/images/tray.png'
+            icon: '/public/images/tray.icon'
         },
         security: {
             enable: true,

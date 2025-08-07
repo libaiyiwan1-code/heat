@@ -2,13 +2,15 @@ import {
   decodeCheckInquireSelfTestCT1000,
   decodeCheckInquireSelfTestNTP100C,
   decodeCheckInquireSelfTestWAC230CF,
-  decodeCheckInquireSelfTestWAC300CD,
+  decodeCheckInquireSelfTestWAC300CD, decodeCheckInquireSelfTestWAC300N, decodeCheckInquireSelfTestWAC300NH,
   decodeCheckInquireSelfTestWAC710CD
 } from "@/packBuffer/decode/inquireSelfTest";
 import {decodeCheckWriteTorqueConfigWAC710CD} from "@/packBuffer/decode/writeTorqueConfig";
 import {
   decodeCheckWriteProbesConfigNTP100C,
   decodeCheckWriteTemperatureProbesConfigWAC300CD,
+  decodeCheckWriteTemperatureProbesConfigWAC300N,
+  decodeCheckWriteTemperatureProbesConfigWAC300NH,
   decodeCheckWriteTemperatureProbesConfigWAC710CD
 } from "@/packBuffer/decode/writeTemperatureProbesConfig";
 
@@ -102,6 +104,22 @@ import {decodeCheckReadICCIDCT1000} from "@/packBuffer/decode/nb/ct1000/readICCI
 import {decodeCheckWriteAddressCT1000} from "@/packBuffer/decode/nb/ct1000/writeAddress";
 import {decodeReadDataCT1000} from "@/packBuffer/decode/nb/ct1000/readData";
 import {decodeCheckReturnSelfTestCPT1000} from "@/packBuffer/decode/nb/ct1000/returnSelfTest";
+import {decodeCheckAwakenWAC300N} from "@/packBuffer/decode/nb/wac300n/awaken";
+import {decodeCheckReadSelfTestStatusWAC300N} from "@/packBuffer/decode/nb/wac300n/readSelfTestStatus";
+import {decodeCheckReadICCIDWAC300N} from "@/packBuffer/decode/nb/wac300n/readICCID";
+import {decodeCheckReadIMEIWAC300N} from "@/packBuffer/decode/nb/wac300n/readIMEI";
+import {decodeCheckWriteAddressWAC300N} from "@/packBuffer/decode/nb/wac300n/writeAddress";
+import {decodeReadDataWAC300N} from "@/packBuffer/decode/nb/wac300n/readData";
+import {decodeCheckReadTemperatureProbesWAC300N} from "@/packBuffer/decode/nb/wac300n/readProbesConfig";
+import {decodeCheckReadSelfTestStatusWAC300NH} from "@/packBuffer/decode/nb/wac300nh/readSelfTestStatus";
+import {decodeCheckReadICCIDWAC300NH} from "@/packBuffer/decode/nb/wac300nh/readICCID";
+import {decodeCheckReadIMEIWAC300NH} from "@/packBuffer/decode/nb/wac300nh/readIMEI";
+import {decodeCheckWriteAddressWAC300NH} from "@/packBuffer/decode/nb/wac300nh/writeAddress";
+import {decodeCheckAwakenWAC300NH} from "@/packBuffer/decode/nb/wac300nh/awaken";
+import {decodeReadDataWAC300NH} from "@/packBuffer/decode/nb/wac300nh/readData";
+import {decodeCheckReadTemperatureProbesWAC300NH} from "@/packBuffer/decode/nb/wac300nh/readProbesConfig";
+import {decodeCheckReadAddressWAC300NH} from "@/packBuffer/decode/nb/wac300nh/readAddress";
+import {decodeCheckReadAddressWAC300N} from "@/packBuffer/decode/nb/wac300n/readAddress";
 
 
 /**
@@ -575,6 +593,182 @@ export const protocolIDMap = {
         return decodeCheckAwakenNTP100C(data);
       },
 
+
+    },
+  },
+  'WAC300N': {
+    protocolCode: `EN1434_9993`,
+    model: 1,  /*1移动|6电信*/
+    joinMode: 2,/*2移动|8电信*/
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': true,
+      'writeTemperatureProbesConfig': true,
+      'selfTest': true,
+      'readSelfTestStatus': true,
+      'readICCID': false,
+      'readIMEI': false,
+      'readAddress': false,
+      'writeAddress': false,
+      'returnSelfTestStatus': true,
+      'awaken': false,
+      'readData': true,
+      'readTemperatureProbes': true
+    },
+    protocolId: 71,
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 67,
+      'writeTemperatureProbesConfig': 69,
+      'selfTest': 99,
+      'readSelfTestStatus': 106,
+      'readICCID': 52,
+      'readIMEI': 47,
+      'readAddress': 47,
+      'writeAddress': 37,
+      'returnSelfTestStatus': 67,
+      'awaken': 32,
+      'readData': 105,
+      'readTemperatureProbes': 69
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 33,
+      'writeTemperatureProbesConfig': 35,
+      'selfTest': 99,
+      'readSelfTestStatus': 33,
+      'readICCID': 16,
+      'readIMEI': 16,
+      'readAddress': 16,
+      'writeAddress': 21,
+      'returnSelfTestStatus': 33,
+      'awaken': 16,
+      'readData': 33,
+      'readTemperatureProbes': 33
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return decodeCheckInquireSelfTestWAC300N(data);
+      },
+      writeTemperatureProbesConfig: (data) => {
+        return decodeCheckWriteTemperatureProbesConfigWAC300N(data);
+      },
+      readSelfTestStatus: (context, data) => {
+        return decodeCheckReadSelfTestStatusWAC300N(context, data);
+      },
+      readICCID: (context, data) => {
+        return decodeCheckReadICCIDWAC300N(context, data);
+      },
+      readIMEI: (context, data) => {
+        return decodeCheckReadIMEIWAC300N(context, data);
+      },
+      readAddress: (context, data) => {
+        return decodeCheckReadAddressWAC300N(context, data);
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return decodeCheckWriteAddressWAC300N(leftGenerateAddress, data);
+      },
+      awaken: (data) => {
+        return decodeCheckAwakenWAC300N(data);
+      },
+      readData: (context, data) => {
+        return decodeReadDataWAC300N(context, data);
+      },
+      readTemperatureProbes: (context, data) => {
+        return decodeCheckReadTemperatureProbesWAC300N(context, data);
+      },
+
+    },
+  },
+  'WAC300NH': {
+    protocolCode: `EN1434_9993`,
+    model: 1,  /*1移动|6电信*/
+    joinMode: 2,/*2移动|8电信*/
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': true,
+      'writeTemperatureProbesConfig': true,
+      'selfTest': true,
+      'readSelfTestStatus': true,
+      'readICCID': false,
+      'readIMEI': false,
+      'readAddress': false,
+      'writeAddress': false,
+      'returnSelfTestStatus': true,
+      'awaken': false,
+      'readData': true,
+      'readTemperatureProbes': true
+    },
+    protocolId: 71,
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 67,
+      'writeTemperatureProbesConfig': 69,
+      'selfTest': 99,
+      'readSelfTestStatus': 106,
+      'readICCID': 52,
+      'readIMEI': 47,
+      'readAddress': 47,
+      'writeAddress': 37,
+      'returnSelfTestStatus': 67,
+      'awaken': 32,
+      'readData': 105,
+      'readTemperatureProbes': 69
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 33,
+      'writeTemperatureProbesConfig': 35,
+      'selfTest': 99,
+      'readSelfTestStatus': 33,
+      'readICCID': 16,
+      'readIMEI': 16,
+      'readAddress': 16,
+      'writeAddress': 21,
+      'returnSelfTestStatus': 33,
+      'awaken': 16,
+      'readData': 33,
+      'readTemperatureProbes': 33
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return decodeCheckInquireSelfTestWAC300NH(data);
+      },
+      writeTemperatureProbesConfig: (data) => {
+        return decodeCheckWriteTemperatureProbesConfigWAC300NH(data);
+      },
+      readSelfTestStatus: (context, data) => {
+        return decodeCheckReadSelfTestStatusWAC300NH(context, data);
+      },
+      readICCID: (context, data) => {
+        return decodeCheckReadICCIDWAC300NH(context, data);
+      },
+      readIMEI: (context, data) => {
+        return decodeCheckReadIMEIWAC300NH(context, data);
+      },
+      readAddress: (context, data) => {
+        return decodeCheckReadAddressWAC300NH(context, data);
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return decodeCheckWriteAddressWAC300NH(leftGenerateAddress, data);
+      },
+      awaken: (data) => {
+        return decodeCheckAwakenWAC300NH(data);
+      },
+      readData: (context, data) => {
+        return decodeReadDataWAC300NH(context, data);
+      },
+      readTemperatureProbes: (context, data) => {
+        return decodeCheckReadTemperatureProbesWAC300NH(context, data);
+      },
 
     },
   },

@@ -239,7 +239,7 @@ async function waitForResponse(context, timeout, expectedLength, expectedLength2
   let pass = false;
 
   while (Date.now() - startTime < timeout) {
-    await new Promise(resolve => setTimeout(resolve, 950));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     let data
     if (type === 'one') {
       data = context.receivedData.globalReceivedOneData;

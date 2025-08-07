@@ -1053,7 +1053,9 @@
                       this.configDetail.printLabel === 'WAC710CD'||
                       this.configDetail.printLabel === 'WAC300CD'||
                       this.configDetail.printLabel === 'NTP100C' ||
-                      this.configDetail.printLabel==='CT1000'"
+                      this.configDetail.printLabel==='CT1000' ||
+                      this.configDetail.printLabel==='WAC300N'||
+                      this.configDetail.printLabel==='WAC300NH'"
                         v-show="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'"
                         @click="awaken(
                         protocolIDMap[this.configForm.produceModel].protocolId,'one'
@@ -1119,7 +1121,9 @@
                       this.configDetail.printLabel === 'WAC710CD'||
                       this.configDetail.printLabel === 'WAC300CD'||
                       this.configDetail.printLabel === 'NTP100C'||
-                      this.configDetail.printLabel === 'CT1000'
+                      this.configDetail.printLabel === 'CT1000'||
+                        this.configDetail.printLabel==='WAC300N'||
+                        this.configDetail.printLabel==='WAC300NH'
 "
                         @click="breakSelfTest(
                         protocolIDMap[this.configForm.produceModel].protocolId,'one'
@@ -1694,7 +1698,6 @@
 </template>
 
 <script>
-import heigeImage from '@/assets/heige.jpg'; // 方式 1: 使用 import 加载图片
 import {useRoute} from "vue-router";
 import {
   checkPort,
@@ -2313,7 +2316,8 @@ export default {
     this.routerParam.startsWithJ = route.query.startsWithJ === 'true';
     this.routerParam.userName = route.query.userName;
     console.log('路由数据：', this.routerParam)
-
+    this.leftWorkPrompt = '请选择打印机和标签纸规格'
+    this.rightWorkPrompt = '请选择打印机和标签纸规格'
     // 按钮禁用
     this.wireDeviceButtonDisabled('one')
     this.wireDeviceButtonDisabled('two')
@@ -2358,15 +2362,16 @@ export default {
         this.isNBDevice = false;
         this.leftProduceViewTitle = '左侧工装'
         this.rightProduceViewTitle = '右侧工装'
-        this.leftWorkPrompt = '请选择打印机和标签纸规格'
-        this.rightWorkPrompt = '请选择打印机和标签纸规格'
+
         this.listenLeftFixture(); //开启监听器 监听左侧工装
         this.listenRightFixture(); //开启监听器 监听右侧工装
       } else if (this.configForm.produceModel === 'WAC710CD' ||
         this.configForm.produceModel === 'WAC230CF' ||
         this.configForm.produceModel === 'WAC300CD' ||
         this.configForm.produceModel === 'NTP100C' ||
-        this.configForm.produceModel === 'CT1000'
+        this.configForm.produceModel === 'CT1000'||
+        this.configForm.produceModel==='WAC300N'||
+        this.configForm.produceModel==='WAC300NH'
       ) {
         this.isNBDevice = true
         this.leftProduceViewTitle = '生产流程'
@@ -2648,6 +2653,10 @@ export default {
         this.configForm.customizePrintLabel = 'NTP100C'
       } else if (value === 'CT1000') {
         this.configForm.customizePrintLabel = 'CT1000'
+      }else if(value==='WAC300N'){
+        this.configForm.customizePrintLabel='WAC300N'
+      }else if(value==='WAC300NH'){
+        this.configForm.customizePrintLabel='WAC300NH'
       } else {
         this.configForm.customizePrintLabel = undefined
       }
@@ -3738,7 +3747,9 @@ export default {
           this.configForm.produceModel === 'WAC230CF' ||
           this.configForm.produceModel === 'WAC300CD' ||
           this.configForm.produceModel === 'NTP100C' ||
-          this.configForm.produceModel === 'CT1000'
+          this.configForm.produceModel === 'CT1000'||
+          this.configForm.produceModel==='WAC300N'||
+          this.configForm.produceModel==='WAC300NH'
         ) {
           this.leftProduceViewTitle = '生产流程'
           this.rightProduceViewTitle = '生产验证'
@@ -3764,7 +3775,9 @@ export default {
           this.configForm.produceModel === 'WAC300CD' ||
           this.configForm.produceModel === 'NTP100C' ||
           this.configForm.produceModel === 'NBT200' ||
-          this.configForm.produceModel === 'CT1000'
+          this.configForm.produceModel === 'CT1000'||
+          this.configForm.produceModel==='WAC300N'||
+          this.configForm.produceModel==='WAC300NH'
         ) {
           this.isNBDevice = true
           if (this.configForm.version === undefined) {

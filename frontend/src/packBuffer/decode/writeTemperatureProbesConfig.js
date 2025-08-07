@@ -32,3 +32,23 @@ export function decodeCheckWriteProbesConfigNTP100C(responseMessage) {
     dataView.getUint8(28) !== 0x00 ||
     dataView.getUint8(30) !== 0X01
 }
+export function decodeCheckWriteTemperatureProbesConfigWAC300N(responseMessage) {
+  let messageBuffer = hex2arrayBuffer(responseMessage)
+  let dataView = new DataView(messageBuffer)
+  return dataView.getUint8(35) !== 0X68 ||
+    dataView.getUint8(38) !== 0X68 ||
+    dataView.getUint8(39) !== 0X80||
+    dataView.getUint8(40) !== 0X47 ||
+    dataView.getUint8(62) !== 0XAC ||
+    dataView.getUint8(63) !== 0X09
+}
+export function decodeCheckWriteTemperatureProbesConfigWAC300NH(responseMessage) {
+  let messageBuffer = hex2arrayBuffer(responseMessage)
+  let dataView = new DataView(messageBuffer)
+  return dataView.getUint8(35) !== 0X68 ||
+    dataView.getUint8(38) !== 0X68 ||
+    dataView.getUint8(39) !== 0X80||
+    dataView.getUint8(40) !== 0X47 ||
+    dataView.getUint8(62) !== 0XAC ||
+    dataView.getUint8(63) !== 0X09
+}

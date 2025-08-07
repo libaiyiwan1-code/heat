@@ -20,6 +20,12 @@ import {writeAddressNTP100C} from "@/views/device/operations/nb/ntp100c/writeAdd
 import {writeAddressWAC230CF} from "@/views/device/operations/nb/wac230cf/writeAddress";
 import {writeAddressWAC710CD} from "@/views/device/operations/nb/wac710cd/writeAddress";
 import {writeAddressWAC300CD} from "@/views/device/operations/nb/wac300cd/writeAddress";
+import {doSelfTestWAC300N} from "@/views/device/operations/nb/wac300n/selfTest";
+import {returnSelfTestWAC300N} from "@/views/device/operations/nb/wac300n/returnSelfTest";
+import {writeAddressWAC300N} from "@/views/device/operations/nb/wac300n/writeAddress";
+import {doSelfTestWAC300NH} from "@/views/device/operations/nb/wac300nh/selfTest";
+import {returnSelfTestWAC300NH} from "@/views/device/operations/nb/wac300nh/returnSelfTest";
+import {writeAddressWAC300NH} from "@/views/device/operations/nb/wac300nh/writeAddress";
 
 const Log = require('ee-core/log');
 
@@ -35,7 +41,9 @@ export const doSelfTest = async (context, protocolId, type) => {
     'WAC230CF': doSelfTestWAC230CF,
     'WAC300CD': doSelfTestWAC300CD,
     'CT1000': doSelfTestCT1000,
-    'NTP100C': doSelfTestNTP100C
+    'NTP100C': doSelfTestNTP100C,
+    'WAC300N':doSelfTestWAC300N,
+    'WAC300NH':doSelfTestWAC300NH
   };
   const produceModel = context.configForm.produceModel;
   const selfTestFunction = selfTestStrategies[produceModel];
@@ -204,7 +212,9 @@ export const doBreakSelfTest = async (context, protocolId, type) => {
     'WAC230CF': returnSelfTestWAC230CF,
     'WAC300CD': returnSelfTestWAC300CD,
     'CT1000': returnSelfTestCT1000,
-    'NTP100C': returnSelfTestNTP100C
+    'NTP100C': returnSelfTestNTP100C,
+    'WAC300N': returnSelfTestWAC300N,
+    'WAC300NH': returnSelfTestWAC300NH
   };
   const produceModel = context.configForm.produceModel;
   const returnSelfTestFunction = returnSelfTestStrategies[produceModel];
@@ -230,7 +240,9 @@ export async function doWriteAddress(context, protocolId, type) {
     'WAC230CF': writeAddressWAC230CF,
     'WAC300CD': writeAddressWAC300CD,
     'CT1000': writeAddressCT1000,
-    'NTP100C': writeAddressNTP100C
+    'NTP100C': writeAddressNTP100C,
+    'WAC300N': writeAddressWAC300N,
+    'WAC300NH': writeAddressWAC300NH
   };
   const produceModel = context.configForm.produceModel;
   const writeAddressFunction = writeAddressStrategies[produceModel];
@@ -261,25 +273,46 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
       await playErrorAudio(context)
       return
     }
+   if (context.configForm.produceModel!=='WAC300N'&& context.configForm.produceModel!=='WAC300NH') {
+     let readAddressResult = await serialPortOperation(context, {
+       actionType: 'labelPrint',
+       operationName: '读地址',
+       cmdType: '05',                         // afn 的命令类型
+       cmdCode: '06',                         // fn 的命令码
+       protocolId: protocolId,
+       maxRetries: context.maxRetries,
+       expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readAddress'],
+       expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['readAddress'],
+       timeout: context.timeout,
+       validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readAddress(context, context.receivedData.globalReceivedOneData),
+       preprocess: () => {
+       },
+       isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
+       isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readAddress,
+     }, type)
+     printAddress = context.leftReadAddress
+     printNotPass = readAddressResult
+   }else{
+     let readAddressResult = await serialPortOperation(context, {
+       actionType: 'labelPrint',
+       operationName: '读地址',
+       cmdType: '05',                         // afn 的命令类型
+       cmdCode: '0b',                         // fn 的命令码
+       protocolId: protocolId,
+       maxRetries: context.maxRetries,
+       expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readAddress'],
+       expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['readAddress'],
+       timeout: context.timeout,
+       validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readAddress(context, context.receivedData.globalReceivedOneData),
+       preprocess: () => {
+       },
+       isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
+       isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readAddress,
+     }, type)
+     printAddress = context.leftReadAddress
+     printNotPass = readAddressResult
+   }
 
-    let readAddressResult = await serialPortOperation(context, {
-      actionType: 'labelPrint',
-      operationName: '读地址',
-      cmdType: '05',                         // afn 的命令类型
-      cmdCode: '06',                         // fn 的命令码
-      protocolId: protocolId,
-      maxRetries: context.maxRetries,
-      expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readAddress'],
-      expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['readAddress'],
-      timeout: context.timeout,
-      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readAddress(context, context.receivedData.globalReceivedOneData),
-      preprocess: () => {
-      },
-      isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
-      isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readAddress,
-    }, type)
-    printAddress = context.leftReadAddress
-    printNotPass = readAddressResult
   }
   if (printNotPass) {
     await playErrorAudio(context)
@@ -297,7 +330,7 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
     listDoubleRowLabels: context.listDoubleRowLabels,
   };
   if (context.configForm.produceModel === 'NTP100C' || context.configForm.produceModel === 'WAC710CD' || context.configForm.produceModel === 'WAC300CD'
-    || context.configForm.produceModel === 'CT1000'
+    || context.configForm.produceModel === 'CT1000'||context.configForm.produceModel==='WAC230CF' || context.configForm.produceModel === 'WAC300N' || context.configForm.produceModel === 'WAC300NH'
   ) {
     await ipc.send(ipcApiRoute.printDoubleRowLabel4020, params)
   } else {

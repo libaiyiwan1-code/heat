@@ -1,5 +1,5 @@
 {
-  "productName": "生产软件_2.1.004",
+  "productName": "生产软件_2.1.005",
   "appId": "com.electron.ee",
   "copyright": "© 20248883 生产软件 Technology to 青岛海龙马科技有限公司.",
   "directories": {
@@ -28,7 +28,7 @@
     "installerHeaderIcon": "build/icons/icon.ico",
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "生产软件_2.1.004",
+    "shortcutName": "生产软件_2.1.005",
     "include": "build/installer.nsh"
   },
   "mac": {

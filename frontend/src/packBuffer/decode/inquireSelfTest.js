@@ -56,3 +56,23 @@ export function decodeCheckInquireSelfTestNTP100C(responseMessage) {
     dataView.getUint8(26) !== 0Xf0||
     dataView.getUint8(28) !== 0X01
 }
+export function decodeCheckInquireSelfTestWAC300N(responseMessage) {
+  let messageBuffer = hex2arrayBuffer(responseMessage)
+  let dataView = new DataView(messageBuffer)
+  return dataView.getUint8(33) !== 0X68 ||
+    dataView.getUint8(36) !== 0X68 ||
+    dataView.getUint8(37) !== 0X80||
+    dataView.getUint8(38) !== 0X47 ||
+    dataView.getUint8(60) !== 0XDD ||
+    dataView.getUint8(61) !== 0XF0
+}
+export function decodeCheckInquireSelfTestWAC300NH(responseMessage) {
+  let messageBuffer = hex2arrayBuffer(responseMessage)
+  let dataView = new DataView(messageBuffer)
+  return dataView.getUint8(33) !== 0X68 ||
+    dataView.getUint8(36) !== 0X68 ||
+    dataView.getUint8(37) !== 0X80||
+    dataView.getUint8(38) !== 0X47 ||
+    dataView.getUint8(60) !== 0XDD ||
+    dataView.getUint8(61) !== 0XF0
+}

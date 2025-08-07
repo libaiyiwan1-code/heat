@@ -183,7 +183,7 @@ export async function generateAddress(context) {
 
 
 export async function nbDeviceRegister(context) {
-  let registerResponse = await axios.post(`http://hems.chaobiao.qdhlm.cn:20206/produce/imei/${context.leftGenerateAddress}?joinMode=2&model=${protocolIDMap[context.configForm.produceModel].model}&imei=${context.imei}&protocolCode=${protocolIDMap[context.configForm.produceModel].protocolCode}&simNumber=${context.iccid}`, null, {
+  let registerResponse = await axios.post(`http://hems.chaobiao.qdhlm.cn:20206/produce/imei/${context.leftGenerateAddress}?joinMode=${protocolIDMap[context.configForm.produceModel].joinMode}&model=${protocolIDMap[context.configForm.produceModel].model}&imei=${context.imei}&protocolCode=${protocolIDMap[context.configForm.produceModel].protocolCode}&simNumber=${context.iccid}&applicationId=2&productId=3`, null, {
     // let registerResponse = await axios.post(`http://124.70.68.52:20206/produce/imei/${context.leftGenerateAddress}?joinMode=2&model=${protocolIDMap[context.configForm.produceModel].model}&imei=${context.imei}&protocolCode=${protocolIDMap[context.configForm.produceModel].protocolCode}&simNumber=${context.iccid}`, null, {
     headers: {
       Authorization: '3a80979e67318eea69f03e65fe9a8e49' //正式
@@ -277,8 +277,9 @@ export const checkIMEI = async (context) => {
 export const checkNetWork = async (context, protocolId, type) => {
   let notPass = true;
   //根据型号区分走不同扫码验证逻辑
-  if (context.configDetail.printLabel === 'WAC230CF' || context.configDetail.printLabel === 'WAC710CD'
-    || context.configDetail.printLabel === 'WAC300CD' || context.configDetail.printLabel === 'NTP100C' || context.configDetail.printLabel === 'CT1000') {
+  if (context.configDetail.printLabel === 'WAC230CF' || context.configDetail.printLabel === 'WAC710CD' ||
+    context.configDetail.printLabel === 'WAC300CD' || context.configDetail.printLabel === 'NTP100C' ||
+    context.configDetail.printLabel === 'CT1000') {
     let readAddressResult = await serialPortOperation(context, {
       actionType: undefined,
       operationName: '读地址',
@@ -300,6 +301,29 @@ export const checkNetWork = async (context, protocolId, type) => {
       context.scanAddress = ''
       return notPass
     }
+  }else if(context.configDetail.printLabel === 'WAC300NH'|| context.configDetail.printLabel === 'WAC300N') {
+    let readAddressResult = await serialPortOperation(context, {
+      actionType: undefined,
+      operationName: '读地址',
+      cmdType: '05',                         // afn 的命令类型
+      cmdCode: '0b',                         // fn 的命令码
+      protocolId: protocolId,
+      maxRetries: context.maxRetries,
+      expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readAddress'],
+      expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['readAddress'],
+      timeout: context.timeout,
+      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readAddress(context, context.receivedData.globalReceivedOneData),
+      preprocess: () => {
+      },
+      isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
+      isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readAddress,
+    }, type)
+    if (readAddressResult) {
+      await playErrorAudio(context)
+      context.scanAddress = ''
+      return notPass
+    }
+  }
     // 地址验证
     if (context.leftReadAddress !== context.scanAddress) {
       if (!context.uploadAddressList.includes(context.leftReadAddress)) {
@@ -316,7 +340,7 @@ export const checkNetWork = async (context, protocolId, type) => {
     let data
     if (context.configDetail.printLabel === 'WAC230CF') {
       data = await checkRecentlyUploadedData(context.scanAddress, 'col_terminal_data_meter_valve')
-    } else if (context.configDetail.printLabel === 'WAC710CD' || context.configDetail.printLabel === 'WAC300CD') {
+    } else if (context.configDetail.printLabel === 'WAC710CD' || context.configDetail.printLabel === 'WAC300CD'|| context.configDetail.printLabel === 'WAC300NH' || context.configDetail.printLabel === 'WAC300N') {
       data = await checkRecentlyUploadedData(context.scanAddress, 'col_terminal_data_valve')
     } else if (context.configDetail.printLabel === 'NTP100C' || context.configDetail.printLabel === 'CT1000') {
       data = await checkRecentlyUploadedData(context.scanAddress, 'col_terminal_data_measure_point')
@@ -341,8 +365,6 @@ export const checkNetWork = async (context, protocolId, type) => {
       context.scanAddress = ''
     }
     notPass = false
-
-
     return notPass
-  }
+
 }

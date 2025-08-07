@@ -99,7 +99,7 @@ module.exports = (appInfo) => {
     },
     filterRequest: {
       uris:  [
-        'favicon.ico'
+        'tray.ico'
       ],
       returnData: ''
     }
