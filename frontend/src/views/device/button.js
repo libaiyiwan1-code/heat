@@ -1,18 +1,18 @@
 export default {
   color: {
-    waiting: 'yellow', // 等待执行
+    waiting: '#FF770F', // 等待执行
     success: 'limegreen', // 成功
     error: 'red',  // 错误
     lightgray:'lightgray'//禁用 浅灰色
   },
   nbDeviceButton: {
     color: {
-      selfTest: 'yellow',
-      writeAddress: 'yellow',
-      awaken: 'yellow',
-      breakSelfTest: 'yellow',
-      labelPrint: 'yellow',
-      quadraticVerify:'yellow'
+      selfTest: '#FF770F',
+      writeAddress: '#FF770F',
+      awaken: '#FF770F',
+      breakSelfTest: '#FF770F',
+      labelPrint: '#FF770F',
+      quadraticVerify:'#FF770F'
 
     },
     disabledStatus: {

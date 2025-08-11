@@ -125,44 +125,44 @@ export function decodeCheckReadSelfTestStatusNTP100C(context, responseMessage) {
   let inPressureSensorNotPass = decodeCheckInPressureSensorNTP100C(context.receivedData.globalReceivedOneData)     //             进压传感器
   let outPressureNotPass = decodeCheckOutPressureSensorNTP100C(context.receivedData.globalReceivedOneData)     //             回压传感器
   if (selfTestCompletedNotPass) {
-    context.createLeftSpanMessage('未进行过自检', 'red');
+    context.createLeftSpanMessage('未进行过自检', 'grey');
     Log.error('未进行过自检');
     console.log('未进行过自检');
   }
 
   if (eepNotPass) {
-    context.createLeftSpanMessage('eep 不正常', 'red');
+    context.createLeftSpanMessage('eep 不正常', 'grey');
     Log.error('eep 不正常');
     console.log('eep 不正常');
   }
   if (networkNotPass) {
-    context.createLeftSpanMessage('联网 不正常', 'red');
+    context.createLeftSpanMessage('联网 不正常', 'grey');
     Log.error('联网 不正常');
     console.log('联网 不正常');
   }
   if (hallNotPass) {
-    context.createLeftSpanMessage('霍尔 不正常', 'red');
+    context.createLeftSpanMessage('霍尔 不正常', 'grey');
     Log.error('霍尔 不正常');
     console.log('霍尔 不正常');
   }
   if (inTemperatureSensorNotPass) {
-    context.createLeftSpanMessage('进温传感器 不正常', 'red');
+    context.createLeftSpanMessage('进温传感器 不正常', 'grey');
     Log.error('进温传感器 不正常');
     console.log('进温传感器 不正常');
   }
   if (outTemperatureSensorNotPass) {
-    context.createLeftSpanMessage('回温传感器 不正常', 'red');
+    context.createLeftSpanMessage('回温传感器 不正常', 'grey');
     Log.error('回温传感器 不正常');
     console.log('回温传感器 不正常');
   }
 
   if (inPressureSensorNotPass) {
-    context.createLeftSpanMessage('进压传感器 不正常', 'red');
+    context.createLeftSpanMessage('进压传感器 不正常', 'grey');
     Log.error('进压传感器 不正常');
     console.log('进压传感器 不正常');
   }
   if (outPressureNotPass) {
-    context.createLeftSpanMessage('回压传感器 不正常', 'red');
+    context.createLeftSpanMessage('回压传感器 不正常', 'grey');
     Log.error('回压传感器 不正常');
     console.log('回压传感器 不正常');
   }

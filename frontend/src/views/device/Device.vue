@@ -29,7 +29,7 @@
             >
               <a-row :gutter="4">
                 <a-col :span="11">
-                  <h1 style="font-weight: bold"
+                  <h1 style="font-weight: bold;margin-top: -2vh"
                       v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'">
                     配置项</h1>
                   <a-form-item label="压力探头" v-show="this.isNBDevice===true"
@@ -82,7 +82,7 @@
                   <a-form-item label="扭矩" v-show="this.isNBDevice===true&&this.configForm.produceModel==='WAC710CD'">
                     <a-select
                       v-model:value="this.configForm.torques"
-                      style="width: 8vw; margin-left: 4.5vw"
+                      style="width: 7vw; margin-left: 4.5vw"
                       placeholder="需手动录入"
                       @change="changePrintModel()"
                     >
@@ -94,13 +94,32 @@
                       </a-select-option>
                     </a-select>
                   </a-form-item>
+
+                  <a-form-item  label="波特率" >
+                    <a-select  style="width: 7vw; margin-left: 3.8vw"   v-model:value="this.portAttributes.selectedBadRate">
+                      <a-select-option v-for="port in this.baudRateList" :value="port">{{
+                          port
+                        }}
+                      </a-select-option>
+                    </a-select>
+                  </a-form-item>
+
+                  <a-form-item label="校验位">
+                    <a-select    style="width: 7vw; margin-left: 3.8vw" v-model:value="this.portAttributes.selectedCheckDigit">
+                      <a-select-option v-for="port in this.checkDigitList" :value="port">{{
+                          port
+                        }}
+                      </a-select-option>
+                    </a-select>
+                  </a-form-item>
+
                   <a-form-item label="电流源"
                                v-show="this.isNBDevice===true&&
                 this.configForm.produceModel==='WAC710CD'&&
                 this.configForm.pressureProbes==='压差'">
                     <a-select
                       v-model:value="this.configForm.currentSource"
-                      style="width: 8vw; margin-left: 3.9vw"
+                      style="width: 7vw; margin-left: 3.9vw"
                     >
                       <a-select-option
                         v-for="item in this.currentSourceList"
@@ -113,7 +132,7 @@
                 </a-col>
 
                 <a-col :span="12">
-                  <h1 style="font-weight: bold">验证项</h1>
+                  <h1 style="font-weight: bold;margin-top: -2vh">验证项</h1>
                   <a-form-item label="产品型号">
                     <a-select
                       v-model:value="this.configForm.produceModel"
@@ -160,39 +179,39 @@
                     ></a-input-number>
                   </a-form-item>
 
-                  <a-form-item label="电流源与设备电流误差"
+                  <a-form-item label="源设误差(mA)"
                                v-show="this.isNBDevice===true&&
                              this.configForm.pressureProbes==='压差'&&
                              this.configForm.currentSource==='有'">
                     <a-input-number
                       v-model:value="this.configForm.cs_device_err"
-                      style="width: 7vw; margin-left: 0.5vw"
+                      style="width: 7vw; margin-left: 3.3vw"
                       placeholder="需手动录入"
                       :precision="3"
                       :parser="value => value.replace(/\.\d{3,}/, match => match.substring(0, 4))"
                       :formatter="value => typeof value === 'number' ? value.toFixed(3) : value"
                     ></a-input-number>
                   </a-form-item>
-                  <a-form-item label="信号源与电流源电流误差"
+                  <a-form-item label="信源误差(mA)"
                                v-show="this.isNBDevice===true &&
                              this.configForm.pressureProbes==='压差'&&
                              this.configForm.currentSource==='有'">
                     <a-input-number
                       v-model:value="this.configForm.sig_cs_err"
-                      style="width: 7vw; margin-left: -0.2vw"
+                      style="width: 7vw; margin-left: 3.3vw"
                       placeholder="需手动录入"
                       :precision="3"
                       :parser="value => value.replace(/\.\d{3,}/, match => match.substring(0, 4))"
                       :formatter="value => typeof value === 'number' ? value.toFixed(3) : value"
                     ></a-input-number>
                   </a-form-item>
-                  <a-form-item label="信号源与设备误差"
+                  <a-form-item label="信设误差(mA)"
                                v-show="this.isNBDevice===true &&
                              this.configForm.pressureProbes==='压差'&&
                              this.configForm.currentSource==='无'">
                     <a-input-number
                       v-model:value="this.configForm.sig_device_err"
-                      style="width: 7vw; margin-left: 2vw"
+                      style="width: 7vw; margin-left: 3.2vw"
                       placeholder="需手动录入"
                       :precision="3"
                       :parser="value => value.replace(/\.\d{3,}/, match => match.substring(0, 4))"
@@ -211,7 +230,7 @@
                 </a-col>
               </a-row>
 
-              <h2 style="margin-left: 6vw;  color: red; font-weight: bold;"
+              <h2 style="margin-left: 6vw;  color: red; font-weight: bold;margin-top: -2vh"
                   v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'">
                 需手动录入项，现规格型号或接口不支持</h2>
               <a-form-item label="工序重点" style="margin-top: 3vh; margin-left: 4vw" v-show="this.isNBDevice===true"
@@ -408,89 +427,126 @@
               </div>
             </template>
             <div v-if="this.isNBDevice===true">
-              <a-row :gutter="16">
-                <!-- Left column: Configuration Items -->
-                <a-col :span="12"
+              <a-row style="width: calc(680/1920*100vw);height: calc(206/1080*100vh) ">
+                <a-col class="hlm-card-nb-configInfo-body-left-column"
                        v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'">
-                  <h1 style="font-weight: bold; margin-bottom: 10px;">配置项</h1>
-                  <div class="info-line">
-                    <span class="label">测温类型</span>:
-                    <span class="value">{{ configDetail.temperatureProbe }}</span>
+                  <div class="hlm-card-configInfo-body-info-line">
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">测温类型:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{
+                        configDetail.temperatureProbe
+                      }}</span>
                   </div>
 
-                  <div class="info-line">
-                    <span class="label">压力探头</span>:
-                    <span class="value">{{ configDetail.pressureProbes }}</span>
+                  <div class="hlm-card-configInfo-body-info-line">
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">压力探头:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{
+                        configDetail.pressureProbes
+                      }}</span>
                   </div>
-                  <div class="info-line">
-                    <span class="label">屏幕显示</span>:
-                    <span class="value">{{ configDetail.screenDisplay }}</span>
+                  <div class="hlm-card-configInfo-body-info-line">
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">屏幕显示:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.screenDisplay }}</span>
                   </div>
-                  <div class="info-line">
-                    <span class="label">扭矩</span>:
-                    <span class="value">{{ configDetail.torques }}</span>
+                  <div class="hlm-card-configInfo-body-info-line">
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">扭矩:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.torques }}</span>
                   </div>
-                  <div class="info-line">
-                    <span class="label">温度误差</span>:
-                    <span class="value">{{ configDetail.temperatureDiff }}</span>
+                  <div class="hlm-card-configInfo-body-info-line">
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">温度误差:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{
+                        configDetail.temperatureDiff
+                      }}</span>
                   </div>
-                  <div class="info-line"
+                  <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configDetail.pressureProbes==='压差'&&this.configDetail.currentSource==='有'">
-                    <span class="label">电流源与设备电流误差(mA)</span>:
-                    <span class="value">{{ configDetail.cs_device_err }}</span>
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">源设误差(mA):</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.cs_device_err }}</span>
                   </div>
-                  <div class="info-line"
+                  <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configDetail.pressureProbes==='压差'&&this.configDetail.currentSource==='有'">
-                    <span class="label">信号源与电流源电流误差(mA)</span>:
-                    <span class="value">{{ configDetail.sig_cs_err }}</span>
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">信源误差(mA):</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.sig_cs_err }}</span>
                   </div>
-                  <div class="info-line"
+                  <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configDetail.pressureProbes==='压差'&&this.configDetail.currentSource==='无'">
-                    <span class="label">信号源与设备误差(mA)</span>:
-                    <span class="value">{{ configDetail.sig_device_err }}</span>
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">信设误差(mA):</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{
+                        configDetail.sig_device_err
+                      }}</span>
                   </div>
-                  <div class="info-line">
-                    <span class="label">工序重点:</span>
-                    <span class="value">{{ configDetail.processFocus }}</span>
-                  </div>
-                  <div class="info-line">
-                    <span class="label">电流源</span>:
-                    <span class="value">{{ configDetail.currentSource }}</span>
+                  <div class="hlm-card-configInfo-body-info-line">
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">电流源:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.currentSource }}</span>
                   </div>
                 </a-col>
-
-                <!-- Right column: Verification Items -->
-                <a-col :span="12">
-                  <h1 style="font-weight: bold; margin-bottom: 10px;" v-if="this.configForm.produceModel!=='东元热表'">
-                    验证项</h1>
-                  <div class="info-line"
+                <a-col class="hlm-card-nb-configInfo-body-right-column">
+                  <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'">
-                    <span class="label">温度标定</span>:
-                    <span class="value">{{ configDetail.temperature }}</span>
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">温度标定:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.temperature }}</span>
                   </div>
-                  <div class="info-line"
+                  <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'">
-                    <span class="label">标签型号</span>:
-                    <span class="value">{{ configDetail.printLabel }}</span>
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">标签型号:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.printLabel }}</span>
                   </div>
-                  <div class="info-line"
+                  <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'">
-                    <span class="label">定制化标签型号</span>:
-                    <span class="value">{{ configDetail.customizePrintLabel }}</span>
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">打印型号:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{
+                        configDetail.customizePrintLabel
+                      }}</span>
                   </div>
-                  <div class="info-line" v-if="this.routerParam.startsWithJ">
-                    <span class="label">产品型号</span>:
-                    <span class="value">{{ configDetail.printLabel }}</span>
+                  <div class="hlm-card-configInfo-body-info-line" v-if="this.routerParam.startsWithJ">
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">产品型号:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.printLabel }}</span>
                   </div>
-                  <div class="info-line" v-if="this.configForm.produceModel!=='东元热表'">
-                    <span class="label">程序版本</span>:
-                    <span class="value">{{ configDetail.version }}</span>
+                  <div class="hlm-card-configInfo-body-info-line" v-if="this.configForm.produceModel!=='东元热表'">
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">程序版本:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.version }}</span>
                   </div>
 
                 </a-col>
+
               </a-row>
 
+              <div class="hlm-card-configInfo-body-info-line"
+                   style=" white-space: nowrap; margin-top: 3.5vh ">
+                <div v-show="true" class="hlm-card-configInfo-body-info-line" style='margin-left: 0.9vw'>
+                  <span class="label hlm-card-nb-configInfo-body-info-line-label">波特率: </span>
+                  <span class="value hlm-card-configInfo-body-info-line-value">{{
+                      this.portAttributes.selectedBadRate
+                    }}</span>
+                </div>
+                <div v-show="true" class="hlm-card-configInfo-body-info-line" style="margin-left: -9.8vw">
+                  <span class="label hlm-card-nb-configInfo-body-info-line-label">校验位: </span>
+                  <span class="value hlm-card-configInfo-body-info-line-value">{{
+                      this.portAttributes.selectedCheckDigit
+                    }}</span>
+                </div>
+              </div>
 
+              <div v-show="true" class="hlm-card-configInfo-body-info-line"
+                   style='margin-top: -1vh; margin-left: 0.9vw'>
+                <span class="label hlm-card-nb-configInfo-body-info-line-label">工序重点: </span>
+                <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.processFocus }}</span>
+              </div>
+              <div class="hlm-card-configInfo-body-info-line"
+                   style="  margin-left: 0.9vw;white-space: nowrap;margin-top: -1vh;">
+                <div class="info-line-span-printInfo" style="display: flex;align-items: center;">
+                  <span class="label ">打印机名: </span>
+                  <span class="value" style="margin-left: 0.8vw">{{ configDetail.printerName }}</span>
+                </div>
+                <div class="info-line-span-printInfo" style="margin-left: 2vw">
+                  <span class="label">纸张大小: </span>
+                  <span class="value" style="margin-left: 0.8vw">{{ configDetail.paperSize }}</span>
+                </div>
+                <div class="info-line-span-printInfo" style="margin-left: 2vw">
+                  <span class="label">双排打印: </span>
+                  <span class="value" style="margin-left: 0.8vw">{{ configDetail.whetherDoubleRowPrinting }}</span>
+                </div>
+
+              </div>
             </div>
 
             <div v-show="this.isNBDevice === false">
@@ -791,223 +847,276 @@
                   </a-card>-->
         </div>
 
-        <div style="display: inline-flex ;" v-if="this.isNBDevice!==undefined && this.isNBDevice">
-          <a-card :title="this.leftProduceViewTitle" style="height: 65vh;
-        margin-top: -1.5vh;
-        width: 50vw; margin-right: 9vw;overflow: hidden;"
-                  :headStyle="{
-         textAlign: 'center',
-              background: '#e6e8eb',
-            color: '#F77F00',
-            fontWeight: 'bold',
-            padding: '0.9px 16px',
-
-           }"
+        <div class="hlm-frock-container" v-if="this.isNBDevice!==undefined && this.isNBDevice">
+          <a-card :title="this.leftProduceViewTitle"
+                  :headStyle="downCardHeadStyle"
+                  :bodyStyle="downCardBodyStyle"
           >
+
+            <!--&&configDetail.currentSource==='有'&&this.configDetail.pressureProbes==='压差'            -->
             <!-- 左侧工装内容 -->
             <a-form
+              v-if="this.configDetail.pressureProbes!=='压差'"
               name="basic"
               layout="inline"
-              style="padding-left: 10px; display: flex; align-items: center;"
+              class="hlm-form-port"
             >
               <a-form-item>
-                <a-button @click=" this.getAllPorts('one')">刷新</a-button>
+                <a-button class="hlm-operate-button-style" @click="getAllPorts('one')">刷新</a-button>
               </a-form-item>
-              <a-form-item label="设备串口">
-                <a-select v-model:value="this.portAttributes.selectedPortOne" style="width: 110px;"
+              <a-form-item class="form-item-spacing">
+                <a-button class="hlm-port-button-select-style static-btn ">设备串口</a-button>
+              </a-form-item>
+              <a-select v-model:value="this.portAttributes.selectedPortOne"
+                        class="hlm-port-button-select-style form-item-spacing"
+                        @change="handlePortChange(this.portAttributes.selectedPortOne,'one')">
+                <a-select-option v-for="port in this.computedPortsExcludeLeft" :value="port">{{
+                    port
+                  }}
+                </a-select-option>
+              </a-select>
+
+
+              <a-form-item>
+                <a-button
+                  class="hlm-operate-button-style"
+                  @click="openPort(
+                this.portAttributes.selectedPortOne,
+                'one'
+              )"
+                  :disabled="!this.portAttributes.portClosedOneStatus">打开
+                </a-button>
+              </a-form-item>
+              <a-form-item class="form-item-spacing">
+                <a-button
+                  class="hlm-operate-button-style"
+                  @click="closePort(this.portAttributes.selectedPortOne,'one')"
+                  :disabled="this.portAttributes.portClosedOneStatus">关闭
+                </a-button>
+              </a-form-item>
+            </a-form>
+
+
+            <a-form
+              v-if="this.configDetail.pressureProbes==='压差'&&configDetail.currentSource==='无'"
+              name="basic"
+              layout="inline"
+              class="hlm-form-port"
+            >
+              <a-form-item>
+                <a-button class="hlm-operate-button-style" @click="getAllPorts('one')">刷新</a-button>
+              </a-form-item>
+              <a-form-item class="form-item-spacing">
+                <a-button class="hlm-port-button-select-style static-btn ">设备串口</a-button>
+              </a-form-item>
+              <a-select v-model:value="this.portAttributes.selectedPortOne"
+                        class="hlm-port-button-select-style form-item-spacing"
+                        @change="handlePortChange(this.portAttributes.selectedPortOne,'one')">
+                <a-select-option v-for="port in this.computedPortsExcludeLeft" :value="port">{{
+                    port
+                  }}
+                </a-select-option>
+              </a-select>
+
+
+              <a-form-item>
+                <a-button
+                  class="hlm-operate-button-style"
+                  @click="openPort(
+                this.portAttributes.selectedPortOne,
+                'one'
+              )"
+                  :disabled="!this.portAttributes.portClosedOneStatus">打开
+                </a-button>
+              </a-form-item>
+              <a-form-item class="form-item-spacing">
+                <a-button
+                  class="hlm-operate-button-style"
+                  @click="closePort(this.portAttributes.selectedPortOne,'one')"
+                  :disabled="this.portAttributes.portClosedOneStatus">关闭
+                </a-button>
+              </a-form-item>
+              <a-form-item>
+                <a-button class="hlm-operate-button-style" @click="getAllPorts('one')">刷新</a-button>
+              </a-form-item>
+              <a-form-item class="form-item-spacing">
+                <a-button class="hlm-port-button-select-style static-btn ">信号源串口</a-button>
+              </a-form-item>
+              <a-select v-model:value="this.portAttributes.selectedPortSignalSource" class="hlm-port-button-select-style form-item-spacing"
+                        @change="handlePortChange(this.portAttributes.selectedPortSignalSource,'three')">
+                <a-select-option v-for="port in this.computedPortsExcludeRight" :value="port">{{
+                    port
+                  }}
+                </a-select-option>
+              </a-select>
+              <a-form-item>
+                <a-button   class="hlm-operate-button-style"  @click="openPort(
+                          this.portAttributes.selectedPortSignalSource,'three')"
+                            :disabled="!this.portAttributes.portClosedSignalSourceStatus">打开
+                </a-button>
+              </a-form-item>
+              <a-form-item class="form-item-spacing">
+                <a-button   class="hlm-operate-button-style" @click="closePort(this.portAttributes.selectedPortSignalSource,'three')"
+                            :disabled="this.portAttributes.portClosedSignalSourceStatus">关闭
+                </a-button>
+              </a-form-item>
+            </a-form>
+
+              <a-form
+                v-if="this.configDetail.pressureProbes==='压差'&&configDetail.currentSource==='有'"
+                name="basic"
+                layout="inline"
+                class="hlm-form-port"
+              >
+                <a-form-item>
+                  <a-button class="hlm-operate-button-style" @click="getAllPorts('one')">刷新</a-button>
+                </a-form-item>
+                <a-form-item class="form-item-spacing">
+                  <a-button class="hlm-port-button-select-style static-btn ">设备串口</a-button>
+                </a-form-item>
+                <a-select v-model:value="this.portAttributes.selectedPortOne"
+                          class="hlm-port-button-select-style form-item-spacing"
                           @change="handlePortChange(this.portAttributes.selectedPortOne,'one')">
                   <a-select-option v-for="port in this.computedPortsExcludeLeft" :value="port">{{
                       port
                     }}
                   </a-select-option>
                 </a-select>
-              </a-form-item>
-              <div v-if="this.configDetail.printLabel==='WAC710CD'">
-                <a-form-item label="波特率">
-                  <a-select v-model:value="this.portAttributes.selectedBadRate" style="width:75px;">
-                    <a-select-option v-for="port in this.baudRateList" :value="port">{{
-                        port
-                      }}
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
-              </div>
-              <div v-if="this.configDetail.printLabel==='WAC710CD'">
-                <a-form-item label="校验位">
-                  <a-select v-model:value="this.portAttributes.selectedCheckDigit" style="width:100px;">
-                    <a-select-option v-for="port in this.checkDigitList" :value="port">{{
-                        port
-                      }}
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
-              </div>
-              <a-form-item>
-                <a-button @click="openPort(
+
+
+                <a-form-item>
+                  <a-button
+                    class="hlm-operate-button-style"
+                    @click="openPort(
                 this.portAttributes.selectedPortOne,
                 'one'
               )"
-                          :disabled="!this.portAttributes.portClosedOneStatus">打开
-                </a-button>
-              </a-form-item>
-              <a-form-item>
-                <a-button @click="closePort(this.portAttributes.selectedPortOne,'one')"
-                          :disabled="this.portAttributes.portClosedOneStatus">关闭
-                </a-button>
-              </a-form-item>
-
-
-              <div v-if="this.configForm.produceModel === 'WAC710CD'&&this.configDetail.pressureProbes==='压差'">
-
-                <div style="display: inline-flex">
-                  <a-form-item label="信号源串口">
-                    <a-select v-model:value="this.portAttributes.selectedPortSignalSource" style="width: 110px;"
-                              @change="handlePortChange(this.portAttributes.selectedPortSignalSource,'three')">
-                      <a-select-option v-for="port in this.computedPortsExcludeRight" :value="port">{{
-                          port
-                        }}
-                      </a-select-option>
-                    </a-select>
-                  </a-form-item>
-
-                  <a-form-item>
-                    <a-button @click="openPort(
-                this.portAttributes.selectedPortSignalSource,
-                'three'
-              )"
+                    :disabled="!this.portAttributes.portClosedOneStatus">打开
+                  </a-button>
+                </a-form-item>
+                <a-form-item class="form-item-spacing">
+                  <a-button
+                    class="hlm-operate-button-style"
+                    @click="closePort(this.portAttributes.selectedPortOne,'one')"
+                    :disabled="this.portAttributes.portClosedOneStatus">关闭
+                  </a-button>
+                </a-form-item>
+                <a-form-item>
+                  <a-button class="hlm-operate-button-style" @click="getAllPorts('one')">刷新</a-button>
+                </a-form-item>
+                <a-form-item class="form-item-spacing">
+                  <a-button class="hlm-port-button-select-style static-btn ">信号源串口</a-button>
+                </a-form-item>
+                <a-select v-model:value="this.portAttributes.selectedPortSignalSource" class="hlm-port-button-select-style form-item-spacing"
+                          @change="handlePortChange(this.portAttributes.selectedPortSignalSource,'three')">
+                  <a-select-option v-for="port in this.computedPortsExcludeRight" :value="port">{{
+                      port
+                    }}
+                  </a-select-option>
+                </a-select>
+                <a-form-item>
+                  <a-button   class="hlm-operate-button-style"  @click="openPort(
+                          this.portAttributes.selectedPortSignalSource,'three')"
                               :disabled="!this.portAttributes.portClosedSignalSourceStatus">打开
-                    </a-button>
-                  </a-form-item>
-                  <a-form-item>
-                    <a-button @click="closePort(this.portAttributes.selectedPortSignalSource,'three')"
+                  </a-button>
+                </a-form-item>
+                <a-form-item class="form-item-spacing">
+                  <a-button   class="hlm-operate-button-style" @click="closePort(this.portAttributes.selectedPortSignalSource,'three')"
                               :disabled="this.portAttributes.portClosedSignalSourceStatus">关闭
-                    </a-button>
-                  </a-form-item>
-                </div>
-              </div>
+                  </a-button>
+                </a-form-item>
 
 
-              <a-form-item label="写入地址" style="margin-left: 1vw" v-show="!this.routerParam.startsWithJ">
-                <a-input
-                  type="number"
-                  v-model:value="this.leftGenerateAddress"
-                  placeholder="请输入地址"
-                  :maxlength="8"
-                  ref="input1"
-                  @input="validateNumberInputOne(this.leftGenerateAddress)"
-                ></a-input>
+
+
+
+              </a-form>
+
+
+            <a-form
+              v-if="this.configDetail.pressureProbes==='压差'&&configDetail.currentSource==='有'"
+              name="basic"
+              layout="inline"
+              class="hlm-form-port"
+            >
+              <a-form-item>
+                <a-button class="hlm-operate-button-style" @click="getAllPorts('one')">刷新</a-button>
               </a-form-item>
-
-              <a-form-item label="写入地址" style="margin-left: 1vw" v-show="this.routerParam.startsWithJ">
-                <a-input
-                  type="text"
-                  v-model:value="this.secondaryInspectionGenerateAddress"
-                  placeholder="请输入地址"
-                  ref="secondaryInspectionGenerateAddress"
-                  @keydown.enter="handleEnterSecondaryInspection"
-                  @input="validateNumberInputSecondaryInspectionGenerateAddress"
-                ></a-input>
+              <a-form-item class="form-item-spacing">
+                <a-button class="hlm-port-button-select-style static-btn ">电流源串口</a-button>
               </a-form-item>
+              <a-select v-model:value="this.portAttributes.selectedPortCurrentSource" class="hlm-port-button-select-style form-item-spacing"
+                        @change="handlePortChange(this.portAttributes.selectedPortCurrentSource,'four')">
+                <a-select-option v-for="port in this.computedPortsExcludeRight" :value="port">{{
+                    port
+                  }}
+                </a-select-option>
+              </a-select>
 
-              <div v-if="this.configForm.produceModel === 'WAC710CD'&&this.configDetail.pressureProbes==='压差'">
-
-                <div style="display: inline-flex" v-show="configDetail.currentSource==='有'">
-                  <a-form-item label="电流源串口">
-                    <a-select v-model:value="this.portAttributes.selectedPortCurrentSource" style="width: 110px;"
-                              @change="handlePortChange(this.portAttributes.selectedPortCurrentSource,'four')">
-                      <a-select-option v-for="port in this.computedPortsExcludeRight" :value="port">{{
-                          port
-                        }}
-                      </a-select-option>
-                    </a-select>
-                  </a-form-item>
-
-                  <a-form-item>
-                    <a-button @click="openPort(
+              <a-form-item>
+                <a-button   class="hlm-operate-button-style" @click="openPort(
                 this.portAttributes.selectedPortCurrentSource,
                 'four'
               )"
-                              :disabled="!this.portAttributes.portClosedCurrentSourceStatus">打开
-                    </a-button>
-                  </a-form-item>
-                  <a-form-item>
-                    <a-button @click="closePort(this.portAttributes.selectedPortCurrentSource,'four')"
-                              :disabled="this.portAttributes.portClosedCurrentSourceStatus">关闭
-                    </a-button>
-                  </a-form-item>
-                </div>
-              </div>
+                            :disabled="!this.portAttributes.portClosedCurrentSourceStatus">打开
+                </a-button>
+              </a-form-item>
+              <a-form-item class="form-item-spacing">
+                <a-button   class="hlm-operate-button-style" @click="closePort(this.portAttributes.selectedPortCurrentSource,'four')"
+                            :disabled="this.portAttributes.portClosedCurrentSourceStatus">关闭
+                </a-button>
+              </a-form-item>
 
             </a-form>
 
-            <div style="margin-top: 16px; display: inline-flex; margin-right: 9vw;">
-              <a-button
-                type="primary"
-                :style="{
-                    backgroundColor: 'white',
-                     borderColor: '#d9d9d9',
-                    color: 'black',
-                    width: '7vw',
-                    height: '5vh',
-                    pointerEvents: 'none',
-                    fontWeight: 'bold',
-                    fontSize: '19px'
-                 }"
-              >
-                <p style="font-size: 19px; white-space: nowrap; font-weight: bold; margin-top: 5px;color: grey ">
-                  作业提示
-                </p>
-              </a-button>
-              <a-button type="primary"
-                        :style="{
-                      color: '#F77F00',
-                      backgroundColor:'white',
-                      borderColor: '#d9d9d9',
-                      width: '38vw', height: '5vh' ,
-                      pointerEvents: 'none',fontWeight: 'bold',fontSize: '19px'
-                      }">
-                <p style="margin-top: 0.4vh">
-                  {{ this.leftWorkPrompt }}
-                </p>
-              </a-button>
+
+<!--                </div>-->
+<!--              </div>-->
+
+
+
+<!--              <div v-if="this.configForm.produceModel === 'WAC710CD'&&this.configDetail.pressureProbes==='压差'">-->
+
+<!--                <div style="display: inline-flex" v-show="configDetail.currentSource==='有'">-->
+
+<!--                </div>-->
+<!--              </div>-->
+            <div class="hlm-assignmentTips">
+              <a-button class="hlm-assignmentTips-button-style static-btn">作业提示</a-button>
+              <a-button class="hlm-assignmentTips-button-text-style static-btn"> {{  leftWorkPrompt }}</a-button>
+
             </div>
 
 
-            <div style="position: relative; display: inline-flex; margin-right: 7vw; margin-top: 5vh;">
-              <!-- 绿色箭头 -->
-              <div
-                style="position: absolute; top: -4vh; left: 0; right: 0; display: flex; justify-content: center;margin-left: -2vw">
-                <div style="width: 47vw; height: 1vh; background-color: #F77F00; position: relative;">
-                  <!-- 箭头本体 -->
-                  <div style="height: 100%; width: 100%; background-color: #F77F00;"></div>
-                  <!-- 箭头尖（朝右） -->
-                  <div
-                    style="border-top: 1.5vh solid transparent;
-                    border-bottom: 1.5vh solid transparent;
-                    border-left: 3vh solid #F77F00 ;
-                    position: absolute;
-                    right: -3vh;
-                    top: -0.8vh;"></div>
-                </div>
-              </div>
 
+            <div style="position: relative; display: inline-flex; margin-left:-2vw;   margin-top: calc(20/1080*100vh)">
+              <!--            二次验证用写地址组件              -->
+              <a-form
+                name="basic"
+                layout="inline"
+                style="margin-left: -16.6vw"
+                v-if="this.routerParam.startsWithJ"
+              >
+                <a-form-item label="写入地址" >
+                  <a-input
+                    style="width: 10vw"
+                    type="text"
+                    v-model:value="this.secondaryInspectionGenerateAddress"
+                    placeholder="请输入地址"
+                    ref="secondaryInspectionGenerateAddress"
+                    @keydown.enter="handleEnterSecondaryInspection"
+                    @input="validateNumberInputSecondaryInspectionGenerateAddress"
+                  ></a-input>
+                </a-form-item>
+              </a-form>
               <a-button type="primary" block
                         v-if="this.routerParam.startsWithJ"
                         @click="quadraticVerify(protocolIDMap[this.configForm.produceModel].protocolId,'one')"
                         :disabled="nbButtonDisabledStatus.quadraticVerify"
                         :style="{
-                        backgroundColor: nbButtonColor.quadraticVerify,
-                         borderColor: 'black',
-                         width: '7vw',
-                         height:'5.5vh',
-                         color: 'black',
-                         textAlign: 'center',
-                         whiteSpace: 'nowrap',
-                         wordBreak: 'break-all',
-                         paddingTop: '0px',
-                         fontWeight: 'bold'
-                      }">
-                验证
+                           backgroundColor: nbButtonColor.quadraticVerify
+                        }">
+                二次验证
               </a-button>
 
               <a-button type="primary" block
@@ -1015,36 +1124,21 @@
                         @click="selfTest(protocolIDMap[this.configForm.produceModel].protocolId,'one')"
                         :disabled="nbButtonDisabledStatus.selfTest"
                         :style="{
-                        backgroundColor: nbButtonColor.selfTest,
-                         borderColor: 'black',
-                         width: '7vw',
-                         height:'5.5vh',
-                         color: 'black',
-                         textAlign: 'center',
-                         whiteSpace: 'nowrap',
-                         wordBreak: 'break-all',
-                         paddingTop: '0px',
-                         fontWeight: 'bold'
-                      }">
-                自检
+                           backgroundColor: nbButtonColor.selfTest
+                        }"
+                        class="hlm-nb-business-start-button-style"
+              >
+                自检发送
               </a-button>
-
               <a-button type="primary" block
                         v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'"
                         @click="addressWrite(protocolIDMap[this.configForm.produceModel].protocolId,'one')"
                         :disabled="nbButtonDisabledStatus.writeAddress"
                         :style="{
-                        backgroundColor: nbButtonColor.writeAddress,
-                         borderColor: 'black',
-                          width: '7vw',height:'5.5vh',
-                          color: 'black',
-                          textAlign: 'center',
-                          marginLeft:'3.3vw',
-                         whiteSpace: 'nowrap',
-                        wordBreak: 'break-all',
-                        paddingTop:'0px',
-                        fontWeight: 'bold'
-                }">
+                           backgroundColor: nbButtonColor.writeAddress
+                        }"
+                        class="hlm-nb-business-start-button-style"
+              >
                 地址写入
               </a-button>
               <a-button type="primary" block
@@ -1062,60 +1156,12 @@
                         )"
                         :disabled="nbButtonDisabledStatus.awaken"
                         :style="{
-                        backgroundColor: nbButtonColor.awaken,
-                         borderColor: 'black',
-                          width: '7vw',height:'5.5vh',
-                          color: 'black',
-                          textAlign: 'center',
-                          marginLeft:'3.3vw',
-                         whiteSpace: 'nowrap',
-                        wordBreak: 'break-all',
-                        paddingTop:'0px',
-                        fontWeight: 'bold'
-                }">
-                唤醒
+                           backgroundColor: nbButtonColor.awaken
+                        }"
+                        class="hlm-nb-business-start-button-style">
+                联网唤醒
               </a-button>
-              <a-button type="primary" block
-                        v-show="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'"
-                        @click="printLabel(
-                      false,
-                        protocolIDMap[this.configForm.produceModel].protocolId,'one'
-                        )"
-                        :disabled="nbButtonDisabledStatus.labelPrint"
-                        :style="{
-                        backgroundColor: nbButtonColor.labelPrint,
-                         borderColor: 'black',
-                          width: '7vw',height:'5.5vh',
-                          color: 'black',
-                          textAlign: 'center',
-                          marginLeft:'3.3vw',
-                         whiteSpace: 'nowrap',
-                        wordBreak: 'break-all',
-                        paddingTop:'0px',
-                        fontWeight: 'bold'
-                }">
-                标签打印
-              </a-button>
-              <!--                          <a-button type="primary" block-->
-              <!--                                    @click="printLabel1(-->
-              <!--                                    false,-->
-              <!--                                      protocolIDMap[this.configForm.produceModel].protocolId,'one'-->
-              <!--                                      )"-->
-              <!--                                    :disabled="nbButtonDisabledStatus.labelPrint"-->
-              <!--                                    :style="{-->
-              <!--                                      backgroundColor: nbButtonColor.labelPrint,-->
-              <!--                                       borderColor: 'black',-->
-              <!--                                        width: '7vw',height:'5.5vh',-->
-              <!--                                        color: 'black',-->
-              <!--                                        textAlign: 'center',-->
-              <!--                                        marginLeft:'3.3vw',-->
-              <!--                                       whiteSpace: 'nowrap',-->
-              <!--                                      wordBreak: 'break-all',-->
-              <!--                                      paddingTop:'0px',-->
-              <!--                                      fontWeight: 'bold'-->
-              <!--                              }">-->
-              <!--                            标签打印测试-->
-              <!--                          </a-button>-->
+
               <a-button type="primary" block
                         v-if="
                       this.configDetail.printLabel === 'WAC710CD'||
@@ -1125,32 +1171,112 @@
                         this.configDetail.printLabel==='WAC300N'||
                         this.configDetail.printLabel==='WAC300NH'
 "
-                        @click="breakSelfTest(
+                        @click="scanCodeVerification(
                         protocolIDMap[this.configForm.produceModel].protocolId,'one'
                         )"
                         :disabled="nbButtonDisabledStatus.breakSelfTest"
                         :style="{
-                        backgroundColor: nbButtonColor.breakSelfTest,
-                         borderColor: 'black',
-                          width: '7vw',height:'5.5vh',
-                          color: 'black',
-                          textAlign: 'center',
-                          marginLeft:'3.3vw',
-                         whiteSpace: 'nowrap',
-                        wordBreak: 'break-all',
-                        paddingTop:'0px',
-                        fontWeight: 'bold'
-                }">
-                退出自检
-              </a-button>
+                           backgroundColor: nbButtonColor.awaken
+                        }"
+                        class="hlm-nb-business-start-button-style">
+                        扫码验证
+                      </a-button>
+              <div class="hlm-nb-not-important-business-body-style">
+                <a-button type="primary" block
+                          v-show="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'"
+                          @click="printLabel(
+                      false,
+                        protocolIDMap[this.configForm.produceModel].protocolId,'one'
+                        )"
+                          :disabled="nbButtonDisabledStatus.labelPrint"
+                          class="hlm-nb-not-important-business-start-button-style"
+                          :style="{
+                           color: nbButtonColor.labelPrint
+                        }"
+                >
+                  标签<br/>重打
+
+                </a-button>
+
+                <a-button type="primary" block
+                          v-if="
+                      this.configDetail.printLabel === 'WAC710CD'||
+                      this.configDetail.printLabel === 'WAC300CD'||
+                      this.configDetail.printLabel === 'NTP100C'||
+                      this.configDetail.printLabel === 'CT1000'||
+                        this.configDetail.printLabel==='WAC300N'||
+                        this.configDetail.printLabel==='WAC300NH'
+"
+                          @click="breakSelfTest(
+                        protocolIDMap[this.configForm.produceModel].protocolId,'one'
+                        )"
+                          :disabled="nbButtonDisabledStatus.breakSelfTest"
+                          class="hlm-nb-not-important-business-start-button-style"
+                          :style="{
+                           color: nbButtonColor.breakSelfTest
+                        }">
+                  退出<br/>自检
+                </a-button>
+              </div>
 
             </div>
+
+            <div class="hlm-nb-flow-arrowContainer-style">
+              <!-- 箭头直线 -->
+              <div class="hlm-nb-flow-straightArrows-style"/>
+              <!-- 空心箭头 -->
+              <div class="hlm-nb-flow-arrows-style"/>
+            </div>
+
+
+            <div class="hlm-nb-statistics-container-style">
+              <a-button class="hlm-flow-machine-goodProduct-statistics-style static-btn">
+                机号
+              </a-button>
+              <a-button class="hlm-flow-machine-goodProduct-statistics-style static-btn">
+                {{ machineNumber }}
+              </a-button>
+              <a-button class="hlm-flow-machine-goodProduct-statistics-style static-btn">
+                良品数
+              </a-button>
+              <a-button class="hlm-flow-machine-goodProduct-statistics-style static-btn">
+                {{ leftGoodProductQuantity }}
+              </a-button>
+              <a-button class="hlm-flow-defectiveProducts-statistics-style static-btn">
+                不良数
+              </a-button>
+              <a-button class="hlm-flow-defectiveProducts-statistics-style static-btn">
+                {{ leftBadProductQuantity }}
+              </a-button>
+              <a-button class="hlm-flow-defectiveProducts-statistics-style static-btn">
+                不良率
+              </a-button>
+              <a-button class="hlm-flow-defectiveProducts-statistics-style static-btn">
+                {{ this.computedLeftBadRate('one') }}
+              </a-button>
+              <a-button v-if="!this.routerParam.startsWithJ" class="hlm-nb-address-style static-btn" style="margin-left: calc(104/1920*100vw)">
+                写入/扫码地址
+              </a-button>
+              <a-input
+                v-if="!this.routerParam.startsWithJ"
+                class="no-spinner hlm-nb-address-style"
+                type="number"
+                v-model:value="this.leftGenerateAddress"
+                placeholder="(待生成|扫码)地址"
+                :maxlength="8"
+                ref="input1"
+                @input="validateNumberInputOne($event, 8)"
+              ></a-input>
+            </div>
+
+
+
 
             <!-- 外层固定高度，不滚动 -->
             <div
               id="left_textarea_id"
               ref="receptionOneText"
-              class="hlm-flow-log-container-style"
+              class="hlm-nb-log-container-style"
             >
               <!-- 内层高度60%，内容超出时滚动 -->
               <div
@@ -1160,129 +1286,17 @@
             </div>
 
           </a-card>
-          <a-card :title="this.rightProduceViewTitle" style="
-        height: 65vh; width: 50vw;margin-left: -9vw;
-                 margin-top: -1.50vh;
-         overflow: hidden; "
-                  :headStyle="{
-              textAlign: 'center',
-              background: '#e6e8eb',
-            color: '#F77F00',
-            fontWeight: 'bold',
-            padding: '0.9px 16px'
-           }">
-            <div style="display: inline-flex; align-items: center;margin-top: 5.7vh">
-              <a-form :layout="'inline'" v-if="!this.routerParam.startsWithJ" style="margin-top: -4vh">
-                <a-form-item label="机号"
-                             style="background-color: deepskyblue;height: 32px ;width: 5vw;margin-left:-4vw">
-                  <p
-                    :style="machineNumber !== undefined ? { backgroundColor: '#f0f0f0', padding: '5px', width: '3vw' } : {}">
-                    {{ machineNumber }}
-                  </p>
-                </a-form-item>
-                <a-form-item label="良品数"
-                             style="background-color: deepskyblue;height: 32px ;margin-left: 3vw;width: 5vw;">
-                  <p
-                    :style="leftGoodProductQuantity !== undefined ? { backgroundColor: '#f0f0f0', padding: '5px', width: '3vw' } : {}">
-                    {{ leftGoodProductQuantity }}
-                  </p>
-                </a-form-item>
-                <a-form-item label="不良数"
-                             style="background-color: deepskyblue;height: 32px;;margin-left: 3vw;width: 5vw;">
-                  <p
-                    :style="leftBadProductQuantity !== undefined ? { backgroundColor: '#f0f0f0', padding: '5px', width: '3vw',color: 'red' } : {}">
-                    {{ leftBadProductQuantity }}
-                  </p>
-                </a-form-item>
-                <a-form-item label="不良率"
-                             style="background-color: deepskyblue;height: 32px;margin-left: 3vw;width: 5vw;">
-                  <p
-                    :style="this.leftBadRate !== undefined ? { backgroundColor: '#f0f0f0', padding: '5px', width: '3vw'  ,color: 'red'} : {}">
-                    {{ this.computedLeftBadRate() }}
-                  </p>
-                </a-form-item>
-              </a-form>
-            </div>
-            <div style="margin-top: 0.9vh; display: inline-flex; margin-right: 5vw;"
-                 v-if="!this.routerParam.startsWithJ">
-              <a-button
-                type="primary"
-                :style="{
-                    backgroundColor: 'white',
-                     borderColor: '#d9d9d9',
-                    color: 'black',
-                    width: '7vw',
-                    height: '5vh',
-                    pointerEvents: 'none',
-                    fontWeight: 'bold',
-                    fontSize: '19px'
-                 }"
-              >
-                <p style="font-size: 19px; white-space: nowrap; font-weight: bold; margin-top: 5px;color: grey ">
-                  作业提示
-                </p>
-              </a-button>
-              <a-button type="primary"
-                        :style="{
-                     color: '#F77F00',
-                     backgroundColor:'white',
-                      borderColor: '#d9d9d9',
-                        width: '38vw', height: '5vh' ,
-                      pointerEvents: 'none',fontWeight: 'bold',fontSize: '19px'
-                      }">
-                <p style="margin-top: 0.4vh">
-                  {{ this.rightWorkPrompt }}
-                </p>
-              </a-button>
-            </div>
-
-            <div style="position: relative; margin-top: 5vh;" v-if="!this.routerParam.startsWithJ">
-              <a-form
-                name="basic"
-                layout="inline"
-                style=" display: flex; align-items: center;margin-left: 10px"
-              >
-                <a-form-item label="扫码地址验证联网">
-                  <a-input v-model:value="scanAddress" style="width: 140px"
-                           @input="handleScanAddressInput( protocolIDMap[this.configForm.produceModel].protocolId,'one')"
-                  />
-                </a-form-item>
-
-
-              </a-form>
-
-            </div>
-            <div style="height: 2.5vh;">
-              <div style="margin-top: 0.9vh" v-if="this.configDetail.printLabel!=='WAC230CF'">
-                <a-form
-                  name="basic"
-                  layout="inline"
-                  style="display: flex; align-items: center;"
-                >
-                  <!--                <a-form-item label="误差限额50℃ ±" :colon="false" style="margin-left: 3.4vw;">
-                                    <a-input v-model:value="diffTemperatureValue" style="width: 140px"/>
-                                  </a-form-item>
-                                  <a-form-item label="设备进温" :colon="true" style="margin-left: 0.5vw">
-                                    <p style="width: 5vw; margin: 0 0 0 -40px; color: #0080FF; font-weight: bold;">
-                                      {{ deviceInTemperature }}
-                                    </p>
-                                  </a-form-item>
-                                  <a-form-item label="设备回温" :colon="true" style="margin-left: -1vw">
-                                    <p style="width: 5vw; margin: 0 0 0 -40px; color: #0080FF; font-weight: bold;">
-                                      {{ deviceInTemperature }}
-                                    </p>
-                                  </a-form-item>-->
-                </a-form>
-              </div>
-            </div>
-            <div style="margin-top: 2vh; width: 45vw; height: 25vh" v-if="!this.routerParam.startsWithJ">
+          <a-card :title="this.rightProduceViewTitle"
+                  :headStyle="downCardHeadStyle"
+                  :bodyStyle="downCardBodyStyle">
+            <div style="margin-top: 2vh;" >
               <div
-                id="right_textarea_id"
-                ref="receptionTwoText"
-                class="hlm-flow-log-container-style"
+                id="fail_textarea_id"
+                ref="receptionFailText"
+                class="hlm-flow-fail-log-container-style"
               >
                 <div
-                  v-html="text.receptionTwoText"
+                  v-html="text.receptionFailText"
                   class="hlm-flow-log-info-style"
                 ></div>
               </div>
@@ -1714,7 +1728,7 @@ import {protocolIDMap} from "@/views/device/enum/enum";
 import {
   doAwaken,
   doBreakSelfTest,
-  doPrintLabel, doQuadraticVerification,
+  doPrintLabel, doQuadraticVerification, doScanCodeVerification,
   doSelfTest,
   doWriteAddress
 } from "@/views/device/operations/nbDeviceOperations";
@@ -1730,7 +1744,7 @@ import {
   writeOutFactoryOpenCondition
 } from "@/views/device/action/deviceWireAction";
 import CustomTitleBar from "@/views/device/CustomTitleBar.vue";
-import {checkNetWork} from "@/utils/serviceUtils";
+// import {checkNetWork} from "@/utils/serviceUtils";
 
 export default {
   components: {CustomTitleBar},
@@ -1756,8 +1770,8 @@ export default {
       rightBadProductQuantity: 0,
       leftBadRate: 0,
       rightBadRate: 0,
-      leftWorkPrompt: '',
-      rightWorkPrompt: '',
+      leftWorkPrompt: '    ',
+      rightWorkPrompt: '    ',
       selectedImage: '',
       click: true,
       machineNumber: undefined,
@@ -1881,6 +1895,7 @@ export default {
       text: {
         receptionOneText: '',
         receptionTwoText: '',
+        receptionFailText: '',
       },
       password: undefined,
       workNumberPassword: undefined,
@@ -2351,7 +2366,12 @@ export default {
         this.productModel = '生产测试软件 - 温控面板系列 - '
       } else if (this.roomTemperatureCollectorList.includes(this.configForm.produceModel)) {
         this.productModel = '生产测试软件 - 室温采集器系列 - '
+      }else if (this.configForm.produceModel === '东元热表'||this.configForm.produceModel==='NBT200'){
+        this.productModel = '生产测试软件 - 二次验证系列 - '
+      } else {
+        this.productModel = '生产测试软件 - 二次验证系列 - '
       }
+      console.log(this.configForm.produceModel)
       //根据不同型号展示的页面不同
       if (this.configForm.produceModel.includes('VAC10') ||
         this.configForm.produceModel.includes('VAC20') ||
@@ -2369,13 +2389,13 @@ export default {
         this.configForm.produceModel === 'WAC230CF' ||
         this.configForm.produceModel === 'WAC300CD' ||
         this.configForm.produceModel === 'NTP100C' ||
-        this.configForm.produceModel === 'CT1000'||
-        this.configForm.produceModel==='WAC300N'||
-        this.configForm.produceModel==='WAC300NH'
+        this.configForm.produceModel === 'CT1000' ||
+        this.configForm.produceModel === 'WAC300N' ||
+        this.configForm.produceModel === 'WAC300NH'
       ) {
         this.isNBDevice = true
-        this.leftProduceViewTitle = '生产流程'
-        this.rightProduceViewTitle = '生产验证'
+        this.leftProduceViewTitle = '测试验证'
+        this.rightProduceViewTitle = '不良记录'
         // NB 配置解析
         if (productNamingConventionsList.length >= 2) {
           this.decodeConfigForm.secondLevelContainsD = productNamingConventionsList[1].includes('D');
@@ -2547,7 +2567,7 @@ export default {
       }
     },
     upperCardBodyStyle() {
-      // 计算视口宽度百分比
+      // 计算窗口宽度百分比
       const widthPercent = (640 / 1920) * 100
       const heightPercent = (320 / 1080) * 100
       return {
@@ -2558,7 +2578,7 @@ export default {
       }
     },
     downCardHeadStyle() {
-      // 计算视口宽度百分比
+      // 计算窗口宽度百分比
       const widthPercent = (960 / 1920) * 100
       const heightPercent = (40 / 1080) * 100
       return {
@@ -2610,8 +2630,22 @@ export default {
           }
         });
       },
+
+    },
+    "text.receptionFailText": {
+      handler() {
+        this.$nextTick(() => {
+          // 操作的是内层滚动容器
+          const contentDiv = this.$refs.receptionFailText.querySelector('.hlm-flow-log-info-style');
+          if (contentDiv) {
+            //当前滚动条距离容器顶部的垂直偏移量（单位：像素）。= 滚动条内可见高度
+            contentDiv.scrollTop = contentDiv.scrollHeight;
+          }
+        });
+      },
     }
   },
+
   methods: {
     handleToggleMaximize() {
       ipc.send('toggle-maximize');
@@ -2653,10 +2687,10 @@ export default {
         this.configForm.customizePrintLabel = 'NTP100C'
       } else if (value === 'CT1000') {
         this.configForm.customizePrintLabel = 'CT1000'
-      }else if(value==='WAC300N'){
-        this.configForm.customizePrintLabel='WAC300N'
-      }else if(value==='WAC300NH'){
-        this.configForm.customizePrintLabel='WAC300NH'
+      } else if (value === 'WAC300N') {
+        this.configForm.customizePrintLabel = 'WAC300N'
+      } else if (value === 'WAC300NH') {
+        this.configForm.customizePrintLabel = 'WAC300NH'
       } else {
         this.configForm.customizePrintLabel = undefined
       }
@@ -3747,12 +3781,16 @@ export default {
           this.configForm.produceModel === 'WAC230CF' ||
           this.configForm.produceModel === 'WAC300CD' ||
           this.configForm.produceModel === 'NTP100C' ||
-          this.configForm.produceModel === 'CT1000'||
-          this.configForm.produceModel==='WAC300N'||
-          this.configForm.produceModel==='WAC300NH'
+          this.configForm.produceModel === 'CT1000' ||
+          this.configForm.produceModel === 'WAC300N' ||
+          this.configForm.produceModel === 'WAC300NH'
         ) {
-          this.leftProduceViewTitle = '生产流程'
-          this.rightProduceViewTitle = '生产验证'
+          this.leftProduceViewTitle = '测试验证'
+          this.rightProduceViewTitle = '不良记录'
+        }else if (this.configForm.produceModel==='NBT200'||
+          this.configForm.produceModel==='东元热表'){
+          this.leftProduceViewTitle = '测试验证'
+          this.rightProduceViewTitle = '不良记录'
         }
 
         //无线配置
@@ -3775,9 +3813,9 @@ export default {
           this.configForm.produceModel === 'WAC300CD' ||
           this.configForm.produceModel === 'NTP100C' ||
           this.configForm.produceModel === 'NBT200' ||
-          this.configForm.produceModel === 'CT1000'||
-          this.configForm.produceModel==='WAC300N'||
-          this.configForm.produceModel==='WAC300NH'
+          this.configForm.produceModel === 'CT1000' ||
+          this.configForm.produceModel === 'WAC300N' ||
+          this.configForm.produceModel === 'WAC300NH'
         ) {
           this.isNBDevice = true
           if (this.configForm.version === undefined) {
@@ -3880,15 +3918,21 @@ export default {
     }
     ,
 
-    validateNumberInputOne(value) {
-      const leadingZeros = value.match(/^0+/);
-      const zeroCount = leadingZeros ? leadingZeros[0].length : 0;
-      let numPart = parseInt(value, 10);
-      if (value.length > 8) {
-        value = value.slice(0, 8);
+    validateNumberInputOne(event, maxLength) {
+      // const leadingZeros = value.match(/^0+/);
+      // const zeroCount = leadingZeros ? leadingZeros[0].length : 0;
+      // let numPart = parseInt(value, 10);
+      // if (value.length > 8) {
+      //   value = value.slice(0, 8);
+      // }
+      // let newValue = numPart.toString().padStart(zeroCount, "0");
+      // this.leftGenerateAddress = newValue.slice(0, 8).padStart(8, "0");
+      let value = event.target.value;
+      if (value.length > maxLength) {
+        value = value.slice(0, maxLength);  // 截断超出部分
+        event.target.value = value;  // 重新赋值
       }
-      let newValue = numPart.toString().padStart(zeroCount, "0");
-      this.leftGenerateAddress = newValue.slice(0, 8).padStart(8, "0");
+      this.leftGenerateAddress = value;  // 更新 v-model
     },
     validateNumberInputSecondaryInspectionGenerateAddress(event) {
       let value = event.target.value.replace(/[^0-9]/g, '');
@@ -3960,9 +4004,9 @@ export default {
      * 上传MES成功后 或点击流程按钮  所有状态清空
      * */
     messageClean() {
-      this.leftWorkPrompt = ''
-      this.rightWorkPrompt = ''
-      this.text.receptionOneText = ''//
+      this.leftWorkPrompt = '\u200B'
+      this.rightWorkPrompt = '\u200B'
+      this.text.receptionOneText = ''
 
       //无线设备
       this.buttonWaiting('selfTest')
@@ -4003,6 +4047,9 @@ export default {
     async breakSelfTest(protocolId, type) {
       await doBreakSelfTest(this, protocolId, type)
     },
+    async scanCodeVerification(protocolId, type) {
+      await doScanCodeVerification(this, protocolId, type)
+    },
     async handleScanAddressInput(protocolId, type) {
       if (!checkPort(this, type)) {
         this.scanAddress = ''
@@ -4018,14 +4065,14 @@ export default {
       }
 
       if (this.scanAddress.length === 8) {
-        if (!await checkNetWork(this, protocolId, type)) {
-          // if (!this.uploadAddressList.includes(this.scanAddress)) {
-          //
-          // }    console.warn(this.uploadAddressList)
-          this.uploadAddressList.push(this.scanAddress)
-          this.leftGoodProductQuantity += 1;
-          //TODO 成功打印定制标签根据型号区分
-        }
+        // if (!await checkNetWork(this, protocolId, type)) {
+        //   // if (!this.uploadAddressList.includes(this.scanAddress)) {
+        //   //
+        //   // }    console.warn(this.uploadAddressList)
+        //   this.uploadAddressList.push(this.scanAddress)
+        //   this.leftGoodProductQuantity += 1;
+        //   //TODO 成功打印定制标签根据型号区分
+        // }
       }
     }
     ,
@@ -4206,12 +4253,22 @@ html, body {
   margin-left: calc(10 / 1080 * 100vw);
 }
 
+.hlm-card-nb-configInfo-body-left-column {
+  margin-top: calc(10 / 1080 * 100vh);
+  margin-left: calc(10 / 1080 * 100vw);
+}
+
 .hlm-card-configInfo-body-center-column {
   margin-top: calc(10 / 1080 * 100vh);
   margin-left: calc(10 / 1080 * 100vw);
 }
 
 .hlm-card-configInfo-body-right-column {
+  margin-top: calc(10 / 1080 * 100vh);
+  margin-left: calc(10 / 1080 * 100vw);
+}
+
+.hlm-card-nb-configInfo-body-right-column {
   margin-top: calc(10 / 1080 * 100vh);
   margin-left: calc(10 / 1080 * 100vw);
 }
@@ -4225,6 +4282,11 @@ html, body {
 
 .hlm-card-configInfo-body-info-line-label {
   width: calc(85 / 1920 * 100vw);
+  height: calc(30 / 1080 * 100vh)
+}
+
+.hlm-card-nb-configInfo-body-info-line-label {
+  width: calc(110 / 1920 * 100vw);
   height: calc(30 / 1080 * 100vh)
 }
 
@@ -4246,6 +4308,7 @@ html, body {
   width: calc(1920 / 1920 * 100vw);
   height: calc(660 / 1080 * 100vh);
   display: inline-flex;
+  left: 0;
 }
 
 .hlm-form-port {
@@ -4323,6 +4386,8 @@ html, body {
   font-size: calc(19 / 1920 * 100vw); /* 响应式字体大小 */
   font-weight: bold;
   color: #FF770F;
+  visibility: visible !important;
+
 }
 
 .hlm-flow-container-style {
@@ -4331,6 +4396,29 @@ html, body {
   position: relative;
 }
 
+
+.hlm-nb-flow-arrowContainer-style {
+  position: absolute;
+  margin-top: calc(35/1080*100vh);
+  display: flex; /*箭头由两部分组成 ：实现+空心箭头 flex布局 */
+}
+.hlm-nb-flow-straightArrows-style {
+  width: calc(600/1920 * 100vw);
+  height: 0.5vh;
+  background-color: #FF770F;
+  margin-left: 3vw;
+}
+.hlm-nb-flow-arrows-style {
+  position: absolute;
+  right: -0.01vh; /* 向内收一点，让线条顶到箭头 */
+  top: 50%;
+  width: 2vh;
+  height: 2vh;
+  border-top: 0.4vh solid #FF770F;
+  border-right: 0.4vh solid #FF770F;
+  transform: translateY(-50%) rotate(45deg);
+  background: transparent;
+}
 .hlm-flow-arrowContainer-style {
   position: absolute;
   top: 7vh;
@@ -4338,7 +4426,6 @@ html, body {
   margin-left: -3vw;
 
 }
-
 .hlm-flow-straightArrows-style {
   width: 35vw;
   height: 0.5vh;
@@ -4373,6 +4460,21 @@ html, body {
 
 }
 
+.hlm-nb-flow-button-style {
+  width: calc(120 / 1920 * 100vw);
+  height: calc(50 / 1080 * 100vh);
+  border-color: #666666;
+  background-color: transparent;
+  text-align: center;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(15 / 1920 * 100vw); /* 响应式字体大小 */
+  white-space: normal;
+
+}
+
 .hlm-flow-start-button-style {
   width: calc(140 / 1920 * 100vw);
   height: calc(100 / 1080 * 100vh);
@@ -4386,8 +4488,40 @@ html, body {
 
 }
 
+.hlm-nb-business-start-button-style {
+  width: calc(120 / 1920 * 100vw);
+  height: calc(50 / 1080 * 100vh);
+  border-color: #666666;
+  background-color: #FF770F;   /*强制覆盖 防止disabled 优先级过高*/
+  color: white !important; /*强制覆盖 防止disabled 优先级过高*/
+  text-align: center;
+  font-size: calc(18 / 1920 * 100vw); /* 响应式字体大小 */
+  white-space: nowrap;
+  margin-left: calc(40/1920*100vw);
+
+}
+
+.hlm-nb-not-important-business-start-button-style {
+  width: calc(60 / 1920 * 100vw);
+  height: calc(50 / 1080 * 100vh);
+  border-color: #666666;
+  background-color: #F2F2F2;
+  font-size: calc(15 / 1920 * 100vw);
+  padding: 0; /* 清除可能的内边距 */
+}
+.hlm-nb-not-important-business-body-style {
+ margin-left: calc(140/1920*100vw);
+}
+
+
 .hlm--statistics-container-style {
   margin-top: calc(20 / 1080 * 100vh);
+  margin-left: calc(50 / 1920 * 100vw);
+  width: 100%;
+  display: inline-flex;
+
+}.hlm-nb-statistics-container-style {
+  margin-top: calc(70 / 1080 * 100vh);
   margin-left: calc(50 / 1920 * 100vw);
   width: 100%;
   display: inline-flex;
@@ -4402,7 +4536,14 @@ html, body {
   font-size: calc(15 / 1920 * 100vw); /* 响应式字体大小 */
   padding: 0 !important; /* 防止框架默认 padding 影响 */
 }
-
+.hlm-nb-address-style {
+  width: calc(140 / 1920 * 100vw);
+  height: calc(30 / 1080 * 100vh);
+  border-color: grey;
+  color: black;
+  font-size: calc(15 / 1920 * 100vw); /* 响应式字体大小 */
+  padding: 0 !important; /* 防止框架默认 padding 影响 */
+}
 .hlm-flow-defectiveProducts-statistics-style {
   width: calc(60 / 1920 * 100vw);
   height: calc(30 / 1080 * 100vh);
@@ -4415,6 +4556,27 @@ html, body {
 .hlm-flow-log-container-style {
   width: calc(860 / 1920 * 100vw);
   height: calc(290 / 1080 * 100vh);
+  margin-top: calc(20 / 1080 * 100vh);
+  margin-left: calc(50 / 1920 * 100vw);
+  border: 1px solid #d9d9d9; /*外边框*/
+  text-align: left;
+  overflow: hidden; /*  禁止外层滚动 */
+}
+
+.hlm-nb-log-container-style {
+  width: calc(860 / 1920 * 100vw);
+  height: calc(230 / 1080 * 100vh);
+  margin-top: calc(20 / 1080 * 100vh);
+  margin-left: calc(50 / 1920 * 100vw);
+  border: 1px solid #d9d9d9; /*外边框*/
+  text-align: left;
+  overflow: hidden; /*  禁止外层滚动 */
+}
+
+
+.hlm-flow-fail-log-container-style {
+  width: calc(860 / 1920 * 100vw);
+  height: calc(568 / 1080 * 100vh);
   margin-top: calc(20 / 1080 * 100vh);
   margin-left: calc(50 / 1920 * 100vw);
   border: 1px solid #d9d9d9; /*外边框*/
@@ -4451,4 +4613,22 @@ html, body {
   margin-left: -0.9vw;
 }
 
+/* 隐藏数字输入框的加减按钮（Chrome、Safari、Edge、Opera） */
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 隐藏数字输入框的加减按钮（Firefox） */
+.no-spinner {
+  -moz-appearance: textfield;
+}
+/* 强制覆盖 AntD 按钮禁用样式 */
+.ant-btn[disabled],
+.ant-btn-disabled {
+  border-color: inherit !important;     /* 继承原边框色 */
+  cursor: not-allowed !important;        /* 保留禁止点击光标 */
+  pointer-events: none !important;       /* 禁止点击效果 */
+}
 </style>

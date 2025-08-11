@@ -6,38 +6,38 @@ const Log = require('ee-core/log');
 export const checkPort = (context, type) => {
   if (type === 'one') {
     if (context.portAttributes.selectedPortOne === null || context.portAttributes.selectedPortOne === undefined) {
-      context.createLeftSpanMessage('请选择串口', 'red');
+      context.createLeftSpanMessage('请选择串口', 'grey');
       return false
     }
     if (context.portAttributes.portClosedOneStatus) {
-      context.createLeftSpanMessage('串口未打开', 'red');
+      context.createLeftSpanMessage('串口未打开', 'grey');
       return false
     }
   } else if (type==='two') {
     if (context.portAttributes.selectedPortTwo === null || context.portAttributes.selectedPortTwo === undefined) {
-      context.createLeftSpanMessage('请选择串口', 'red');
+      context.createLeftSpanMessage('请选择串口', 'grey');
       return false
     }
     if (context.portAttributes.portClosedTwoStatus) {
-      context.createLeftSpanMessage('串口未打开', 'red');
+      context.createLeftSpanMessage('串口未打开', 'grey');
       return false
     }
   }else if (type==='three'){
     if (context.portAttributes.selectedPortSignalSource === null || context.portAttributes.selectedPortSignalSource === undefined) {
-      context.createLeftSpanMessage('请选择信号源串口', 'red');
+      context.createLeftSpanMessage('请选择信号源串口', 'grey');
       return false
     }
     if (context.portAttributes.portClosedSignalSourceStatus) {
-      context.createLeftSpanMessage('信号源串口未打开', 'red');
+      context.createLeftSpanMessage('信号源串口未打开', 'grey');
       return false
     }
   }else if (type==='four'){
     if (context.portAttributes.selectedPortCurrentSource === null || context.portAttributes.selectedPortCurrentSource === undefined) {
-      context.createLeftSpanMessage('请选择电流源串口', 'red');
+      context.createLeftSpanMessage('请选择电流源串口', 'grey');
       return false
     }
     if (context.portAttributes.selectedPortCurrentSource) {
-      context.createLeftSpanMessage('电流源串口未打开', 'red');
+      context.createLeftSpanMessage('电流源串口未打开', 'grey');
       return false
     }
   }
@@ -64,7 +64,7 @@ export const doOpenPort = (context, portName, parity, dataBits, baudRate, stopBi
       context.portAttributes.serialPortOne.open((err) => {
         if (err) {
           // 串口打开失败
-          context.createLeftSpanMessage('串口：' + portName + '打开失败', 'red');
+          context.createLeftSpanMessage('串口：' + portName + '打开失败', 'grey');
           context.portAttributes.serialPortOne = null;
           console.error('Failed to open port:', err.message);
           Log.error('Failed to open port:', err.message);
@@ -90,7 +90,7 @@ export const doOpenPort = (context, portName, parity, dataBits, baudRate, stopBi
       context.portAttributes.serialPortTwo.open((err) => {
         if (err) {
           // 串口打开失败
-          context.createRightSpanMessage('串口：' + portName + '打开失败', 'red');
+          context.createRightSpanMessage('串口：' + portName + '打开失败', 'grey');
           context.portAttributes.serialPortTwo = null;
           console.error('Failed to open port:', err.message);
           Log.error('Failed to open port:', err.message);
@@ -116,7 +116,7 @@ export const doOpenPort = (context, portName, parity, dataBits, baudRate, stopBi
       context.portAttributes.serialPortSignalSource.open((err) => {
         if (err) {
           // 串口打开失败
-          context.createLeftSpanMessage('串口：' + portName + '打开失败', 'red');
+          context.createLeftSpanMessage('串口：' + portName + '打开失败', 'grey');
           context.portAttributes.serialPortSignalSource = null;
           console.error('Failed to open port:', err.message);
           Log.error('Failed to open port:', err.message);
@@ -142,7 +142,7 @@ export const doOpenPort = (context, portName, parity, dataBits, baudRate, stopBi
       context.portAttributes.serialPortCurrentSource.open((err) => {
         if (err) {
           // 串口打开失败
-          context.createLeftSpanMessage('串口：' + portName + '打开失败', 'red');
+          context.createLeftSpanMessage('串口：' + portName + '打开失败', 'grey');
           context.portAttributes.serialPortCurrentSource = null;
           console.error('Failed to open port:', err.message);
           Log.error('Failed to open port:', err.message);

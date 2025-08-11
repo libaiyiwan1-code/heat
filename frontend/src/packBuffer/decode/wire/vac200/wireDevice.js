@@ -183,9 +183,9 @@ export function decodeSeparationAlarmState(responseMessage, close,context,type) 
       str='闭合'
     }
     if (type==='one'){
-      context.createLeftSpanMessage('分离警报检测('+str+')-失败', 'red')
+      context.createLeftSpanMessage('分离警报检测('+str+')-失败', 'grey')
     }else{
-      context.createRightSpanMessage('分离警报检测('+str+')-失败', 'red')
+      context.createRightSpanMessage('分离警报检测('+str+')-失败', 'grey')
     }
     return {notPass: true, errorMessage: '分离警报检测-失败'}
   }
@@ -207,18 +207,18 @@ export function decodeMainAndAuxiliaryValvesState(responseMessage,context,type) 
   let done = decodeMainAndAuxiliaryValvesDone(responseMessage)
   if (continuedState) {
     if (type==='one'){
-      context.createLeftSpanMessage('主阀检测失败', 'red')
+      context.createLeftSpanMessage('主阀检测失败', 'grey')
     }else{
-      context.createRightSpanMessage('主阀检测失败', 'red')
+      context.createRightSpanMessage('主阀检测失败', 'grey')
     }
     return {notPass: true, errorMessage: '副阀检测失败'}
   } else if (done ) {
     return {notPass: false, errorMessage: '副阀检测成功'}
   } else {
     if (type==='one'){
-      context.createLeftSpanMessage('主阀检测失败', 'red')
+      context.createLeftSpanMessage('主阀检测失败', 'grey')
     }else{
-      context.createRightSpanMessage('主阀检测失败', 'red')
+      context.createRightSpanMessage('主阀检测失败', 'grey')
     }
     return {notPass: true, errorMessage: '副阀检测失败'}
   }

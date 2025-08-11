@@ -46,7 +46,7 @@ export function decodeCheckReadSelfTestStatusWAC230CF(context, responseMessage) 
   let hallNotPass = decodeCheckHall(context.receivedData.globalReceivedOneData)               //霍尔
   let batteryVoltageNotPass = decodeCheckBatteryVoltage(context.receivedData.globalReceivedOneData)               //电池电压
   if (selfTestCompletedNotPass) {
-    context.createLeftSpanMessage('未进行过自检', 'red');
+    context.createLeftSpanMessage('未进行过自检', 'grey');
     Log.error('未进行过自检');
     console.log('未进行过自检');
   } else {
@@ -54,65 +54,65 @@ export function decodeCheckReadSelfTestStatusWAC230CF(context, responseMessage) 
   }
 
   if (eepNotPass) {
-    context.createLeftSpanMessage('eep 不正常', 'red');
+    context.createLeftSpanMessage('eep 不正常', 'grey');
     Log.error('eep 不正常');
     console.log('eep 不正常');
   } else {
     context.createLeftSpanMessage('eep 正常', 'grey');
   }
   if (networkNotPass) {
-    context.createLeftSpanMessage('联网 不正常', 'red');
+    context.createLeftSpanMessage('联网 不正常', 'grey');
     Log.error('联网 不正常');
     console.log('联网 不正常');
   } else {
-    context.createLeftSpanMessage('联网 正常', 'green');
+    context.createLeftSpanMessage('联网 正常', 'grey');
   }
   if (valveCloseNotPass) {
-    context.createLeftSpanMessage('阀关 不正常', 'red');
+    context.createLeftSpanMessage('阀关 不正常', 'grey');
     Log.error('阀关 不正常');
     console.log('阀关 不正常');
   } else {
-    context.createLeftSpanMessage('阀关 正常', 'green');
+    context.createLeftSpanMessage('阀关 正常', 'grey');
   }
   if (valveOpenNotPass) {
-    context.createLeftSpanMessage('阀开 不正常', 'red');
+    context.createLeftSpanMessage('阀开 不正常', 'grey');
     Log.error('阀开 不正常');
     console.log('阀开 不正常');
   } else {
-    context.createLeftSpanMessage('阀开 正常', 'green');
+    context.createLeftSpanMessage('阀开 正常', 'grey');
   }
   if (fskNotPass) {
-    context.createLeftSpanMessage('无线通信fsk 不正常', 'red');
+    context.createLeftSpanMessage('无线通信fsk 不正常', 'grey');
     Log.error('无线通信fsk 不正常');
     console.log('无线通信fsk 不正常');
   } else {
-    context.createLeftSpanMessage('无线通信fsk 正常', 'green');
+    context.createLeftSpanMessage('无线通信fsk 正常', 'grey');
   }
   if (mbusNotPass) {
-    context.createLeftSpanMessage('MBUS 不正常', 'red');
+    context.createLeftSpanMessage('MBUS 不正常', 'grey');
     Log.error('MBUS 不正常');
     console.log('MBUS 不正常');
   } else {
-    context.createLeftSpanMessage('MBUS 正常', 'green');
+    context.createLeftSpanMessage('MBUS 正常', 'grey');
   }
   if (hallNotPass) {
-    context.createLeftSpanMessage('霍尔 不正常', 'red');
+    context.createLeftSpanMessage('霍尔 不正常', 'grey');
     Log.error('霍尔 不正常');
     console.log('霍尔 不正常');
   } else {
-    context.createLeftSpanMessage('霍尔 正常', 'green');
+    context.createLeftSpanMessage('霍尔 正常', 'grey');
   }
   if (batteryVoltageNotPass) {
-    context.createLeftSpanMessage('电池电压 不正常', 'red');
+    context.createLeftSpanMessage('电池电压 不正常', 'grey');
     Log.error('电池电压 不正常');
     console.log('电池电压 不正常');
   } else {
-    context.createLeftSpanMessage('电池电压 正常', 'green');
+    context.createLeftSpanMessage('电池电压 正常', 'grey');
   }
 
   if (selfTestCompletedNotPass || eepNotPass || networkNotPass || valveCloseNotPass || valveOpenNotPass ||
     fskNotPass || mbusNotPass || hallNotPass || batteryVoltageNotPass || baseCheck) {
-    context.createLeftSpanMessage('自检不通过', 'red');
+    context.createLeftSpanMessage('自检不通过', 'grey');
     console.error('自检不通过');
     Log.error('自检不通过');
     context.leftWorkPrompt = '自检失败(读自检状态不通过)'
@@ -123,7 +123,7 @@ export function decodeCheckReadSelfTestStatusWAC230CF(context, responseMessage) 
   context.leftReadAddress = decodeReadSelfTestAddress(context, context.receivedData.globalReceivedOneData); //读设备地址
   context.productName = decodeGetProductNameWAC230CF(context.receivedData.globalReceivedOneData); //产品名称
   if (!context.productName.toLowerCase().includes('WAC230CF')){
-    context.createLeftSpanMessage('产品名称错误：'+context.productName, 'red');
+    context.createLeftSpanMessage('产品名称错误：'+context.productName, 'grey');
     return true
   }
   context.protocolId = decodeGetProtocolId(context.receivedData.globalReceivedOneData);//协议id

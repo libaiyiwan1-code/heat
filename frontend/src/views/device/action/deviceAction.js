@@ -91,13 +91,13 @@ export const serialPortOperation = async (context, config, type) => {
         if (!response) {
           retries++;
           if (type === 'one') {
-            context.createLeftSpanMessage(`${operationName}失败-进行重试 次数:${retries}`, 'red');
+            context.createLeftSpanMessage(`${operationName}失败-进行重试 次数:${retries}`, 'grey');
           } else if (type === 'two') {
-            context.createRightSpanMessage(`${operationName}失败-进行重试 次数:${retries}`, 'red');
+            context.createRightSpanMessage(`${operationName}失败-进行重试 次数:${retries}`, 'grey');
           } else if (type === 'three') {
-            context.createLeftSpanMessage(`${operationName}失败-进行重试 次数:${retries}`, 'red');
+            context.createLeftSpanMessage(`${operationName}失败-进行重试 次数:${retries}`, 'grey');
           } else if (type === 'four') {
-            context.createLeftSpanMessage(`${operationName}失败-进行重试 次数:${retries}`, 'red');
+            context.createLeftSpanMessage(`${operationName}失败-进行重试 次数:${retries}`, 'grey');
           }
           console.warn('等待响应超时，进行重试:', retries);
           continue;
@@ -121,13 +121,13 @@ export const serialPortOperation = async (context, config, type) => {
         operationName !== '不良品提示') {
         retries++;
         if (type === 'one') {
-          context.createLeftSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'red');
+          context.createLeftSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'grey');
         } else if (type === 'two') {
-          context.createRightSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'red');
+          context.createRightSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'grey');
         } else if (type === 'three') {
-          context.createLeftSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'red');
+          context.createLeftSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'grey');
         }else if (type === 'four') {
-          context.createLeftSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'red');
+          context.createLeftSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'grey');
         }
         await new Promise(resolve => setTimeout(resolve, 900));
         continue;
@@ -157,13 +157,13 @@ export const serialPortOperation = async (context, config, type) => {
         if (context.isNBDevice) {
           retries++;
           if (type === 'one') {
-            context.createLeftSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'red');
+            context.createLeftSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'grey');
           } else if (type === 'two') {
-            context.createRightSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'red');
+            context.createRightSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'grey');
           } else if (type === 'three') {
-            context.createLeftSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'red');
+            context.createLeftSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'grey');
           }else if (type === 'four') {
-            context.createLeftSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'red');
+            context.createLeftSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'grey');
           }
           continue;
         } else {
@@ -267,7 +267,7 @@ export async function handleLeftError(context, operationName, message, actionTyp
   context.leftWorkPrompt = `${operationName}-操作失败`;
   context.buttonError('leftWorkPromptColor')
   context.buttonError(actionType)
-  context.createLeftSpanMessage(`${operationName}-${message}`, 'red');
+  context.createLeftSpanMessage(`${operationName}-${message}`, 'grey');
   context.receivedData.globalReceivedOneData = '';
   await playErrorAudio(context)
 
@@ -278,7 +278,7 @@ export async function handleRightError(context, operationName, message, actionTy
   context.rightWorkPrompt = `${operationName}-操作失败（${message}）`;
   context.buttonError('rightWorkPromptColor')
   context.buttonError(actionType)
-  context.createRightSpanMessage(`${operationName}-${message}`, 'red');
+  context.createRightSpanMessage(`${operationName}-${message}`, 'grey');
   context.receivedData.globalReceivedOneData = '';
   if (operationName !== 'MES') {
     await playErrorAudio(context)

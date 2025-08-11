@@ -193,7 +193,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   let inPressureMatchNotPass = decodeCheckInPressureMatchWAC710CD(context.receivedData.globalReceivedOneData)     //             进水压力探头是否匹配
   // let differentialPressureMatchNotPass = decodeCheckDifferentialPressureMatchWAC710CD(context.receivedData.globalReceivedOneData)     //             压差探头是否匹配
   if (selfTestCompletedNotPass) {
-    context.createLeftSpanMessage('未进行过自检', 'red');
+    context.createLeftSpanMessage('未进行过自检', 'drey');
     Log.error('未进行过自检');
     console.log('未进行过自检');
   }
@@ -202,7 +202,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   // }
 
   if (eepNotPass) {
-    context.createLeftSpanMessage('eep 不正常', 'red');
+    context.createLeftSpanMessage('eep 不正常', 'grey');
     Log.error('eep 不正常');
     console.log('eep 不正常');
   }
@@ -210,7 +210,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('eep 正常', 'green');
   // }
   if (networkNotPass) {
-    context.createLeftSpanMessage('联网 不正常', 'red');
+    context.createLeftSpanMessage('联网 不正常', 'grey');
     Log.error('联网 不正常');
     console.log('联网 不正常');
   }
@@ -218,7 +218,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('联网 正常', 'green');
   // }
   if (minimumValveOpeningNotPass) {
-    context.createLeftSpanMessage('阀门最小开度标定 不正常', 'red');
+    context.createLeftSpanMessage('阀门最小开度标定 不正常', 'grey');
     Log.error('阀门最小开度标定 不正常');
     console.log('阀门最小开度标定 不正常');
   }
@@ -226,7 +226,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('阀门最小开度标定 正常', 'green');
   // }
   if (maximumValveOpeningNotPass) {
-    context.createLeftSpanMessage('阀门最大开度标定 不正常', 'red');
+    context.createLeftSpanMessage('阀门最大开度标定 不正常', 'grey');
     Log.error('阀门最大开度标定 不正常');
     console.log('阀门最大开度标定 不正常');
   }
@@ -234,7 +234,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('阀门最大开度标定 正常', 'green');
   // }
   if (outTemperatureCalibrationNotPass) {
-    context.createLeftSpanMessage('回温标定 不正常', 'red');
+    context.createLeftSpanMessage('回温标定 不正常', 'grey');
     Log.error('回温标定 不正常');
     console.log('回温标定 不正常');
   }
@@ -242,7 +242,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('回温标定 正常', 'green');
   // }
   if (inTemperatureCalibrationNotPass) {
-    context.createLeftSpanMessage('进温标定 不正常', 'red');
+    context.createLeftSpanMessage('进温标定 不正常', 'grey');
     Log.error('进温标定 不正常');
     console.log('进温标定 不正常');
   }
@@ -250,7 +250,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('进温标定 正常', 'green');
   // }
   if (voltageNotPass) {
-    context.createLeftSpanMessage('电压 不正常', 'red');
+    context.createLeftSpanMessage('电压 不正常', 'grey');
     Log.error('电压 不正常');
     console.log('电压 不正常');
   }
@@ -258,7 +258,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('电压 正常', 'green');
   // }
   if (barometricPressureSensorNotPass) {
-    context.createLeftSpanMessage('气压传感器 不正常', 'red');
+    context.createLeftSpanMessage('气压传感器 不正常', 'grey');
     Log.error('气压传感器 不正常');
     console.log('气压传感器 不正常');
   }
@@ -266,7 +266,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('气压传感器 正常', 'green');
   // }
   if (inPressureNotPass) {
-    context.createLeftSpanMessage('进水压力 不正常', 'red');
+    context.createLeftSpanMessage('进水压力 不正常', 'grey');
     Log.error('进水压力 不正常');
     console.log('进水压力 不正常');
   }
@@ -274,7 +274,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('进水压力 正常', 'green');
   // }
   if (outPressureNotPass) {
-    context.createLeftSpanMessage('回水压力 不正常', 'red');
+    context.createLeftSpanMessage('回水压力 不正常', 'grey');
     Log.error('回水压力 不正常');
     console.log('回水压力 不正常');
   }
@@ -288,7 +288,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('回水压力 正常', 'green');
   // }
   if (magneticSensorsNotPass) {
-    context.createLeftSpanMessage('磁传感器 不正常', 'red');
+    context.createLeftSpanMessage('磁传感器 不正常', 'grey');
     Log.error('磁传感器 不正常');
     console.log('磁传感器 不正常');
   }
@@ -296,7 +296,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('磁传感器 正常', 'green');
   // }
   if (outTemperatureMatchNotPass) {
-    context.createLeftSpanMessage('回温探头 与实物不匹配', 'red');
+    context.createLeftSpanMessage('回温探头 与实物不匹配', 'grey');
     Log.error('回温探头 与实物不匹配');
     console.log('回温探头 与实物不匹配');
   }
@@ -304,7 +304,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('回温探头 与实物匹配', 'green');
   // }
   if (inTemperatureMatchNotPass) {
-    context.createLeftSpanMessage('进温探头 与实物不匹配', 'red');
+    context.createLeftSpanMessage('进温探头 与实物不匹配', 'grey');
     Log.error('进温探头 与实物不匹配');
     console.log('进温探头 与实物不匹配');
   }
@@ -312,7 +312,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('进温探头 与实物匹配', 'green');
   // }
   if (outPressureMatchNotPass) {
-    context.createLeftSpanMessage('回压探头 与实物不匹配', 'red');
+    context.createLeftSpanMessage('回压探头 与实物不匹配', 'grey');
     Log.error('回压探头 与实物不匹配');
     console.log('回压探头 与实物不匹配');
   }
@@ -320,7 +320,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   //   context.createLeftSpanMessage('回压探头 与实物匹配', 'green');
   // }
   if (inPressureMatchNotPass) {
-    context.createLeftSpanMessage('进压探头 与实物不匹配', 'red');
+    context.createLeftSpanMessage('进压探头 与实物不匹配', 'grey');
     Log.error('进压探头 与实物不匹配');
     console.log('进压探头 与实物不匹配');
   }
@@ -349,7 +349,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
     outPressureMatchNotPass||
     inPressureMatchNotPass
   ) {
-    context.createLeftSpanMessage('自检不通过', 'red');
+    context.createLeftSpanMessage('自检不通过', 'grey');
     console.error('自检不通过');
     Log.error('自检不通过');
     context.leftWorkPrompt = '自检失败(读自检状态不通过)'
@@ -365,7 +365,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   context.leftReadAddress = decodeReadSelfTestAddressWAC710CD(context.receivedData.globalReceivedOneData); //读设备地址
   context.productName = decodeGetProductNameWAC710CD( context.receivedData.globalReceivedOneData); //产品名称
   if (!context.productName.includes('WAC710CD')) {
-    context.createLeftSpanMessage('产品名称错误：' + context.productName, 'red');
+    context.createLeftSpanMessage('产品名称错误：' + context.productName, 'grey');
     return true;
   }
   context.protocolId = getDeviceProtocolIdWAC710CD(context.receivedData.globalReceivedOneData);//协议id

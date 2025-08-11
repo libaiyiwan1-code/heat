@@ -4,7 +4,7 @@ import {playErrorAudio} from "@/utils/audioUtils";
 import {checkIMEI, generateAddress} from "@/utils/serviceUtils";
 import {doSelfTestWAC300NH} from "@/views/device/operations/nb/wac300nh/selfTest";
 
-export async function writeAddressWAC300NH(context,protocolId, type) {
+export async function writeAddressWAC300NH(protocolId, type, context) {
 
   //进回温验证
   //回温探头

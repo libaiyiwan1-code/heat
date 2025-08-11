@@ -3,7 +3,7 @@ import {protocolIDMap} from "@/views/device/enum/enum";
 import {playErrorAudio} from "@/utils/audioUtils";
 import {checkIMEI, generateAddress} from "@/utils/serviceUtils";
 
-export async function writeAddressWAC300N(context,protocolId, type) {
+export async function writeAddressWAC300N(protocolId, type, context) {
 
   //进回温验证
   //回温探头
