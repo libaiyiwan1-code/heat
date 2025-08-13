@@ -1,4 +1,4 @@
-import {serialPortOperation} from "@/views/device/action/deviceAction";
+import {badRecordUpload, serialPortOperation} from "@/views/device/action/deviceAction";
 import {protocolIDMap} from "@/views/device/enum/enum";
 import {playErrorAudio} from "@/utils/audioUtils";
 import {checkIMEI, generateAddress} from "@/utils/serviceUtils";
@@ -73,11 +73,13 @@ export async function writeAddressWAC710CD(protocolId, type, context) {
       }
       if (!(context.readDifferentialPressure >= 10 - context.configDetail.sig_device_err &&
         context.readDifferentialPressure <= 10 + context.configDetail.sig_device_err)) {
-        context.createLeftSpanMessage('压差误差过大，设备电流:' + Number(context.readDifferentialPressure).toFixed(4) + '误差:' + (context.readDifferentialPressure - 10).toFixed(4), 'red')
+        await badRecordUpload(context,'压差误差过大','设备电流:' + Number(context.readDifferentialPressure).toFixed(4) + '误差:' + (context.readDifferentialPressure - 10).toFixed(4), 'grey','writeAddress')
+        await context.uploadMes(context,0,'压差误差过大,设备电流:' + Number(context.readDifferentialPressure).toFixed(4) + '误差:' + (context.readDifferentialPressure - 10).toFixed(4))
         await playErrorAudio(context)
+        context.leftBadProductQuantity += 1
         return true
       }
-      context.createLeftSpanMessage('压差精度检测正常,设备电流:' + Number(context.readDifferentialPressure).toFixed(4) + '误差:' + (context.readDifferentialPressure - 10).toFixed(4), 'green')
+      context.createLeftSpanMessage('压差精度检测正常,设备电流:' + Number(context.readDifferentialPressure).toFixed(4) + '误差:' + (context.readDifferentialPressure - 10).toFixed(4), 'grey')
 
     } else if (context.configDetail.currentSource === '有') {
       // 通过信号源串口发送  产生10mA电流
@@ -127,12 +129,14 @@ export async function writeAddressWAC710CD(protocolId, type, context) {
       const upperBound = 10 + context.sig_cs_err;
       // 判断是否在死区内
       if (context.readCurrent < lowerBound || context.readCurrent > upperBound) {
-        context.createLeftSpanMessage('电流源和信号源误差过大,电流源电流:' + Number(context.readCurrent).toFixed(4) + ',信号源电流:10mA' + '实际误差:' + Number(context.readCurrent - 10).toFixed(4) + 'mA', 'red');
+        await badRecordUpload(context,'电流源和信号源误差过大','电流源电流:' + Number(context.readCurrent).toFixed(4) + ',信号源电流:10mA' + '实际误差:' + Number(context.readCurrent - 10).toFixed(4) + 'mA','writeAddress');
+        await context.uploadMes(context.leftGenerateAddress, 0, '电流源和信号源误差过大,电流源电流:' + Number(context.readCurrent).toFixed(4) + ',信号源电流:10mA' + '实际误差:' + Number(context.readCurrent - 10).toFixed(4))
         await playErrorAudio(context)
+        context.leftBadProductQuantity += 1
         return true;
       }
-      context.createLeftSpanMessage('电流源和信号源误差正常,电流源电流:' + Number(context.readCurrent).toFixed(4) + ',信号源电流:10mA' + '实际误差:' + Number(context.readCurrent - 10).toFixed(4) + 'mA', 'green');
-      context.createLeftSpanMessage('电流源电流:' + Number(context.readCurrent).toFixed(4), 'green');
+      context.createLeftSpanMessage('电流源和信号源误差正常,电流源电流:' + Number(context.readCurrent).toFixed(4) + ',信号源电流:10mA' + '实际误差:' + Number(context.readCurrent - 10).toFixed(4) + 'mA', 'grey');
+      context.createLeftSpanMessage('电流源电流:' + Number(context.readCurrent).toFixed(4), 'grey');
 
 
       let readDataResult = await serialPortOperation(context, {
@@ -184,16 +188,19 @@ export async function writeAddressWAC710CD(protocolId, type, context) {
 
       // 判断误差是否大于死区值
       if (error > deadZone) {
-        context.createLeftSpanMessage(
-          `设备和电流源误差过大，电流源电流: ${Number(context.readCurrent).toFixed(4)}mA, 设备电流: ${Number(context.readDifferentialPressure).toFixed(4)}mA, 误差: ${error.toFixed(4)}mA (超过死区 ${deadZone}mA)`,
-          'red'
+        await badRecordUpload(context,
+          `设备和电流源误差过大`,
+          `电流源电流: ${Number(context.readCurrent).toFixed(4)}mA, 设备电流: ${Number(context.readDifferentialPressure).toFixed(4)}mA, 误差: ${error.toFixed(4)}mA (超过死区 ${deadZone}mA)`,'writeAddress'
+
         );
+        await context.uploadMes(context.leftGenerateAddress, 0, `设备和电流源误差过大，电流源电流: ${Number(context.readCurrent).toFixed(4)}mA, 设备电流: ${Number(context.readDifferentialPressure).toFixed(4)}mA, 误差: ${error.toFixed(4)}mA (超过死区 ${deadZone}mA)`)
         await playErrorAudio(context)
+        context.leftBadProductQuantity += 1
         return true;
       }
 
       context.createLeftSpanMessage(`设备和电流源误差正常，电流源电流: ${Number(context.readCurrent).toFixed(4)}mA, 设备电流: ${Number(context.readDifferentialPressure).toFixed(4)}mA, 误差: ${error.toFixed(4)}mA`,
-        'green'
+        'grey'
       )
 
 
@@ -235,38 +242,46 @@ export async function writeAddressWAC710CD(protocolId, type, context) {
   if (context.configDetail.temperatureProbe === '回温探头') {
     if (!(context.readOutTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
       context.readOutTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
-      context.createLeftSpanMessage('回温温度误差过大:' + context.readOutTemperature, 'red')
+      await badRecordUpload(context,'回温温度误差过大' , + context.readOutTemperature, 'writeAddress')
+      await context.uploadMes(context.leftGenerateAddress, 0, '回温温度误差过大:' + context.readOutTemperature)
+      context.leftBadProductQuantity += 1
       await playErrorAudio(context)
       return true
     }
-    context.createLeftSpanMessage('回温验证成功:' + context.readOutTemperature, 'green')
+    context.createLeftSpanMessage('回温验证成功:' + context.readOutTemperature, 'grey')
 
   } else if (context.configDetail.temperatureProbe === '进温探头') {
     //进温探头
     if (!(context.readInTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
       context.readInTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
-      context.createLeftSpanMessage('进温温度误差过大:' + context.readInTemperature, 'red')
+      await badRecordUpload(context,'进温温度误差过大' , + context.readInTemperature, 'writeAddress')
+      await context.uploadMes(context.leftGenerateAddress, 0, '进温温度误差过大:' + context.readInTemperature)
+      context.leftBadProductQuantity += 1
       await playErrorAudio(context)
       return true
     }
-    context.createLeftSpanMessage('进温验证成功:' + context.readInTemperature, 'green')
+    context.createLeftSpanMessage('进温验证成功:' + context.readInTemperature, 'grey')
 
   } else if (context.configDetail.temperatureProbe === '双探头') {
     //双探头
     if (!(context.readOutTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
       context.readOutTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
-      context.createLeftSpanMessage('回温温度误差过大:' + context.readOutTemperature, 'red')
+      await badRecordUpload(context,'回温温度误差过大' , + context.readOutTemperature, 'writeAddress')
+      await context.uploadMes(context.leftGenerateAddress, 0, '回温温度误差过大:' + context.readOutTemperature)
       await playErrorAudio(context)
+      context.leftBadProductQuantity += 1
       return true
     }
-    context.createLeftSpanMessage('回温验证成功:' + context.readOutTemperature, 'green')
+    context.createLeftSpanMessage('回温验证成功:' + context.readOutTemperature, 'grey')
     if (!(context.readInTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
       context.readInTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
-      context.createLeftSpanMessage('进温温度误差过大:' + context.readInTemperature, 'red')
+      await badRecordUpload(context,'进温温度误差过大' , + context.readInTemperature, 'writeAddress')
+      await context.uploadMes(context.leftGenerateAddress, 0, '进温温度误差过大:' + context.readInTemperature)
+      context.leftBadProductQuantity += 1
       await playErrorAudio(context)
       return true
     }
-    context.createLeftSpanMessage('进温验证成功:' + context.readInTemperature, 'green')
+    context.createLeftSpanMessage('进温验证成功:' + context.readInTemperature, 'grey')
   }
   let notPass = await generateAddress(context)
   if (notPass) {
@@ -294,12 +309,13 @@ export async function writeAddressWAC710CD(protocolId, type, context) {
     return true
   }
   if (context.version.toString() !== context.configDetail.version.toString()) {
-    context.createLeftSpanMessage('版本号不一致,设备版本号:' + context.version + '配置版本号：' + context.configDetail.version, 'red')
-    await context.uploadMes(undefined, 0, '版本号不一致,设备版本号:' + context.version + '配置版本号：' + context.configDetail.version)
+    await badRecordUpload(context,'版本号不一致' ,  '设备版本号:' + context.version + '配置版本号：' + context.configDetail.version, 'writeAddress')
+    await context.uploadMes(context.leftGenerateAddress, 0, '版本号不一致,设备版本号:' + context.version + '配置版本号：' + context.configDetail.version)
+    context.leftBadProductQuantity += 1
     await playErrorAudio(context)
     return true
   } else {
-    context.createLeftSpanMessage('版本号一致,设备版本号:' + context.version + '配置版本号：' + context.configDetail.version, 'green')
+    context.createLeftSpanMessage('版本号一致,设备版本号:' + context.version + '配置版本号：' + context.configDetail.version, 'grey')
   }
   let readIMEIResult = await serialPortOperation(context, {
     actionType: 'writeAddress',
@@ -368,11 +384,13 @@ export async function writeAddressWAC710CD(protocolId, type, context) {
     return true
   }
   if (context.torqueStr !== context.configDetail.torques) {
-    context.createLeftSpanMessage('扭矩配置不一致,设备扭矩：' + context.torqueStr + '配置扭矩：' + context.configDetail.torques, 'red');
+    await badRecordUpload(context, '写扭矩配置不一致', '设备扭矩：' + context.torqueStr + '配置扭矩：' + context.configDetail.torques, 'writeAddress')
+    await context.uploadMes(context.context.leftGenerateAddress,1,'设备扭矩：' + context.torqueStr + '配置扭矩：' + context.configDetail.torques)
+    context.leftBadProductQuantity += 1;
     await playErrorAudio(context)
     return true
   } else {
-    context.createLeftSpanMessage('扭矩配置一致,设备扭矩：' + context.torqueStr + '配置扭矩：' + context.configDetail.torques, 'green');
+    context.createLeftSpanMessage('扭矩配置一致,设备扭矩：' + context.torqueStr + '配置扭矩：' + context.configDetail.torques, 'grey');
   }
   let readTemperatureProbesResult = await serialPortOperation(context, {
     actionType: 'readTemperatureProbes',
@@ -394,7 +412,7 @@ export async function writeAddressWAC710CD(protocolId, type, context) {
     await playErrorAudio(context)
     return true
   }
-  context.createLeftSpanMessage('读温度探头配置成功', 'green');
+  context.createLeftSpanMessage('读温度探头配置成功', 'grey');
 
   let readPressureProbesProbesResult = await serialPortOperation(context, {
     actionType: 'readPressureProbes',
@@ -416,7 +434,7 @@ export async function writeAddressWAC710CD(protocolId, type, context) {
     await playErrorAudio(context)
     return true
   }
-  context.createLeftSpanMessage('读压力探头配置成功', 'green');
+  context.createLeftSpanMessage('读压力探头配置成功', 'grey');
 
   let writeAddressResult = await serialPortOperation(context, {
     actionType: 'writeAddress',

@@ -95,8 +95,9 @@
                     </a-select>
                   </a-form-item>
 
-                  <a-form-item  label="波特率" >
-                    <a-select  style="width: 7vw; margin-left: 3.8vw"   v-model:value="this.portAttributes.selectedBadRate">
+                  <a-form-item label="波特率">
+                    <a-select style="width: 7vw; margin-left: 3.8vw"
+                              v-model:value="this.portAttributes.selectedBadRate">
                       <a-select-option v-for="port in this.baudRateList" :value="port">{{
                           port
                         }}
@@ -105,7 +106,8 @@
                   </a-form-item>
 
                   <a-form-item label="校验位">
-                    <a-select    style="width: 7vw; margin-left: 3.8vw" v-model:value="this.portAttributes.selectedCheckDigit">
+                    <a-select style="width: 7vw; margin-left: 3.8vw"
+                              v-model:value="this.portAttributes.selectedCheckDigit">
                       <a-select-option v-for="port in this.checkDigitList" :value="port">{{
                           port
                         }}
@@ -216,7 +218,8 @@
                       :precision="3"
                       :parser="value => value.replace(/\.\d{3,}/, match => match.substring(0, 4))"
                       :formatter="value => typeof value === 'number' ? value.toFixed(3) : value"
-                    ></a-input-number>
+                    >
+                    </a-input-number>
                   </a-form-item>
                   <a-form-item label="程序版本" v-show="this.isNBDevice===true"
                                v-if="this.configForm.produceModel!=='东元热表'">
@@ -447,7 +450,7 @@
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">屏幕显示:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.screenDisplay }}</span>
                   </div>
-                  <div class="hlm-card-configInfo-body-info-line">
+                  <div class="hlm-card-configInfo-body-info-line" v-show="configDetail.printLabel==='WAC710CD'">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">扭矩:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.torques }}</span>
                   </div>
@@ -459,22 +462,22 @@
                   </div>
                   <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configDetail.pressureProbes==='压差'&&this.configDetail.currentSource==='有'">
-                    <span class="label hlm-card-nb-configInfo-body-info-line-label">源设误差(mA):</span>
-                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.cs_device_err }}</span>
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">源设误差:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.cs_device_err+' mA' }}</span>
                   </div>
                   <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configDetail.pressureProbes==='压差'&&this.configDetail.currentSource==='有'">
-                    <span class="label hlm-card-nb-configInfo-body-info-line-label">信源误差(mA):</span>
-                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.sig_cs_err }}</span>
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">信源误差:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.sig_cs_err+' mA' }}</span>
                   </div>
                   <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configDetail.pressureProbes==='压差'&&this.configDetail.currentSource==='无'">
-                    <span class="label hlm-card-nb-configInfo-body-info-line-label">信设误差(mA):</span>
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">信设误差:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{
-                        configDetail.sig_device_err
+                        configDetail.sig_device_err+' mA'
                       }}</span>
                   </div>
-                  <div class="hlm-card-configInfo-body-info-line">
+                  <div class="hlm-card-configInfo-body-info-line" v-show="configDetail.printLabel==='WAC710CD'">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">电流源:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.currentSource }}</span>
                   </div>
@@ -942,7 +945,8 @@
               <a-form-item class="form-item-spacing">
                 <a-button class="hlm-port-button-select-style static-btn ">信号源串口</a-button>
               </a-form-item>
-              <a-select v-model:value="this.portAttributes.selectedPortSignalSource" class="hlm-port-button-select-style form-item-spacing"
+              <a-select v-model:value="this.portAttributes.selectedPortSignalSource"
+                        class="hlm-port-button-select-style form-item-spacing"
                         @change="handlePortChange(this.portAttributes.selectedPortSignalSource,'three')">
                 <a-select-option v-for="port in this.computedPortsExcludeRight" :value="port">{{
                     port
@@ -950,87 +954,87 @@
                 </a-select-option>
               </a-select>
               <a-form-item>
-                <a-button   class="hlm-operate-button-style"  @click="openPort(
+                <a-button class="hlm-operate-button-style" @click="openPort(
                           this.portAttributes.selectedPortSignalSource,'three')"
-                            :disabled="!this.portAttributes.portClosedSignalSourceStatus">打开
+                          :disabled="!this.portAttributes.portClosedSignalSourceStatus">打开
                 </a-button>
               </a-form-item>
               <a-form-item class="form-item-spacing">
-                <a-button   class="hlm-operate-button-style" @click="closePort(this.portAttributes.selectedPortSignalSource,'three')"
-                            :disabled="this.portAttributes.portClosedSignalSourceStatus">关闭
+                <a-button class="hlm-operate-button-style"
+                          @click="closePort(this.portAttributes.selectedPortSignalSource,'three')"
+                          :disabled="this.portAttributes.portClosedSignalSourceStatus">关闭
                 </a-button>
               </a-form-item>
             </a-form>
 
-              <a-form
-                v-if="this.configDetail.pressureProbes==='压差'&&configDetail.currentSource==='有'"
-                name="basic"
-                layout="inline"
-                class="hlm-form-port"
-              >
-                <a-form-item>
-                  <a-button class="hlm-operate-button-style" @click="getAllPorts('one')">刷新</a-button>
-                </a-form-item>
-                <a-form-item class="form-item-spacing">
-                  <a-button class="hlm-port-button-select-style static-btn ">设备串口</a-button>
-                </a-form-item>
-                <a-select v-model:value="this.portAttributes.selectedPortOne"
-                          class="hlm-port-button-select-style form-item-spacing"
-                          @change="handlePortChange(this.portAttributes.selectedPortOne,'one')">
-                  <a-select-option v-for="port in this.computedPortsExcludeLeft" :value="port">{{
-                      port
-                    }}
-                  </a-select-option>
-                </a-select>
+            <a-form
+              v-if="this.configDetail.pressureProbes==='压差'&&configDetail.currentSource==='有'"
+              name="basic"
+              layout="inline"
+              class="hlm-form-port"
+            >
+              <a-form-item>
+                <a-button class="hlm-operate-button-style" @click="getAllPorts('one')">刷新</a-button>
+              </a-form-item>
+              <a-form-item class="form-item-spacing">
+                <a-button class="hlm-port-button-select-style static-btn ">设备串口</a-button>
+              </a-form-item>
+              <a-select v-model:value="this.portAttributes.selectedPortOne"
+                        class="hlm-port-button-select-style form-item-spacing"
+                        @change="handlePortChange(this.portAttributes.selectedPortOne,'one')">
+                <a-select-option v-for="port in this.computedPortsExcludeLeft" :value="port">{{
+                    port
+                  }}
+                </a-select-option>
+              </a-select>
 
 
-                <a-form-item>
-                  <a-button
-                    class="hlm-operate-button-style"
-                    @click="openPort(
+              <a-form-item>
+                <a-button
+                  class="hlm-operate-button-style"
+                  @click="openPort(
                 this.portAttributes.selectedPortOne,
                 'one'
               )"
-                    :disabled="!this.portAttributes.portClosedOneStatus">打开
-                  </a-button>
-                </a-form-item>
-                <a-form-item class="form-item-spacing">
-                  <a-button
-                    class="hlm-operate-button-style"
-                    @click="closePort(this.portAttributes.selectedPortOne,'one')"
-                    :disabled="this.portAttributes.portClosedOneStatus">关闭
-                  </a-button>
-                </a-form-item>
-                <a-form-item>
-                  <a-button class="hlm-operate-button-style" @click="getAllPorts('one')">刷新</a-button>
-                </a-form-item>
-                <a-form-item class="form-item-spacing">
-                  <a-button class="hlm-port-button-select-style static-btn ">信号源串口</a-button>
-                </a-form-item>
-                <a-select v-model:value="this.portAttributes.selectedPortSignalSource" class="hlm-port-button-select-style form-item-spacing"
-                          @change="handlePortChange(this.portAttributes.selectedPortSignalSource,'three')">
-                  <a-select-option v-for="port in this.computedPortsExcludeRight" :value="port">{{
-                      port
-                    }}
-                  </a-select-option>
-                </a-select>
-                <a-form-item>
-                  <a-button   class="hlm-operate-button-style"  @click="openPort(
+                  :disabled="!this.portAttributes.portClosedOneStatus">打开
+                </a-button>
+              </a-form-item>
+              <a-form-item class="form-item-spacing">
+                <a-button
+                  class="hlm-operate-button-style"
+                  @click="closePort(this.portAttributes.selectedPortOne,'one')"
+                  :disabled="this.portAttributes.portClosedOneStatus">关闭
+                </a-button>
+              </a-form-item>
+              <a-form-item>
+                <a-button class="hlm-operate-button-style" @click="getAllPorts('one')">刷新</a-button>
+              </a-form-item>
+              <a-form-item class="form-item-spacing">
+                <a-button class="hlm-port-button-select-style static-btn ">信号源串口</a-button>
+              </a-form-item>
+              <a-select v-model:value="this.portAttributes.selectedPortSignalSource"
+                        class="hlm-port-button-select-style form-item-spacing"
+                        @change="handlePortChange(this.portAttributes.selectedPortSignalSource,'three')">
+                <a-select-option v-for="port in this.computedPortsExcludeRight" :value="port">{{
+                    port
+                  }}
+                </a-select-option>
+              </a-select>
+              <a-form-item>
+                <a-button class="hlm-operate-button-style" @click="openPort(
                           this.portAttributes.selectedPortSignalSource,'three')"
-                              :disabled="!this.portAttributes.portClosedSignalSourceStatus">打开
-                  </a-button>
-                </a-form-item>
-                <a-form-item class="form-item-spacing">
-                  <a-button   class="hlm-operate-button-style" @click="closePort(this.portAttributes.selectedPortSignalSource,'three')"
-                              :disabled="this.portAttributes.portClosedSignalSourceStatus">关闭
-                  </a-button>
-                </a-form-item>
+                          :disabled="!this.portAttributes.portClosedSignalSourceStatus">打开
+                </a-button>
+              </a-form-item>
+              <a-form-item class="form-item-spacing">
+                <a-button class="hlm-operate-button-style"
+                          @click="closePort(this.portAttributes.selectedPortSignalSource,'three')"
+                          :disabled="this.portAttributes.portClosedSignalSourceStatus">关闭
+                </a-button>
+              </a-form-item>
 
 
-
-
-
-              </a-form>
+            </a-form>
 
 
             <a-form
@@ -1045,7 +1049,8 @@
               <a-form-item class="form-item-spacing">
                 <a-button class="hlm-port-button-select-style static-btn ">电流源串口</a-button>
               </a-form-item>
-              <a-select v-model:value="this.portAttributes.selectedPortCurrentSource" class="hlm-port-button-select-style form-item-spacing"
+              <a-select v-model:value="this.portAttributes.selectedPortCurrentSource"
+                        class="hlm-port-button-select-style form-item-spacing"
                         @change="handlePortChange(this.portAttributes.selectedPortCurrentSource,'four')">
                 <a-select-option v-for="port in this.computedPortsExcludeRight" :value="port">{{
                     port
@@ -1054,39 +1059,38 @@
               </a-select>
 
               <a-form-item>
-                <a-button   class="hlm-operate-button-style" @click="openPort(
+                <a-button class="hlm-operate-button-style" @click="openPort(
                 this.portAttributes.selectedPortCurrentSource,
                 'four'
               )"
-                            :disabled="!this.portAttributes.portClosedCurrentSourceStatus">打开
+                          :disabled="!this.portAttributes.portClosedCurrentSourceStatus">打开
                 </a-button>
               </a-form-item>
               <a-form-item class="form-item-spacing">
-                <a-button   class="hlm-operate-button-style" @click="closePort(this.portAttributes.selectedPortCurrentSource,'four')"
-                            :disabled="this.portAttributes.portClosedCurrentSourceStatus">关闭
+                <a-button class="hlm-operate-button-style"
+                          @click="closePort(this.portAttributes.selectedPortCurrentSource,'four')"
+                          :disabled="this.portAttributes.portClosedCurrentSourceStatus">关闭
                 </a-button>
               </a-form-item>
 
             </a-form>
 
 
-<!--                </div>-->
-<!--              </div>-->
+            <!--                </div>-->
+            <!--              </div>-->
 
 
+            <!--              <div v-if="this.configForm.produceModel === 'WAC710CD'&&this.configDetail.pressureProbes==='压差'">-->
 
-<!--              <div v-if="this.configForm.produceModel === 'WAC710CD'&&this.configDetail.pressureProbes==='压差'">-->
+            <!--                <div style="display: inline-flex" v-show="configDetail.currentSource==='有'">-->
 
-<!--                <div style="display: inline-flex" v-show="configDetail.currentSource==='有'">-->
-
-<!--                </div>-->
-<!--              </div>-->
+            <!--                </div>-->
+            <!--              </div>-->
             <div class="hlm-assignmentTips">
               <a-button class="hlm-assignmentTips-button-style static-btn">作业提示</a-button>
-              <a-button class="hlm-assignmentTips-button-text-style static-btn"> {{  leftWorkPrompt }}</a-button>
+              <a-button class="hlm-assignmentTips-button-text-style static-btn"> {{ leftWorkPrompt }}</a-button>
 
             </div>
-
 
 
             <div style="position: relative; display: inline-flex; margin-left:-2vw;   margin-top: calc(20/1080*100vh)">
@@ -1097,7 +1101,7 @@
                 style="margin-left: -16.6vw"
                 v-if="this.routerParam.startsWithJ"
               >
-                <a-form-item label="写入地址" >
+                <a-form-item label="写入地址">
                   <a-input
                     style="width: 10vw"
                     type="text"
@@ -1174,13 +1178,13 @@
                         @click="scanCodeVerification(
                         protocolIDMap[this.configForm.produceModel].protocolId,'one'
                         )"
-                        :disabled="nbButtonDisabledStatus.breakSelfTest"
+                        :disabled="nbButtonDisabledStatus.scanCode"
                         :style="{
-                           backgroundColor: nbButtonColor.awaken
+                           backgroundColor: nbButtonColor.scanCode
                         }"
                         class="hlm-nb-business-start-button-style">
-                        扫码验证
-                      </a-button>
+                扫码验证
+              </a-button>
               <div class="hlm-nb-not-important-business-body-style">
                 <a-button type="primary" block
                           v-show="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'"
@@ -1254,7 +1258,8 @@
               <a-button class="hlm-flow-defectiveProducts-statistics-style static-btn">
                 {{ this.computedLeftBadRate('one') }}
               </a-button>
-              <a-button v-if="!this.routerParam.startsWithJ" class="hlm-nb-address-style static-btn" style="margin-left: calc(104/1920*100vw)">
+              <a-button v-if="!this.routerParam.startsWithJ" class="hlm-nb-address-style static-btn"
+                        style="margin-left: calc(104/1920*100vw)">
                 写入/扫码地址
               </a-button>
               <a-input
@@ -1268,8 +1273,6 @@
                 @input="validateNumberInputOne($event, 8)"
               ></a-input>
             </div>
-
-
 
 
             <!-- 外层固定高度，不滚动 -->
@@ -1289,7 +1292,7 @@
           <a-card :title="this.rightProduceViewTitle"
                   :headStyle="downCardHeadStyle"
                   :bodyStyle="downCardBodyStyle">
-            <div style="margin-top: 2vh;" >
+            <div style="margin-top: 2vh;">
               <div
                 id="fail_textarea_id"
                 ref="receptionFailText"
@@ -1297,7 +1300,7 @@
               >
                 <div
                   v-html="text.receptionFailText"
-                  class="hlm-flow-log-info-style"
+                  class="hlm-flow-fail-log-info-style"
                 ></div>
               </div>
             </div>
@@ -1733,9 +1736,15 @@ import {
   doWriteAddress
 } from "@/views/device/operations/nbDeviceOperations";
 import {executeWithAddress, executionProcess,} from "@/views/device/handler/wireHandler";
-import {handleLeftError} from "@/views/device/action/deviceAction";
-import {getProductImageList, getWorkConfigParam, getWorkDetail, saveVacDeviceProduceInfo,} from "@/api/remote";
-import {getDefaultPassword} from "@/components/global/productdb";
+import {handleError} from "@/views/device/action/deviceAction";
+import {
+  findBadRecordList,
+  getProductImageList,
+  getWorkConfigParam,
+  getWorkDetail,
+  saveVacDeviceProduceInfo,
+} from "@/api/remote";
+import {getDefaultPassword, getPrintListByProductName} from "@/components/global/productdb";
 import data from '@/views/device/data'
 import {
   deviceMainAndAuxiliaryValves,
@@ -2300,6 +2309,10 @@ export default {
         'CPT100-16A',
       ],
       isMaximized: true,
+      /*不良记录列表*/
+      badRecordList: [],
+      uploadMesList: [],
+      badRecordCounter: 0, // 记录全局不良序号
     };
   },
   /*移除监听器 */
@@ -2324,7 +2337,6 @@ export default {
     this.routerParam.machineNumber = route.query.machineNumber;
     this.machineNumber = this.routerParam.machineNumber
     this.routerParam.produceMachine = Number(route.query.produceMachine);
-    this.routerParam.produceMachine = Number(route.query.produceMachine);
     this.routerParam.workNumber = route.query.workNumber;
     this.routerParam.token = route.query.token;
     this.routerParam.pwd = route.query.pwd;
@@ -2339,17 +2351,35 @@ export default {
     //获取工单默认密码
     let defaultPassword = await getDefaultPassword('workNumber')
     this.workNumberPassword = defaultPassword[0].passWord;
+
+    if (this.routerParam.produceMachine === 0) {
+      let filteredList = await findBadRecordList(this.routerParam.token, this.routerParam.workNumber, this.routerParam.machineNumber)
+      this.badRecordList = filteredList.data.data
+      if (this.badRecordList!==undefined&&this.badRecordList!==null&&this.badRecordList.length>0) {
+        this.leftBadProductQuantity=this.badRecordList.length
+        this.badRecordList.forEach(item => {
+          if (item.address === null) {
+            item.address = ''
+          }
+          this.badRecordCounter++; // 序号累加
+          let msg = `${this.badRecordCounter}、${item.address}、${item.badMemo}。`;
+          this.createFailSpanMessage(msg, 'red');
+        });
+      }
+
+    }
     if (this.routerParam.produceMachine === 0 && !this.routerParam.startsWithJ) {
       const res = await getWorkDetail(this.routerParam.token, this.routerParam.workNumber);
       let data = res.data;
       console.log(data.data)
       if (data.code !== 200) {
         this.$message.error('网络错误请联系管理员');
-        this.createLeftSpanMessage('网络错误请联系管理员', 'red');
+        this.createLeftSpanMessage('网络错误请联系管理员', 'grey');
       }
       let model = data.data.productModel;
       if (model === undefined || model === null || model === '') {
         this.$message.error('产品型号错误，请联系管理员');
+        this.createLeftSpanMessage('产品型号错误，请联系管理员', 'grey');
         return;
       }
       let productNamingConventionsList = model.split('-');
@@ -2366,12 +2396,28 @@ export default {
         this.productModel = '生产测试软件 - 温控面板系列 - '
       } else if (this.roomTemperatureCollectorList.includes(this.configForm.produceModel)) {
         this.productModel = '生产测试软件 - 室温采集器系列 - '
-      }else if (this.configForm.produceModel === '东元热表'||this.configForm.produceModel==='NBT200'){
+      } else if (this.configForm.produceModel === '东元热表' || this.configForm.produceModel === 'NBT200') {
         this.productModel = '生产测试软件 - 二次验证系列 - '
       } else {
         this.productModel = '生产测试软件 - 二次验证系列 - '
       }
       console.log(this.configForm.produceModel)
+
+      let printList = await getPrintListByProductName(this.configForm.produceModel)
+
+      if (printList.length !== undefined && printList.length !== 0) {
+           this.customizePrintLabelList=printList.map((item) => item.printtag)
+      }
+      //打印列表包含产品型号则产品型号默认取那个
+      if (this.customizePrintLabelList!==undefined&&this.customizePrintLabelList!==null&&this.customizePrintLabelList.length>0) {
+        let matched = this.customizePrintLabelList.find(item => item === this.configForm.produceModel);
+        if (matched) {
+          this.configForm.customizePrintLabel = matched;
+        } else {
+          this.configForm.customizePrintLabel = this.customizePrintLabelList[0]
+        }
+      }
+
       //根据不同型号展示的页面不同
       if (this.configForm.produceModel.includes('VAC10') ||
         this.configForm.produceModel.includes('VAC20') ||
@@ -2636,7 +2682,8 @@ export default {
       handler() {
         this.$nextTick(() => {
           // 操作的是内层滚动容器
-          const contentDiv = this.$refs.receptionFailText.querySelector('.hlm-flow-log-info-style');
+          const contentDiv = this.$refs.receptionFailText.querySelector('.hlm-flow-fail-log-info-style');
+          console.log('下滑', contentDiv)
           if (contentDiv) {
             //当前滚动条距离容器顶部的垂直偏移量（单位：像素）。= 滚动条内可见高度
             contentDiv.scrollTop = contentDiv.scrollHeight;
@@ -3592,16 +3639,28 @@ export default {
       this.text.receptionTwoText += (messageHTML);
       this.$nextTick(() => {
         const element = this.$refs.receptionTwoText;
-        const latestMessage = element.querySelector('span:last-of-type');
-        if (latestMessage) {
-          const messageTop = latestMessage.offsetTop;
-          const containerHeight = element.clientHeight;
-          element.scrollTop = messageTop - containerHeight / 2;
-        } else {
+        if (element) {
           element.scrollTop = element.scrollHeight;
+        } else {
+
         }
       });
+      console.log(this.text.receptionTwoText)
       return this.text.receptionTwoText;
+    },
+    createFailSpanMessage(message, color) {
+      const safeMessage = this.escapeHTML(message);
+      const messageHTML = `<span style="color: ${color}; font-size: 15px;">${safeMessage}</span><br>`;
+      this.text.receptionFailText += (messageHTML);
+      this.$nextTick(() => {
+        const element = this.$refs.receptionFailText;
+        if (element) {
+          element.scrollTop = element.scrollHeight;
+        } else {
+
+        }
+      });
+      return this.text.receptionFailText;
     },
     escapeHTML(str) {
       return str.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, "").replace(/'/g, "'");
@@ -3787,8 +3846,8 @@ export default {
         ) {
           this.leftProduceViewTitle = '测试验证'
           this.rightProduceViewTitle = '不良记录'
-        }else if (this.configForm.produceModel==='NBT200'||
-          this.configForm.produceModel==='东元热表'){
+        } else if (this.configForm.produceModel === 'NBT200' ||
+          this.configForm.produceModel === '东元热表') {
           this.leftProduceViewTitle = '测试验证'
           this.rightProduceViewTitle = '不良记录'
         }
@@ -3802,7 +3861,9 @@ export default {
         this.configDetail.printLabel = this.configForm.produceModel
         this.configDetail.customizePrintLabel = this.configForm.customizePrintLabel
         this.configDetail.pressureProbes = this.configForm.pressureProbes
-        this.configDetail.torques = this.configForm.torques
+        if (this.configForm.produceModel === 'WAC710CD') {
+          this.configDetail.torques = this.configForm.torques
+        }
         this.configDetail.temperatureDiff = this.configForm.temperatureDiff
         this.configDetail.cs_device_err = this.configForm.cs_device_err
         this.configDetail.sig_cs_err = this.configForm.sig_cs_err
@@ -3884,6 +3945,7 @@ export default {
       this.nbButtonDisabledStatus.labelPrint = true
       this.nbButtonDisabledStatus.breakSelfTest = true
       this.nbButtonDisabledStatus.quadraticVerify = true
+      this.nbButtonDisabledStatus.scanCode = true
     }
     ,
     buttonEnable() {
@@ -3893,6 +3955,7 @@ export default {
       this.nbButtonDisabledStatus.labelPrint = false
       this.nbButtonDisabledStatus.breakSelfTest = false
       this.nbButtonDisabledStatus.quadraticVerify = false
+      this.nbButtonDisabledStatus.scanCode = false
     },
     buttonSuccess(node) {
       if (this.isNBDevice) {
@@ -4083,6 +4146,7 @@ export default {
      * badMemo: 不良类型
      * */
     async uploadMes(address, logot, badMemo) {
+      //生产机器才上传MES
       if (this.routerParam.produceMachine === 0) {
         let data = {
           address: address,
@@ -4100,13 +4164,12 @@ export default {
           } else {
             this.createLeftSpanMessage('MES上传失败', 'red')
           }
-
         }).catch(err => {
-          handleLeftError(this, 'MES', '网络错误请联系管理员', undefined)
+          this.uploadDataList = [];
+          handleError(this, 'MES', '网络错误请联系管理员', undefined)
         })
 
         this.uploadDataList = [];
-
       }
     },
 
@@ -4286,7 +4349,7 @@ html, body {
 }
 
 .hlm-card-nb-configInfo-body-info-line-label {
-  width: calc(110 / 1920 * 100vw);
+  width: calc(80 / 1920 * 100vw);
   height: calc(30 / 1080 * 100vh)
 }
 
@@ -4399,15 +4462,17 @@ html, body {
 
 .hlm-nb-flow-arrowContainer-style {
   position: absolute;
-  margin-top: calc(35/1080*100vh);
+  margin-top: calc(35 / 1080 * 100vh);
   display: flex; /*箭头由两部分组成 ：实现+空心箭头 flex布局 */
 }
+
 .hlm-nb-flow-straightArrows-style {
-  width: calc(600/1920 * 100vw);
+  width: calc(600 / 1920 * 100vw);
   height: 0.5vh;
   background-color: #FF770F;
   margin-left: 3vw;
 }
+
 .hlm-nb-flow-arrows-style {
   position: absolute;
   right: -0.01vh; /* 向内收一点，让线条顶到箭头 */
@@ -4419,6 +4484,7 @@ html, body {
   transform: translateY(-50%) rotate(45deg);
   background: transparent;
 }
+
 .hlm-flow-arrowContainer-style {
   position: absolute;
   top: 7vh;
@@ -4426,6 +4492,7 @@ html, body {
   margin-left: -3vw;
 
 }
+
 .hlm-flow-straightArrows-style {
   width: 35vw;
   height: 0.5vh;
@@ -4492,12 +4559,12 @@ html, body {
   width: calc(120 / 1920 * 100vw);
   height: calc(50 / 1080 * 100vh);
   border-color: #666666;
-  background-color: #FF770F;   /*强制覆盖 防止disabled 优先级过高*/
+  background-color: #FF770F; /*强制覆盖 防止disabled 优先级过高*/
   color: white !important; /*强制覆盖 防止disabled 优先级过高*/
   text-align: center;
   font-size: calc(18 / 1920 * 100vw); /* 响应式字体大小 */
   white-space: nowrap;
-  margin-left: calc(40/1920*100vw);
+  margin-left: calc(40 / 1920 * 100vw);
 
 }
 
@@ -4509,8 +4576,9 @@ html, body {
   font-size: calc(15 / 1920 * 100vw);
   padding: 0; /* 清除可能的内边距 */
 }
+
 .hlm-nb-not-important-business-body-style {
- margin-left: calc(140/1920*100vw);
+  margin-left: calc(140 / 1920 * 100vw);
 }
 
 
@@ -4520,7 +4588,9 @@ html, body {
   width: 100%;
   display: inline-flex;
 
-}.hlm-nb-statistics-container-style {
+}
+
+.hlm-nb-statistics-container-style {
   margin-top: calc(70 / 1080 * 100vh);
   margin-left: calc(50 / 1920 * 100vw);
   width: 100%;
@@ -4536,6 +4606,7 @@ html, body {
   font-size: calc(15 / 1920 * 100vw); /* 响应式字体大小 */
   padding: 0 !important; /* 防止框架默认 padding 影响 */
 }
+
 .hlm-nb-address-style {
   width: calc(140 / 1920 * 100vw);
   height: calc(30 / 1080 * 100vh);
@@ -4544,6 +4615,7 @@ html, body {
   font-size: calc(15 / 1920 * 100vw); /* 响应式字体大小 */
   padding: 0 !important; /* 防止框架默认 padding 影响 */
 }
+
 .hlm-flow-defectiveProducts-statistics-style {
   width: calc(60 / 1920 * 100vw);
   height: calc(30 / 1080 * 100vh);
@@ -4593,6 +4665,15 @@ html, body {
   overflow-y: auto !important;
 }
 
+.hlm-flow-fail-log-info-style {
+  font-size: calc(16 / 1920 * 100vw) !important;
+  margin-top: calc(10 / 1080 * 100vh);
+  margin-left: calc(30 / 1920 * 100vw);
+  /* 内层内容区：限制为外层高度的60%并滚动 */
+  max-height: 75% !important;
+  overflow-y: auto !important;
+}
+
 .hlm-flow-log-info-style * {
   font-size: inherit !important; /* 继承父级字体大小 */
 }
@@ -4624,11 +4705,12 @@ html, body {
 .no-spinner {
   -moz-appearance: textfield;
 }
+
 /* 强制覆盖 AntD 按钮禁用样式 */
 .ant-btn[disabled],
 .ant-btn-disabled {
-  border-color: inherit !important;     /* 继承原边框色 */
-  cursor: not-allowed !important;        /* 保留禁止点击光标 */
-  pointer-events: none !important;       /* 禁止点击效果 */
+  border-color: inherit !important; /* 继承原边框色 */
+  cursor: not-allowed !important; /* 保留禁止点击光标 */
+  pointer-events: none !important; /* 禁止点击效果 */
 }
 </style>

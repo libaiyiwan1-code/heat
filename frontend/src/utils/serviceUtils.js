@@ -3,7 +3,7 @@ import {playErrorAudio} from "@/utils/audioUtils";
 import axios from "axios";
 import {protocolIDMap} from "@/views/device/enum/enum";
 import {checkIMEIExist, checkRecentlyUploadedData} from "@/components/global/hemssdb";
-import {handleRightError, handleRightSuccess, serialPortOperation} from "@/views/device/action/deviceAction";
+import {badRecordUpload, handleSuccess, serialPortOperation} from "@/views/device/action/deviceAction";
 import moment from "moment/moment";
 const Log = require('ee-core/log');
 /**
@@ -128,14 +128,13 @@ export async function generateAddress(context) {
     context.buttonError('selfTest')
     await playErrorAudio(context)
     context.GoodProductQuantity += 1;
-    context.uploadMes(undefined, 0, '无法超量生产')
     return {notPass, address}
   }
   address = generateAddressByTerminal(context.routerParam.userId, productQuantity[0].quantity)
   console.log('生成的设备地址', address)
   Log.info('生成的设备地址', address)
   context.leftGenerateAddress = address
-  context.createLeftSpanMessage('生成的地址:' + address, 'green');
+  context.createLeftSpanMessage('生成的地址:' + address, 'grey');
   if ((context.leftGenerateAddress === undefined || context.leftGenerateAddress === null)) {
     console.error('生成地址不合格', address)
     Log.error('生成地址不合格', address)
@@ -144,8 +143,6 @@ export async function generateAddress(context) {
     context.buttonError('leftWorkPromptColor')
     context.buttonError('writeAddress')
     context.leftBadProductQuantity += 1;
-    context.uploadMes(address, 0, '生成地址非法')
-
     await playErrorAudio(context)
     return {notPass, address}
   }
@@ -157,7 +154,6 @@ export async function generateAddress(context) {
     context.buttonError('leftWorkPromptColor')
     context.buttonError('writeAddress')
     context.leftBadProductQuantity += 1;
-    context.uploadMes(address, 0, '生成地址非法')
     await playErrorAudio(context)
     return notPass
   }
@@ -171,7 +167,6 @@ export async function generateAddress(context) {
     if (!context.uploadAddressList.includes(context.leftGenerateAddress)) {
       context.uploadAddressList.push(context.leftGenerateAddress)
       context.leftBadProductQuantity += 1;
-      context.uploadMes(address, 0, '生产库已存在该地址')
     }
     await playErrorAudio(context)
     return {notPass, address}
@@ -191,7 +186,7 @@ export async function nbDeviceRegister(context) {
     }
   });
   if (registerResponse.data.s === 0 && registerResponse.status === 200) {
-    context.createLeftSpanMessage('hems平台注册成功', 'green');
+    context.createLeftSpanMessage('hems平台注册成功', 'grey');
     //生产入库
     const productionData = {
       userid: context.routerParam.userId, // 生产账号id
@@ -216,14 +211,13 @@ export async function nbDeviceRegister(context) {
 
     let insertResult = await insertNBValueProduce(productionData);
     if (insertResult) {
-      context.createLeftSpanMessage('生产入库成功', 'green');
-      context.uploadMes(context.leftReadAddress, 1, '成功')
+      context.createLeftSpanMessage('生产入库成功', 'grey');
+      await context.uploadMes(context.leftReadAddress, 1, '成功')
       await context.printLabel(true)
     } else {
       if (!context.uploadAddressList.includes(context.leftReadAddress)) {
         context.uploadAddressList.push(context.leftReadAddress)
         context.leftBadProductQuantity += 1;
-        context.uploadMes(context.leftReadAddress, 0, '生产入库失败')
       }
       context.createLeftSpanMessage('生产入库失败', 'red');
       context.leftWorkPrompt = '地址写入失败(生产入库失败)';
@@ -237,7 +231,6 @@ export async function nbDeviceRegister(context) {
     if (!context.uploadAddressList.includes(context.leftReadAddress)) {
       context.uploadAddressList.push(context.leftReadAddress)
       context.leftBadProductQuantity += 1;
-      context.uploadMes(context.leftReadAddress, 0, '平台注册失败')
     }
     context.createLeftSpanMessage('平台注册失败', 'red');
     context.leftWorkPrompt = '地址写入失败(平台注册失败)';
@@ -255,15 +248,10 @@ export const checkIMEI = async (context) => {
   let imeiExist = await checkIMEIExist(context.imei);
   if (imeiExist.length > 0) {
     if (imeiExist[0].imei !== '' || imeiExist[0].imei !== undefined) {
-      context.leftWorkPrompt = '地址写入失败(此设备已写入过地址)'
       context.buttonError('leftWorkPromptColor')
-      context.createLeftSpanMessage('平台注册失败 IMEI已存在: ' + context.imei, 'red');
-      context.buttonError('writeAddress')
-      context.uploadMes(undefined, 0, '平台注册失败,重复注册')
-      if (!context.uploadAddressList.includes(context.leftGenerateAddress)) {
-        context.uploadAddressList.push(context.leftGenerateAddress)
-        context.leftBadProductQuantity += 1;
-      }
+      await badRecordUpload(context, '平台注册', 'IMEI已存在:'+context.imei, 'writeAddress')
+      await context.uploadMes(context.leftGenerateAddress,1,'平台注册(IMEI已存在)'+context.imei)
+      context.leftBadProductQuantity += 1;
       await playErrorAudio(context)
       Log.error('平台注册失败 IMEI已存在: ' + context.imei);
       console.error('平台注册失败 IMEI已存在: ');

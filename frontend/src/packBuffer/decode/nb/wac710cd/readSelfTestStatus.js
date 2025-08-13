@@ -193,7 +193,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
   let inPressureMatchNotPass = decodeCheckInPressureMatchWAC710CD(context.receivedData.globalReceivedOneData)     //             进水压力探头是否匹配
   // let differentialPressureMatchNotPass = decodeCheckDifferentialPressureMatchWAC710CD(context.receivedData.globalReceivedOneData)     //             压差探头是否匹配
   if (selfTestCompletedNotPass) {
-    context.createLeftSpanMessage('未进行过自检', 'drey');
+    context.createLeftSpanMessage('未进行过自检', 'grey');
     Log.error('未进行过自检');
     console.log('未进行过自检');
   }
@@ -357,7 +357,7 @@ export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) 
     context.receivedData.globalReceivedOneData = '';
     return true
   }else{
-    context.createLeftSpanMessage('自检通过', 'green');
+    context.createLeftSpanMessage('自检通过', 'grey');
     // context.leftWorkPrompt = '自检通过'
     // context.buttonSuccess('leftWorkPromptColor')
   }

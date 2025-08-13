@@ -18,7 +18,7 @@ module.exports = (appInfo) => {
      *      无线：
      *          2.1.001 001累加    2.1起 包含VAC系列。
      * */
-    config.version = '2.1.005'
+    config.version = '2.1.006'
     /**
      * 开发者工具
      */

@@ -354,7 +354,7 @@ export function decodeCheckReadSelfTestStatusWAC300CD(context, responseMessage) 
     context.buttonError('leftWorkPromptColor')
     return true
   }else{
-    context.createLeftSpanMessage('自检通过', 'green');
+    context.createLeftSpanMessage('自检通过', 'grey');
     // context.leftWorkPrompt = '自检通过'
     // context.buttonSuccess('leftWorkPromptColor')
   }

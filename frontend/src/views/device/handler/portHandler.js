@@ -552,7 +552,7 @@ export function initializeAllSerialPorts(context,type) {
       if (type==='one'){
         context.createLeftSpanMessage('当前可用的串口列表:' + portPaths, 'grey');
       }else{
-        context.createRightSpanMessage('当前可用的串口列表:' + portPaths, 'grey');
+        // context.createRightSpanMessage('当前可用的串口列表:' + portPaths, 'grey');
       }
       resolve(); //解决回调触发
     }).catch(error => {

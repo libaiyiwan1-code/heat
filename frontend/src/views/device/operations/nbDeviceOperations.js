@@ -1,6 +1,6 @@
 import {ipc} from "@/utils/ipcRenderer";
 import {ipcApiRoute} from "@/api/main";
-import {handleRightError, handleRightSuccess, serialPortOperation,} from "@/views/device/action/deviceAction";
+import {badRecordUpload, handleSuccess, serialPortOperation,} from "@/views/device/action/deviceAction";
 import {checkPort} from "@/views/device/handler/portHandler";
 import {protocolIDMap} from "@/views/device/enum/enum";
 import {playErrorAudio, playSuccessAudio} from "@/utils/audioUtils";
@@ -50,11 +50,18 @@ export const doSelfTest = async (context, protocolId, type) => {
   const produceModel = context.configForm.produceModel;
   const selfTestFunction = selfTestStrategies[produceModel];
   if (selfTestFunction && await selfTestFunction(context, protocolId, type)) {
+    setTimeout(() => {
+      context.buttonWaiting('selfTest');
+    }, 2000);
     return;
   }
   context.leftWorkPrompt = `自检开启成功`;
   context.buttonSuccess('selfTest');
-  context.buttonSuccess('leftWorkPromptColor');
+  // 2 秒后切换为成功状态
+  setTimeout(() => {
+    context.buttonWaiting('selfTest');
+  }, 2000);
+
   await playSuccessAudio(context);
 };
 
@@ -121,11 +128,11 @@ export const doQuadraticVerification = async (context, protocolId, type) => {
     }
     if (context.leftReadAddress !== context.secondaryInspectionGenerateAddress) {
       await playErrorAudio(context)
-      context.createLeftSpanMessage(`NBT200-地址验证失败,设备地址：${context.leftReadAddress}, 扫码地址：${context.secondaryInspectionGenerateAddress}`, 'red');
+      context.createLeftSpanMessage(`NBT200-地址验证失败,设备地址：${context.leftReadAddress}, 扫码地址：${context.secondaryInspectionGenerateAddress}`, 'grey');
       return
     } else {
       await playSuccessAudio(context)
-      context.createLeftSpanMessage(`NBT200-地址验证成功，设备地址：${context.leftReadAddress}, 扫码地址：${context.secondaryInspectionGenerateAddress}`, 'green');
+      context.createLeftSpanMessage(`NBT200-地址验证成功，设备地址：${context.leftReadAddress}, 扫码地址：${context.secondaryInspectionGenerateAddress}`, 'grey');
     }
 
     let readVersionResult = await serialPortOperation(context, {
@@ -151,11 +158,11 @@ export const doQuadraticVerification = async (context, protocolId, type) => {
     }
 
     if (context.configDetail.version.toString() !== context.readVersion.toString()) {
-      context.createLeftSpanMessage(`NBT200-版本验证失败，设备版本：${context.readVersion}, 配置版本：${context.configDetail.version}`, 'red');
+      context.createLeftSpanMessage(`NBT200-版本验证失败，设备版本：${context.readVersion}, 配置版本：${context.configDetail.version}`, 'grey');
       await playErrorAudio(context)
       return
     } else {
-      context.createLeftSpanMessage(`NBT200-版本验证成功，设备版本：${context.readVersion}, 配置版本：${context.configDetail.version}`, 'green');
+      context.createLeftSpanMessage(`NBT200-版本验证成功，设备版本：${context.readVersion}, 配置版本：${context.configDetail.version}`, 'grey');
       await playSuccessAudio(context)
     }
 
@@ -193,12 +200,20 @@ export const doAwaken = async (context, protocolId, type) => {
   }, type)
   if (result) {
     await playErrorAudio(context)
+    setTimeout(() => {
+      context.buttonWaiting('awaken');
+    }, 2000);
+
     return
   }
   context.leftWorkPrompt = `唤醒成功`;
   await playSuccessAudio(context)
   context.buttonSuccess('leftWorkPromptColor')
   context.buttonSuccess('awaken')
+  // 2 秒后切换为成功状态
+  setTimeout(() => {
+    context.buttonWaiting('awaken');
+  }, 2000);
 
 }
 
@@ -221,12 +236,19 @@ export const doBreakSelfTest = async (context, protocolId, type) => {
   const produceModel = context.configForm.produceModel;
   const returnSelfTestFunction = returnSelfTestStrategies[produceModel];
   if (returnSelfTestFunction && await returnSelfTestFunction(context, protocolId, type)) {
+    setTimeout(() => {
+      context.buttonWaiting('breakSelfTest');
+    }, 2000);
     return;
   }
   context.leftWorkPrompt = `退出自检成功`;
   await playSuccessAudio(context)
   context.buttonSuccess('leftWorkPromptColor')
   context.buttonSuccess('breakSelfTest')
+  setTimeout(() => {
+    context.buttonWaiting('breakSelfTest');
+  }, 2000);
+
 }
 
 
@@ -249,6 +271,11 @@ export async function doWriteAddress(context, protocolId, type) {
   const produceModel = context.configForm.produceModel;
   const writeAddressFunction = writeAddressStrategies[produceModel];
   if (writeAddressFunction && await writeAddressFunction(protocolId,type,context)) {
+    context.buttonError('writeAddress')
+    context.buttonEnable()
+    setTimeout(() => {
+      context.buttonWaiting('writeAddress');
+    }, 2000);
     return;
   }
   await nbDeviceRegister(context);
@@ -256,6 +283,10 @@ export async function doWriteAddress(context, protocolId, type) {
   await playSuccessAudio(context)
   context.buttonSuccess('leftWorkPromptColor')
   context.buttonSuccess('writeAddress')
+  setTimeout(() => {
+    context.buttonWaiting('writeAddress');
+  }, 2000);
+
 
 }
 
@@ -266,6 +297,7 @@ export async function doScanCodeVerification(context, protocolId, type) {
     context.leftGenerateAddress = ''
     return
   }
+  context.buttonDisabled()
   context.leftGenerateAddress=''
   console.log('聚焦0')
   const input = context.$refs.input1.$el;
@@ -276,28 +308,26 @@ export async function doScanCodeVerification(context, protocolId, type) {
 
     // 自动检测（每秒检查是否达到 8 位）
     while (true) {
-      console.log('触发检测');
       await new Promise(resolve => setTimeout(resolve, 1000)); // 每秒检测一次
-
       if (context.leftGenerateAddress.length === 8) {
-        console.warn('地址长度为8位，开始验证');
         break;
       }
-
       // 手动输入检测（每 2 秒检查是否未达到 8 位，则清空）
       await new Promise(resolve => setTimeout(resolve, 1000)); // 再等 1 秒（总共 2 秒）
       if (context.leftGenerateAddress.length !== 8) {
-        console.warn('地址长度不足8位，清空输入');
         context.leftGenerateAddress = ''; // 清空输入
       }
     }
-
     // 验证地址
     if (!await checkNetWork(context, protocolId, type)) {
       context.leftGoodProductQuantity += 1;
       context.leftGenerateAddress = ''; // 成功后清空地址
       // TODO: 成功打印定制标签
     }
+    context.buttonEnable();
+    setTimeout(() => {
+      context.buttonWaiting('scanCode');
+    }, 2000);
   }
 
 }
@@ -358,9 +388,10 @@ const checkNetWork = async (context, protocolId, type) => {
     if (!context.uploadAddressList.includes(context.leftReadAddress)) {
       context.uploadAddressList.push(context.leftReadAddress)
       context.leftBadProductQuantity += 1;
-      context.uploadMes(context.leftGenerateAddress, 0, '扫码地址与设备地址不匹配')
     }
-    await handleRightError(context, '扫码地址验证 联网|温度', '扫码地址与设备地址不匹配', undefined)
+    await badRecordUpload(context, '扫码地址验证联网', '扫码地址与设备地址不匹配', 'scanCode')
+    await context.uploadMes(context.leftGenerateAddress, 0, '扫码地址验证联网(扫码地址与设备地址不匹配) ')
+    context.leftBadProductQuantity += 1
     context.leftGenerateAddress = ''
     await playErrorAudio(context)
     return notPass
@@ -379,18 +410,19 @@ const checkNetWork = async (context, protocolId, type) => {
     if (!context.uploadAddressList.includes(context.leftReadAddress)) {
       context.uploadAddressList.push(context.leftReadAddress)
       context.leftBadProductQuantity += 1;
-      context.uploadMes(context.leftGenerateAddress, 0, '网络未上传')
     }
-    await handleRightError(context, '扫码地址验证 联网|温度', '地址：' + context.leftGenerateAddress + ' 网络未上传', undefined)
-    context.uploadMes(context.leftGenerateAddress, 0, '网络未上传')
+    await badRecordUpload(context, '扫码地址验证联网',  '网络未上传', 'scanCode')
+    await context.uploadMes(context.leftGenerateAddress, 0, '扫码地址验证联网(网络未上传) ')
+    context.leftBadProductQuantity += 1
     context.leftGenerateAddress = ''
     await playErrorAudio(context)
     return notPass
   } else {
     let formattedTime = moment(data[0].collectTime).format('YYYY-MM-DD HH:mm:ss');
-    await handleRightSuccess(context, '扫码地址验证 联网|温度', '地址：' + context.leftGenerateAddress + ' 联网验证成功', undefined)
-    context.createRightSpanMessage('地址：' + context.leftGenerateAddress + '  网络上传成功,上传时间：' + formattedTime, 'green');
-    context.uploadMes(context.leftGenerateAddress, 1, '成功')
+    await handleSuccess(context, '扫码地址验证联网', '地址：' + context.leftGenerateAddress + ' 联网验证成功', 'scanCode')
+    context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  网络上传成功,上传时间：' + formattedTime, 'grey');
+    await context.uploadMes(context.leftGenerateAddress, 1, '成功')
+    context.buttonSuccess('scanCode')
     context.leftGenerateAddress = ''
   }
   notPass = false
@@ -479,10 +511,13 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
   }
 
   context.buttonSuccess('labelPrint')
-  context.createLeftSpanMessage('打印成功，设备地址:' + printAddress, 'green');
+  context.createLeftSpanMessage('打印成功，设备地址:' + printAddress, 'grey');
   context.buttonSuccess('leftWorkPromptColor')
   await playSuccessAudio(context)
   context.leftWorkPrompt = '打印成功'
+  setTimeout(() => {
+    context.buttonWaiting('labelPrint')
+  }, 2000);
 }
 
 

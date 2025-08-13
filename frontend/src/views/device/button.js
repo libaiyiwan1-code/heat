@@ -12,7 +12,8 @@ export default {
       awaken: '#FF770F',
       breakSelfTest: '#FF770F',
       labelPrint: '#FF770F',
-      quadraticVerify:'#FF770F'
+      quadraticVerify:'#FF770F',
+      scanCode:'#FF770F'
 
     },
     disabledStatus: {
@@ -21,7 +22,8 @@ export default {
       awaken: false,
       breakSelfTest: false,
       labelPrint: false,
-      quadraticVerify:false
+      quadraticVerify:false,
+      scanCode:false
     }
   },
   wireDeviceButton: {

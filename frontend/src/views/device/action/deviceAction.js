@@ -78,7 +78,7 @@ export const serialPortOperation = async (context, config, type) => {
           await doWritePort(context.portAttributes.serialPortCurrentSource, packBuffer, type);
         }
       } catch (error) {
-        await handleLeftError(context, operationName, '写入串口失败', actionType);
+        await handleError(context, operationName, '写入串口失败', actionType);
         console.error('Failed to write port:', error.message);
         break;
       }
@@ -156,15 +156,7 @@ export const serialPortOperation = async (context, config, type) => {
       if (result) {
         if (context.isNBDevice) {
           retries++;
-          if (type === 'one') {
-            context.createLeftSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'grey');
-          } else if (type === 'two') {
-            context.createRightSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'grey');
-          } else if (type === 'three') {
-            context.createLeftSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'grey');
-          }else if (type === 'four') {
-            context.createLeftSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'grey');
-          }
+          context.createLeftSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'grey');
           continue;
         } else {
           notPass = true;
@@ -191,24 +183,19 @@ export const serialPortOperation = async (context, config, type) => {
     }
     // 处理结果
     if (retries >= maxRetries) {
-      if (type === 'one' || type === 'three'|| type === 'four') {
-        await handleLeftError(context, operationName, '重试失败', actionType);
-      } else if (type === 'two') {
-        await handleRightError(context, operationName, '重试失败', actionType);
-      }
-      if (type === 'one' || type === 'three'|| type === 'four') {
-        context.leftBadProductQuantity += 1;
-      } else if (type === 'two') {
-        context.rightBadProductQuantity += 1;
-      }
-      if (context.isNBDevice&&!context.routerParam.startsWithJ) {
-        if (type === 'one' || type === 'three'|| type === 'four') {
-          await context.uploadMes(context.leftGenerateAddress === '' ? context.leftReadAddress : context.leftGenerateAddress, 0, '设备重试失败:' + operationName)
-        } else if (type === 'two') {
-          await context.uploadMes(context.rightGenerateAddress === '' ? context.rightReadAddress : context.rightGenerateAddress, 0, '设备重试失败:' + operationName)
+      await badRecordUpload(context, operationName, '重试失败', actionType);
+      if (!context.routerParam.startsWithJ) {
+        let address
+        if(type==='one'){
+           address= context.leftGenerateAddress===undefined?'':context.leftGenerateAddress
+        }else {
+          address= context.rightGenerateAddress===undefined?'':context.rightGenerateAddress
+        }
+        await context.uploadMes(address, 0, '设备重试失败:' + operationName,type)
+        if (context.isNBDevice){
+          context.leftBadProductQuantity += 1;
         }
       }
-
       return true;
     }
 
@@ -263,7 +250,7 @@ async function waitForResponse(context, timeout, expectedLength, expectedLength2
   return pass;
 }
 
-export async function handleLeftError(context, operationName, message, actionType) {
+export async function handleError(context, operationName, message, actionType) {
   context.leftWorkPrompt = `${operationName}-操作失败`;
   context.buttonError('leftWorkPromptColor')
   context.buttonError(actionType)
@@ -274,39 +261,40 @@ export async function handleLeftError(context, operationName, message, actionTyp
 }
 
 
-export async function handleRightError(context, operationName, message, actionType) {
-  context.rightWorkPrompt = `${operationName}-操作失败（${message}）`;
-  context.buttonError('rightWorkPromptColor')
-  context.buttonError(actionType)
-  context.createRightSpanMessage(`${operationName}-${message}`, 'grey');
+export async function badRecordUpload(context, operationName, message, actionType) {
+  if(actionType!==null){
+    context.leftWorkPrompt = `${operationName}-操作失败（${message}）`;
+    context.buttonError(actionType)
+  }else{
+    context.leftWorkPrompt = `${operationName}-操作失败（${message}）`;
+  }
+  let address= context.leftGenerateAddress===undefined?'':context.leftGenerateAddress
+  context.badRecordList.push({
+    address: address,
+    badMemo: `${operationName}-${message}`
+  });
+  // 序号累加
+  context.badRecordCounter = (context.badRecordCounter || 0) + 1;
+  // 拼接日志内容
+  const logMsg = `${context.badRecordCounter}、${address}、${operationName}-${message}`;
+  context.createFailSpanMessage(logMsg, 'red');
   context.receivedData.globalReceivedOneData = '';
   if (operationName !== 'MES') {
-    await playErrorAudio(context)
+    await playErrorAudio(context);
   }
 }
 
 
-export async function handleRightSuccess(context, operationName, message, actionType) {
-  context.rightWorkPrompt = `${operationName}-操作成功`;
-  context.buttonSuccess('rightWorkPromptColor')
+export async function handleSuccess(context, operationName, message, actionType) {
+  context.leftWorkPrompt = `${operationName}-操作成功`;
+  context.buttonSuccess('leftWorkPromptColor')
   context.buttonSuccess(actionType)
-  context.createRightSpanMessage(`${operationName}-${message}`, 'grey');
+  context.createLeftSpanMessage(`${operationName}-${message}`, 'grey');
   context.receivedData.globalReceivedTwoData = '';
   if (operationName !== 'MES') {
     await playSuccessAudio(context)
   }
 
-}
 
-
-export async function handleLeftSuccess(context, operationName, message, actionType) {
-  context.leftWorkPrompt = `${operationName}-操作成功`;
-  context.buttonSuccess('leftWorkPromptColor')
-  context.buttonSuccess(actionType)
-  context.createLeftSpanMessage(`${operationName}-${message}`, 'grey');
-  context.receivedData.globalReceivedOneData = '';
-  if (operationName !== 'MES') {
-    await playSuccessAudio(context)
-  }
 
 }

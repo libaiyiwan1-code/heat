@@ -41,6 +41,38 @@ export function getIdByUsername(username) {
   });
 }
 
+export function getPrintListByProductName(productName) {
+  return new Promise((resolve, reject) => {
+    // 从连接池中获取连接
+    pool.getConnection((err, connection) => {
+      if (err) {
+        console.log(err)
+        reject(err);
+        return;
+      }
+
+      // 执行查询
+      connection.query(
+        `SELECT ac.printtag
+         FROM arc_valvetype av
+                inner JOIN arc_customerproduce ac ON ac.hlmproductid = av.id
+         where av.name = ?
+         GROUP BY printtag`,
+        [productName],
+        (error, results) => {
+          // 释放连接
+          connection.release();
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
+          }
+        }
+      );
+    });
+  });
+}
+
 
 export function getDefaultPassword(type) {
   return new Promise((resolve, reject) => {

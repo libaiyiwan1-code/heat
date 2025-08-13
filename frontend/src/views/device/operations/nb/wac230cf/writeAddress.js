@@ -1,4 +1,4 @@
-import {serialPortOperation} from "@/views/device/action/deviceAction";
+import {badRecordUpload, serialPortOperation} from "@/views/device/action/deviceAction";
 import {protocolIDMap} from "@/views/device/enum/enum";
 import {playErrorAudio} from "@/utils/audioUtils";
 import {checkIMEI, generateAddress} from "@/utils/serviceUtils";
@@ -38,38 +38,46 @@ export async function writeAddressWAC230CF(protocolId, type, context) {
   if (context.configDetail.temperatureProbe === '回温探头') {
     if (!(context.readOutTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
       context.readOutTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
-      context.createLeftSpanMessage('回温温度误差过大:' + context.readOutTemperature, 'red')
+      await badRecordUpload(context,'回温温度误差过大' , + context.readOutTemperature, 'writeAddress')
+      await context.uploadMes(context.leftGenerateAddress, 0, '回温温度误差过大:' + context.readOutTemperature)
+      context.leftBadProductQuantity += 1
       await playErrorAudio(context)
       return true
     }
-    context.createLeftSpanMessage('回温验证成功:' + context.readOutTemperature, 'green')
+    context.createLeftSpanMessage('回温验证成功:' + context.readOutTemperature, 'grey')
 
   } else if (context.configDetail.temperatureProbe === '进温探头') {
     //进温探头
     if (!(context.readInTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
       context.readInTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
-      context.createLeftSpanMessage('进温温度误差过大:' + context.readInTemperature, 'red')
+      await badRecordUpload(context,'进温温度误差过大' ,  context.readInTemperature, 'writeAddress')
+      await context.uploadMes(context.leftGenerateAddress, 0, '进温温度误差过大:' + context.readInTemperature)
+      context.leftBadProductQuantity += 1
       await playErrorAudio(context)
       return true
     }
-    context.createLeftSpanMessage('进温验证成功:' + context.readInTemperature, 'green')
+    context.createLeftSpanMessage('进温验证成功:' + context.readInTemperature, 'grey')
 
   } else if (context.configDetail.temperatureProbe === '双探头') {
     //双探头
     if (!(context.readOutTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
       context.readOutTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
-      context.createLeftSpanMessage('回温温度误差过大:' + context.readOutTemperature, 'red')
+      await badRecordUpload(context,'回温温度误差过大' ,  context.readOutTemperature, 'writeAddress')
+      await context.uploadMes(context.leftGenerateAddress, 0, '回温温度误差过大:' + context.readOutTemperature)
+      context.leftBadProductQuantity += 1
       await playErrorAudio(context)
       return true
     }
-    context.createLeftSpanMessage('回温验证成功:' + context.readOutTemperature, 'green')
+    context.createLeftSpanMessage('回温验证成功:' + context.readOutTemperature, 'grey')
     if (!(context.readInTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
       context.readInTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
-      context.createLeftSpanMessage('进温温度误差过大:' + context.readInTemperature, 'red')
+      await badRecordUpload(context,'进温温度误差过大' ,  context.readInTemperature, 'writeAddress')
+      await context.uploadMes(context.leftGenerateAddress, 0, '进温温度误差过大:' + context.readInTemperature)
+      context.leftBadProductQuantity += 1
       await playErrorAudio(context)
       return true
     }
-    context.createLeftSpanMessage('进温验证成功:' + context.readInTemperature, 'green')
+    context.createLeftSpanMessage('进温验证成功:' + context.readInTemperature, 'grey')
   }
   let notPass = await generateAddress(context)
   if (notPass) {
@@ -97,12 +105,13 @@ export async function writeAddressWAC230CF(protocolId, type, context) {
     return true
   }
   if (context.version.toString() !== context.configDetail.version.toString()) {
-    context.createLeftSpanMessage('版本号不一致,设备版本号:' + context.version + '配置版本号：' + context.configDetail.version, 'red')
-    await context.uploadMes(undefined, 0, '版本号不一致,设备版本号:' + context.version + '配置版本号：' + context.configDetail.version)
+    await badRecordUpload(context,'版本号不一致' , '设备版本号:' + context.version + '配置版本号：' + context.configDetail.version, 'writeAddress')
+    await context.uploadMes(context.leftGenerateAddress, 0, '版本号不一致(设备版本号:' + context.version + '配置版本号：' + context.configDetail.version+')')
+    context.leftBadProductQuantity += 1
     await playErrorAudio(context)
     return true
   } else {
-    context.createLeftSpanMessage('版本号一致,设备版本号:' + context.version + '配置版本号：' + context.configDetail.version, 'green')
+    context.createLeftSpanMessage('版本号一致,设备版本号:' + context.version + '配置版本号：' + context.configDetail.version, 'grey')
   }
   let readIMEIResult = await serialPortOperation(context, {
     actionType: 'writeAddress',
@@ -172,7 +181,7 @@ export async function writeAddressWAC230CF(protocolId, type, context) {
     await playErrorAudio(context)
     return true
   }
-  context.createLeftSpanMessage('读温度探头配置成功', 'green');
+  context.createLeftSpanMessage('读温度探头配置成功', 'grey');
 
   let writeAddressResult = await serialPortOperation(context, {
     actionType: 'writeAddress',
