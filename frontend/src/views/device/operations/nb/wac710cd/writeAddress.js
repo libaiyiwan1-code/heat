@@ -385,7 +385,7 @@ export async function writeAddressWAC710CD(protocolId, type, context) {
   }
   if (context.torqueStr !== context.configDetail.torques) {
     await badRecordUpload(context, '写扭矩配置不一致', '设备扭矩：' + context.torqueStr + '配置扭矩：' + context.configDetail.torques, 'writeAddress')
-    await context.uploadMes(context.context.leftGenerateAddress,1,'设备扭矩：' + context.torqueStr + '配置扭矩：' + context.configDetail.torques)
+    await context.uploadMes(context.context.leftGenerateAddress,0,'设备扭矩：' + context.torqueStr + '配置扭矩：' + context.configDetail.torques)
     context.leftBadProductQuantity += 1;
     await playErrorAudio(context)
     return true

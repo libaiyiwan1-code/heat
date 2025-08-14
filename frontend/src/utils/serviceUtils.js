@@ -250,7 +250,7 @@ export const checkIMEI = async (context) => {
     if (imeiExist[0].imei !== '' || imeiExist[0].imei !== undefined) {
       context.buttonError('leftWorkPromptColor')
       await badRecordUpload(context, '平台注册', 'IMEI已存在:'+context.imei, 'writeAddress')
-      await context.uploadMes(context.leftGenerateAddress,1,'平台注册(IMEI已存在)'+context.imei)
+      await context.uploadMes(context.leftGenerateAddress,0,'平台注册(IMEI已存在)'+context.imei)
       context.leftBadProductQuantity += 1;
       await playErrorAudio(context)
       Log.error('平台注册失败 IMEI已存在: ' + context.imei);
