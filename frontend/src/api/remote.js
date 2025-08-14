@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const ip = '159'
+const ip = '158'
 
 
 export const queryWorkNosWithUnfinished = (token) => {
@@ -17,6 +17,20 @@ export const queryWorkNosWithUnfinished = (token) => {
 export const findBadRecordList = (token, workNo, machineNumber) => {
   return axios({
     url: 'http://192.168.0.' + ip + ':82/api/vac-device-produce-info/failureMessage',
+    method: 'get',
+    timeout: 6000,
+    headers: {
+      authorization: token
+    },
+    params: {
+      workNo: workNo,
+      machineNumber: machineNumber
+    }
+  })
+}
+export const findGoodRecordList = (token, workNo, machineNumber) => {
+  return axios({
+    url: 'http://192.168.0.' + ip + ':82/api/vac-device-produce-info/succeedMessage',
     method: 'get',
     timeout: 6000,
     headers: {

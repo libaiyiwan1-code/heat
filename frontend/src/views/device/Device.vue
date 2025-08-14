@@ -1741,7 +1741,7 @@ import {
 import {executeWithAddress, executionProcess,} from "@/views/device/handler/wireHandler";
 import {handleError} from "@/views/device/action/deviceAction";
 import {
-  findBadRecordList,
+  findBadRecordList, findGoodRecordList,
   getProductImageList,
   getWorkConfigParam,
   getWorkDetail,
@@ -2314,6 +2314,7 @@ export default {
       isMaximized: true,
       /*不良记录列表*/
       badRecordList: [],
+      goodRecordList: [],
       uploadMesList: [],
       badRecordCounter: 0, // 记录全局不良序号
     };
@@ -2357,7 +2358,9 @@ export default {
 
     if (this.routerParam.produceMachine === 0) {
       let filteredList = await findBadRecordList(this.routerParam.token, this.routerParam.workNumber, this.routerParam.machineNumber)
+      let filteredGoodProduceList = await findGoodRecordList(this.routerParam.token, this.routerParam.workNumber, this.routerParam.machineNumber)
       this.badRecordList = filteredList.data.data
+      this.goodRecordList = filteredGoodProduceList.data.data
       if (this.badRecordList!==undefined&&this.badRecordList!==null&&this.badRecordList.length>0) {
         this.leftBadProductQuantity=this.badRecordList.length
         this.badRecordList.forEach(item => {
@@ -2368,6 +2371,9 @@ export default {
           let msg = `${this.badRecordCounter}、${item.address}、${item.badMemo}。`;
           this.createFailSpanMessage(msg, 'red');
         });
+      }
+      if (this.goodRecordList!==undefined&&this.goodRecordList!==null&&this.goodRecordList.length>0) {
+        this.leftGoodProductQuantity=this.goodRecordList.length
       }
 
     }
