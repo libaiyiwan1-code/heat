@@ -43,6 +43,7 @@ export const doSelfTest = async (context, protocolId, type) => {
     'WAC230CF': doSelfTestWAC230CF,
     'WAC300CD': doSelfTestWAC300CD,
     'CT1000': doSelfTestCT1000,
+    'ET01': doSelfTestCT1000,
     'NTP100C': doSelfTestNTP100C,
     'WAC300N': doSelfTestWAC300N,
     'WAC300NH': doSelfTestWAC300NH
@@ -229,6 +230,7 @@ export const doBreakSelfTest = async (context, protocolId, type) => {
     'WAC230CF': returnSelfTestWAC230CF,
     'WAC300CD': returnSelfTestWAC300CD,
     'CT1000': returnSelfTestCT1000,
+    'ET01': returnSelfTestCT1000,
     'NTP100C': returnSelfTestNTP100C,
     'WAC300N': returnSelfTestWAC300N,
     'WAC300NH': returnSelfTestWAC300NH
@@ -264,6 +266,7 @@ export async function doWriteAddress(context, protocolId, type) {
     'WAC230CF': writeAddressWAC230CF,
     'WAC300CD': writeAddressWAC300CD,
     'CT1000': writeAddressCT1000,
+    'ET01': writeAddressCT1000,
     'NTP100C': writeAddressNTP100C,
     'WAC300N': writeAddressWAC300N,
     'WAC300NH': writeAddressWAC300NH
@@ -338,7 +341,7 @@ const checkNetWork = async (context, protocolId, type) => {
   //根据型号区分走不同扫码验证逻辑
   if (context.configDetail.printLabel === 'WAC230CF' || context.configDetail.printLabel === 'WAC710CD' ||
     context.configDetail.printLabel === 'WAC300CD' || context.configDetail.printLabel === 'NTP100C' ||
-    context.configDetail.printLabel === 'CT1000') {
+    context.configDetail.printLabel === 'CT1000'|| context.configDetail.printLabel === 'ET01') {
     let readAddressResult = await serialPortOperation(context, {
       actionType: undefined,
       operationName: '读地址',
@@ -402,7 +405,7 @@ const checkNetWork = async (context, protocolId, type) => {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_meter_valve')
   } else if (context.configDetail.printLabel === 'WAC710CD' || context.configDetail.printLabel === 'WAC300CD' || context.configDetail.printLabel === 'WAC300NH' || context.configDetail.printLabel === 'WAC300N') {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_valve')
-  } else if (context.configDetail.printLabel === 'NTP100C' || context.configDetail.printLabel === 'CT1000') {
+  } else if (context.configDetail.printLabel === 'NTP100C' || context.configDetail.printLabel === 'CT1000'|| context.configDetail.printLabel === 'ET01') {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_measure_point')
   }
   console.log('hems最近上传的数据', data[0])
@@ -503,7 +506,8 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
     listDoubleRowLabels: context.listDoubleRowLabels,
   };
   if (context.configForm.produceModel === 'NTP100C' || context.configForm.produceModel === 'WAC710CD' || context.configForm.produceModel === 'WAC300CD'
-    || context.configForm.produceModel === 'CT1000' || context.configForm.produceModel === 'WAC230CF' || context.configForm.produceModel === 'WAC300N' || context.configForm.produceModel === 'WAC300NH'
+    || context.configForm.produceModel === 'CT1000' || context.configForm.produceModel === 'WAC230CF' || context.configForm.produceModel === 'WAC300N'
+    || context.configForm.produceModel === 'WAC300NH'|| context.configForm.produceModel === 'ET01'
   ) {
     await ipc.send(ipcApiRoute.printDoubleRowLabel4020, params)
   } else {

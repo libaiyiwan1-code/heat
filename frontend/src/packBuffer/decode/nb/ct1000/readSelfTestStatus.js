@@ -182,7 +182,12 @@ export function decodeCheckReadSelfTestStatusCT1000(context, responseMessage) {
   let outTemperatureSensorNotPass = decodeCheckOutTemperatureSensorCT1000(context.receivedData.globalReceivedOneData)     //             回温传感器
   let inletWaterPressureSensorNotPass = decodeCheckInletWaterPressureSensorCT1000(context.receivedData.globalReceivedOneData)     //             进压传感器
   let outWaterPressureSensorNotPass = decodeCheckOutWaterPressureSensorCT1000(context.receivedData.globalReceivedOneData)     //             回压传感器
-  let temperatureSensorNotPass = decodeCheckTemperatureSensorCT1000(context.receivedData.globalReceivedOneData)     //             温度传感器是否正常
+  let temperatureSensorNotPass
+  if (context.configForm.produceModel === 'CT1000'){
+     temperatureSensorNotPass = decodeCheckTemperatureSensorCT1000(context.receivedData.globalReceivedOneData)     //             温度传感器是否正常
+  }else if (context.configForm.produceModel === 'ET01'){
+    temperatureSensorNotPass=false
+  }
   if (selfTestCompletedNotPass) {
     context.createLeftSpanMessage('未进行过自检', 'red');
     Log.error('未进行过自检');

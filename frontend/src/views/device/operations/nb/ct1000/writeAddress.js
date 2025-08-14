@@ -160,28 +160,30 @@ export async function writeAddressCT1000(protocolId, type, context) {
     return true
   }
 
+  if(context.configDetail.printLabel === 'CT1000'){
+    let readPressureProbesProbesResult = await serialPortOperation(context, {
+      actionType: 'readProbesConfig',
+      operationName: '读探头配置',
+      cmdType: '05',                         // afn 的命令类型
+      cmdCode: 'fc',                         // fn 的命令码
+      protocolId: protocolId,
+      maxRetries: context.maxRetries,
+      expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readProbesConfig'],
+      expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['readProbesConfig'],
+      timeout: context.timeout,
+      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readProbesConfig(context, context.receivedData.globalReceivedOneData),
+      preprocess: () => {
+      },
+      isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
+      isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readProbesConfig,
+    }, type)
+    if (readPressureProbesProbesResult) {
+      await playErrorAudio(context)
+      return
+    }
+    context.createLeftSpanMessage('读压力探头配置成功', 'grey');  }
 
-  let readPressureProbesProbesResult = await serialPortOperation(context, {
-    actionType: 'readProbesConfig',
-    operationName: '读探头配置',
-    cmdType: '05',                         // afn 的命令类型
-    cmdCode: 'fc',                         // fn 的命令码
-    protocolId: protocolId,
-    maxRetries: context.maxRetries,
-    expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readProbesConfig'],
-    expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['readProbesConfig'],
-    timeout: context.timeout,
-    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readProbesConfig(context, context.receivedData.globalReceivedOneData),
-    preprocess: () => {
-    },
-    isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
-    isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readProbesConfig,
-  }, type)
-  if (readPressureProbesProbesResult) {
-    await playErrorAudio(context)
-    return
-  }
-  context.createLeftSpanMessage('读压力探头配置成功', 'grey');
+
 
   let writeAddressResult = await serialPortOperation(context, {
     actionType: 'writeAddress',

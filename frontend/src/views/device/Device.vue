@@ -1152,6 +1152,7 @@
                       this.configDetail.printLabel === 'WAC300CD'||
                       this.configDetail.printLabel === 'NTP100C' ||
                       this.configDetail.printLabel==='CT1000' ||
+                      this.configDetail.printLabel==='ET01' ||
                       this.configDetail.printLabel==='WAC300N'||
                       this.configDetail.printLabel==='WAC300NH'"
                         v-show="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'"
@@ -1172,6 +1173,7 @@
                       this.configDetail.printLabel === 'WAC300CD'||
                       this.configDetail.printLabel === 'NTP100C'||
                       this.configDetail.printLabel === 'CT1000'||
+                      this.configDetail.printLabel === 'ET01'||
                         this.configDetail.printLabel==='WAC300N'||
                         this.configDetail.printLabel==='WAC300NH'
 "
@@ -1208,6 +1210,7 @@
                       this.configDetail.printLabel === 'WAC300CD'||
                       this.configDetail.printLabel === 'NTP100C'||
                       this.configDetail.printLabel === 'CT1000'||
+                      this.configDetail.printLabel === 'ET01'||
                         this.configDetail.printLabel==='WAC300N'||
                         this.configDetail.printLabel==='WAC300NH'
 "
@@ -2436,6 +2439,7 @@ export default {
         this.configForm.produceModel === 'WAC300CD' ||
         this.configForm.produceModel === 'NTP100C' ||
         this.configForm.produceModel === 'CT1000' ||
+        this.configForm.produceModel === 'ET01' ||
         this.configForm.produceModel === 'WAC300N' ||
         this.configForm.produceModel === 'WAC300NH'
       ) {
@@ -2734,7 +2738,9 @@ export default {
         this.configForm.customizePrintLabel = 'NTP100C'
       } else if (value === 'CT1000') {
         this.configForm.customizePrintLabel = 'CT1000'
-      } else if (value === 'WAC300N') {
+      } else if (value==='ET01'){
+        this.configForm.customizePrintLabel = 'ET01'
+      }else if (value === 'WAC300N') {
         this.configForm.customizePrintLabel = 'WAC300N'
       } else if (value === 'WAC300NH') {
         this.configForm.customizePrintLabel = 'WAC300NH'
@@ -3841,6 +3847,7 @@ export default {
           this.configForm.produceModel === 'WAC300CD' ||
           this.configForm.produceModel === 'NTP100C' ||
           this.configForm.produceModel === 'CT1000' ||
+          this.configForm.produceModel === 'ET01' ||
           this.configForm.produceModel === 'WAC300N' ||
           this.configForm.produceModel === 'WAC300NH'
         ) {
@@ -3875,6 +3882,7 @@ export default {
           this.configForm.produceModel === 'NTP100C' ||
           this.configForm.produceModel === 'NBT200' ||
           this.configForm.produceModel === 'CT1000' ||
+          this.configForm.produceModel === 'ET01' ||
           this.configForm.produceModel === 'WAC300N' ||
           this.configForm.produceModel === 'WAC300NH'
         ) {

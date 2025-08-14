@@ -504,6 +504,84 @@ export const protocolIDMap = {
       },
     },
   },
+  'ET01': {
+    protocolCode: `EN1434_0177`,
+    model: 81,
+    joinMode: 2,
+    protocolId: 145,
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': false,
+      'selfTest': false,
+      'readSelfTestStatus': false,
+      'readICCID': false,
+      'readIMEI': false,
+      'writeAddress': false,
+      'readAddress': false,
+      'awaken': false,
+      'returnSelfTestStatus': false,
+      'readData': false
+    },
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 32,
+      'selfTest': 99,
+      'readSelfTestStatus': 72,
+      'readAddress': 37,
+      'writeAddress': 37,
+      'readICCID': 52,
+      'readIMEI': 47,
+      'awaken': 32,
+      'returnSelfTestStatus': 32,
+      'readData': 42
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 16,
+      'selfTest': 99,
+      'readSelfTestStatus': 16,
+      'readAddress': 16,
+      'writeAddress': 21,
+      'readICCID': 16,
+      'readIMEI': 16,
+      'awaken': 16,
+      'returnSelfTestStatus': 16,
+      'readData': 16
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return decodeCheckInquireSelfTestCT1000(data);
+      },
+      readSelfTestStatus: (context, data) => {
+        return decodeCheckReadSelfTestStatusCT1000(context, data);
+      },
+      awaken: (data) => {
+        return decodeCheckAwakenCT1000(data);
+      },
+      readIMEI: (context, data) => {
+        return decodeCheckReadIMEICT1000(context, data);
+      },
+      readICCID: (context, data) => {
+        return decodeCheckReadICCIDCT1000(context, data);
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return decodeCheckWriteAddressCT1000(leftGenerateAddress, data);
+      },
+      readAddress: (context, data) => {
+        return decodeCheckReadAddressCT1000(context, data);
+      },
+      returnSelfTestStatus: (data) => {
+        return decodeCheckReturnSelfTestCPT1000(data);
+      },
+      readData: (context, data) => {
+        return decodeReadDataCT1000(context, data);
+      },
+    },
+  },
   'NTP100C': {
     protocolCode: `EN1434_0121`,
     protocolId: 70,
