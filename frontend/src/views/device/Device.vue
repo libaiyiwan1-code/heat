@@ -955,7 +955,7 @@
               </a-select>
               <a-form-item>
                 <a-button class="hlm-operate-button-style" @click="openPort(
-                          this.portAttributes.selectedPortSignalSource,'three')"
+                          this.portAttributes.selectedPortSignalSource,'three' )"
                           :disabled="!this.portAttributes.portClosedSignalSourceStatus">打开
                 </a-button>
               </a-form-item>
@@ -1022,7 +1022,7 @@
               </a-select>
               <a-form-item>
                 <a-button class="hlm-operate-button-style" @click="openPort(
-                          this.portAttributes.selectedPortSignalSource,'three')"
+                          this.portAttributes.selectedPortSignalSource,'three' )"
                           :disabled="!this.portAttributes.portClosedSignalSourceStatus">打开
                 </a-button>
               </a-form-item>
@@ -1349,7 +1349,7 @@
               <a-form-item>
                 <a-button
                   class="hlm-operate-button-style"
-                  @click="openPort(portAttributes.selectedPortOne,'one')"
+                  @click="openPort(portAttributes.selectedPortOne,'one' )"
                   :disabled="!portAttributes.portClosedOneStatus"
                 >
                   打开
@@ -1359,7 +1359,7 @@
               <a-form-item class="form-item-spacing">
                 <a-button
                   class="hlm-operate-button-style"
-                  @click="closePort(portAttributes.selectedPortOne,'one')"
+                  @click="closePort(portAttributes.selectedPortOne,'one' )"
                   :disabled="portAttributes.portClosedOneStatus"
                 >
                   关闭
@@ -1546,7 +1546,7 @@
               </a-select>
               <a-form-item>
                 <a-button class="hlm-operate-button-style"
-                          @click="openPort(this.portAttributes.selectedPortTwo,'two')"
+                          @click="openPort(this.portAttributes.selectedPortTwo,'two' )"
                           :disabled="!this.portAttributes.portClosedTwoStatus">打开
                 </a-button>
               </a-form-item>
@@ -4043,6 +4043,7 @@ export default {
       let dataBits = protocolIDMap[this.configForm.produceModel].portAttribute.dataBits
       let baudRate = protocolIDMap[this.configForm.produceModel].portAttribute.baudRate
       let stopBits = protocolIDMap[this.configForm.produceModel].portAttribute.stopBits
+      this.createLeftSpanMessage('当前打开串口 波特率：' + baudRate+'校验位:'+parity,'grey')
       console.log('串口属性：', portName, parity, dataBits, baudRate, stopBits)
       if (!this.isNBDevice) {
         if (type === 'one') {
