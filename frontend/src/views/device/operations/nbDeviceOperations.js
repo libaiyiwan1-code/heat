@@ -34,7 +34,6 @@ const Log = require('ee-core/log');
 
 
 export const doSelfTest = async (context, protocolId, type) => {
-  type='meter'
   context.messageClean();
   if (!checkPort(context, type)) {
     await playErrorAudio(context);

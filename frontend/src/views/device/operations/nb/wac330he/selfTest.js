@@ -3,6 +3,7 @@ import {playErrorAudio} from "@/utils/audioUtils";
 import {badRecordUpload, serialPortOperation} from "@/views/device/action/deviceAction";
 
 export const doSelfTestWAC330HE = async (context, protocolId, type) => {
+  type='meter'
   let requireSelfTestResult = await serialPortOperation(context, {
     actionType: 'selfTest',
     operationName: '自检询问',
