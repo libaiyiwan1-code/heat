@@ -2,7 +2,7 @@ import {nbExecute, outlineExecute, wireExecute} from "@/packBuffer/commander";
 import {arrayBuffer2Hex, checkSpontaneous, hex2arrayBuffer, mergeArrayBuffer} from "@/packBuffer/common/comUtil";
 import {doWritePort} from "@/views/device/handler/portHandler";
 import {playErrorAudio, playSuccessAudio} from "@/utils/audioUtils";
-import {packReadCurrent} from "@/packBuffer/encode/packOther";
+import {packMeter, packReadCurrent} from "@/packBuffer/encode/packOther";
 
 const Log = require('ee-core/log');
 
@@ -38,18 +38,20 @@ export const serialPortOperation = async (context, config, type) => {
     let retries = 0;
     let notPass = true;
     let packBuffer
-    if (!isWireDevice&&type!=='four') {
+    if (!isWireDevice && type !== 'four' && type !== 'meter') {
       //无线设备报文组包
       if (isTransparentTransmissionProtocol) {
         packBuffer = outlineExecute(cmdType, cmdCode, protocolId, context);
       } else {
         packBuffer = nbExecute(cmdType, cmdCode, protocolId, context);
       }
-    } else if (isWireDevice)  {
+    } else if (isWireDevice) {
       //有线设备报文组包
       packBuffer = wireExecute(cmdType, cmdCode, protocolId, context, type, withStartFrame)
-    }else if (type==='four'){
+    } else if (type === 'four') {
       packBuffer = packReadCurrent()
+    } else if (type === 'meter') {
+      packBuffer = packMeter(cmdType, cmdCode, context)
     }
 
     console.log(`[请求报文] ${operationName}`, arrayBuffer2Hex(packBuffer));
@@ -57,7 +59,7 @@ export const serialPortOperation = async (context, config, type) => {
 
 
     while (notPass && retries < maxRetries) {
-      if (type === 'one') {
+      if (type === 'one' || type === 'meter') {
         context.receivedData.globalReceivedOneData = '';
       } else if (type === 'two') {
         context.receivedData.globalReceivedTwoData = '';
@@ -68,7 +70,7 @@ export const serialPortOperation = async (context, config, type) => {
       }
       // 写入串口
       try {
-        if (type === 'one') {
+        if (type === 'one' || type === 'meter') {
           await doWritePort(context.portAttributes.serialPortOne, packBuffer, type);
         } else if (type === 'two') {
           await doWritePort(context.portAttributes.serialPortTwo, packBuffer, type);
@@ -85,12 +87,12 @@ export const serialPortOperation = async (context, config, type) => {
 
       // 等待响应
       let response = false
-      if (operationName !== '自检开启' && operationName !== '不良品提示') {
+      if (operationName !== '自检开启' && operationName !== '不良品提示' && operationName !== '热表温度标定') {
         response = await waitForResponse(context, timeout, expectedLength, expectedLength2, type);
         // 验证响应
         if (!response) {
           retries++;
-          if (type === 'one') {
+          if (type === 'one' || type === 'meter') {
             context.createLeftSpanMessage(`${operationName}失败-进行重试 次数:${retries}`, 'grey');
           } else if (type === 'two') {
             context.createRightSpanMessage(`${operationName}失败-进行重试 次数:${retries}`, 'grey');
@@ -105,7 +107,7 @@ export const serialPortOperation = async (context, config, type) => {
 
       }
       let data
-      if (type === 'one') {
+      if (type === 'one' || type === 'meter') {
         data = context.receivedData.globalReceivedOneData
       } else if (type === 'two') {
         data = context.receivedData.globalReceivedTwoData
@@ -120,13 +122,13 @@ export const serialPortOperation = async (context, config, type) => {
         context.isNBDevice &&
         operationName !== '不良品提示') {
         retries++;
-        if (type === 'one') {
+        if (type === 'one' || type === 'meter') {
           context.createLeftSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'grey');
         } else if (type === 'two') {
           context.createRightSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'grey');
         } else if (type === 'three') {
           context.createLeftSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'grey');
-        }else if (type === 'four') {
+        } else if (type === 'four') {
           context.createLeftSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'grey');
         }
         await new Promise(resolve => setTimeout(resolve, 900));
@@ -140,7 +142,7 @@ export const serialPortOperation = async (context, config, type) => {
         console.warn('此红外设备回包不包含自发自收，单独处理报文合并！！！')
         data = arrayBuffer2Hex(mergeArrayBuffer(packBuffer, hex2arrayBuffer(data)))
         console.warn('合并自发自收：', data)
-        if (type === 'one') {
+        if (type === 'one' || type === 'meter') {
           context.receivedData.globalReceivedOneData = data
         } else if (type === 'two') {
           context.receivedData.globalReceivedTwoData = data
@@ -186,13 +188,13 @@ export const serialPortOperation = async (context, config, type) => {
       await badRecordUpload(context, operationName, '重试失败', actionType);
       if (!context.routerParam.startsWithJ) {
         let address
-        if(type==='one'){
-           address= context.leftGenerateAddress===undefined?'':context.leftGenerateAddress
-        }else {
-          address= context.rightGenerateAddress===undefined?'':context.rightGenerateAddress
+        if (type === 'one' || type === 'meter') {
+          address = context.leftGenerateAddress === undefined ? '' : context.leftGenerateAddress
+        } else {
+          address = context.rightGenerateAddress === undefined ? '' : context.rightGenerateAddress
         }
-        await context.uploadMes(address, 0, '设备重试失败:' + operationName,type)
-        if (context.isNBDevice){
+        await context.uploadMes(address, 0, '设备重试失败:' + operationName, type)
+        if (context.isNBDevice) {
           context.leftBadProductQuantity += 1;
         }
       }
@@ -200,7 +202,7 @@ export const serialPortOperation = async (context, config, type) => {
     }
 
     if (!notPass) {
-      if (type === 'one') {
+      if (type === 'one' || type === 'meter') {
         context.receivedData.globalReceivedOneData = '';
         context.createLeftSpanMessage(operationName + '-操作成功', 'grey')
       } else if (type === 'two') {
@@ -209,7 +211,7 @@ export const serialPortOperation = async (context, config, type) => {
       } else if (type === 'three') {
         context.receivedData.globalReceivedSignalSourceData = '';
         context.createLeftSpanMessage(operationName + '-操作成功', 'grey')
-      }else if (type === 'four') {
+      } else if (type === 'four') {
         context.receivedData.globalReceivedCurrentSourceData = '';
         context.createLeftSpanMessage(operationName + '-操作成功', 'grey')
       }
@@ -228,13 +230,13 @@ async function waitForResponse(context, timeout, expectedLength, expectedLength2
   while (Date.now() - startTime < timeout) {
     await new Promise(resolve => setTimeout(resolve, 1500));
     let data
-    if (type === 'one') {
+    if (type === 'one' || type === 'meter') {
       data = context.receivedData.globalReceivedOneData;
     } else if (type === 'two') {
       data = context.receivedData.globalReceivedTwoData;
     } else if (type === 'three') {
       data = context.receivedData.globalReceivedSignalSourceData;
-    }else if (type === 'four') {
+    } else if (type === 'four') {
       data = context.receivedData.globalReceivedCurrentSourceData;
     }
     console.log('报文', data)
@@ -262,13 +264,13 @@ export async function handleError(context, operationName, message, actionType) {
 
 
 export async function badRecordUpload(context, operationName, message, actionType) {
-  if(actionType!==null){
+  if (actionType !== null) {
     context.leftWorkPrompt = `${operationName}-操作失败（${message}）`;
     context.buttonError(actionType)
-  }else{
+  } else {
     context.leftWorkPrompt = `${operationName}-操作失败（${message}）`;
   }
-  let address= context.leftGenerateAddress===undefined?'':context.leftGenerateAddress
+  let address = context.leftGenerateAddress === undefined ? '' : context.leftGenerateAddress
   context.badRecordList.push({
     address: address,
     badMemo: `${operationName}-${message}`
@@ -294,7 +296,6 @@ export async function handleSuccess(context, operationName, message, actionType)
   if (operationName !== 'MES') {
     await playSuccessAudio(context)
   }
-
 
 
 }

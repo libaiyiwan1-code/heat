@@ -28,11 +28,13 @@ import {returnSelfTestWAC300NH} from "@/views/device/operations/nb/wac300nh/retu
 import {writeAddressWAC300NH} from "@/views/device/operations/nb/wac300nh/writeAddress";
 import {checkRecentlyUploadedData} from "@/components/global/hemssdb";
 import moment from "moment";
+import {doSelfTestWAC330HE} from "@/views/device/operations/nb/wac330he/selfTest";
 
 const Log = require('ee-core/log');
 
 
 export const doSelfTest = async (context, protocolId, type) => {
+  type='meter'
   context.messageClean();
   if (!checkPort(context, type)) {
     await playErrorAudio(context);
@@ -46,7 +48,8 @@ export const doSelfTest = async (context, protocolId, type) => {
     'ET01': doSelfTestCT1000,
     'NTP100C': doSelfTestNTP100C,
     'WAC300N': doSelfTestWAC300N,
-    'WAC300NH': doSelfTestWAC300NH
+    'WAC300NH': doSelfTestWAC300NH,
+    'WAC330HE':doSelfTestWAC330HE
   };
   const produceModel = context.configForm.produceModel;
   const selfTestFunction = selfTestStrategies[produceModel];
@@ -273,7 +276,7 @@ export async function doWriteAddress(context, protocolId, type) {
   };
   const produceModel = context.configForm.produceModel;
   const writeAddressFunction = writeAddressStrategies[produceModel];
-  if (writeAddressFunction && await writeAddressFunction(protocolId,type,context)) {
+  if (writeAddressFunction && await writeAddressFunction(protocolId, type, context)) {
     context.buttonError('writeAddress')
     context.buttonEnable()
     setTimeout(() => {
@@ -301,7 +304,7 @@ export async function doScanCodeVerification(context, protocolId, type) {
     return
   }
   context.buttonDisabled()
-  context.leftGenerateAddress=''
+  context.leftGenerateAddress = ''
   console.log('聚焦0')
   const input = context.$refs.input1.$el;
   if (input) {
@@ -341,7 +344,7 @@ const checkNetWork = async (context, protocolId, type) => {
   //根据型号区分走不同扫码验证逻辑
   if (context.configDetail.printLabel === 'WAC230CF' || context.configDetail.printLabel === 'WAC710CD' ||
     context.configDetail.printLabel === 'WAC300CD' || context.configDetail.printLabel === 'NTP100C' ||
-    context.configDetail.printLabel === 'CT1000'|| context.configDetail.printLabel === 'ET01') {
+    context.configDetail.printLabel === 'CT1000' || context.configDetail.printLabel === 'ET01' || context.configDetail.printLabel === 'WAC330HE') {
     let readAddressResult = await serialPortOperation(context, {
       actionType: undefined,
       operationName: '读地址',
@@ -405,8 +408,10 @@ const checkNetWork = async (context, protocolId, type) => {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_meter_valve')
   } else if (context.configDetail.printLabel === 'WAC710CD' || context.configDetail.printLabel === 'WAC300CD' || context.configDetail.printLabel === 'WAC300NH' || context.configDetail.printLabel === 'WAC300N') {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_valve')
-  } else if (context.configDetail.printLabel === 'NTP100C' || context.configDetail.printLabel === 'CT1000'|| context.configDetail.printLabel === 'ET01') {
+  } else if (context.configDetail.printLabel === 'NTP100C' || context.configDetail.printLabel === 'CT1000' || context.configDetail.printLabel === 'ET01') {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_measure_point')
+  } else if (context.configDetail.printLabel === 'WAC330HE') {
+    data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_meter_valve')
   }
   console.log('hems最近上传的数据', data[0])
   if (data[0] === undefined || data [0] === null) {
@@ -414,7 +419,7 @@ const checkNetWork = async (context, protocolId, type) => {
       context.uploadAddressList.push(context.leftReadAddress)
       context.leftBadProductQuantity += 1;
     }
-    await badRecordUpload(context, '扫码地址验证联网',  '网络未上传', 'scanCode')
+    await badRecordUpload(context, '扫码地址验证联网', '网络未上传', 'scanCode')
     await context.uploadMes(context.leftGenerateAddress, 0, '扫码地址验证联网(网络未上传) ')
     context.leftBadProductQuantity += 1
     context.leftGenerateAddress = ''
@@ -507,7 +512,7 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
   };
   if (context.configForm.produceModel === 'NTP100C' || context.configForm.produceModel === 'WAC710CD' || context.configForm.produceModel === 'WAC300CD'
     || context.configForm.produceModel === 'CT1000' || context.configForm.produceModel === 'WAC230CF' || context.configForm.produceModel === 'WAC300N'
-    || context.configForm.produceModel === 'WAC300NH'|| context.configForm.produceModel === 'ET01'
+    || context.configForm.produceModel === 'WAC300NH' || context.configForm.produceModel === 'ET01'|| context.configForm.produceModel === 'WAC330HE'
   ) {
     await ipc.send(ipcApiRoute.printDoubleRowLabel4020, params)
   } else {

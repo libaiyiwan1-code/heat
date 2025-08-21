@@ -95,7 +95,7 @@ export const calculateCSByte = (buffer) => {
   for (let i = 0; i < buffer.byteLength; i++) {
     bodySum += bodyDataView.getUint8(i)
   }
-  return bodySum;
+  return bodySum&0XFF;
 }
 
 /**

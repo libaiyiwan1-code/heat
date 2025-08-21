@@ -368,6 +368,86 @@ export function packDataDomains(afn, fn, protocolID, context) {
   return arrayBuffer;
 }
 
+export function packMeterDataDomains(afn, fn, context) {
+  let arrayBuffer = null;
+  let startBuffer = createBuffer(2, [0x68, 0x20]);
+  switch (afn) {
+    case 'a0':
+      switch (fn) {
+        case '15':
+          // 获取当前时间并转换为BCD码
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = now.getMonth() + 1; // 月份从0开始，需要+1
+          const day = now.getDate();
+          const hours = now.getHours();
+          const minutes = now.getMinutes();
+          const seconds = now.getSeconds();
+          // 转换为BCD码（如2022年取后两位22）
+          const yearFirstTwo = parseInt(year.slice(0, 2), 10); // 前两位：20
+          const yearLastTwo = parseInt(year.slice(-2), 10);    // 后两位
+          const bcdMonth = parseInt(month.toString().padStart(2, '0'), 10);
+          const bcdDay = parseInt(day.toString().padStart(2, '0'), 10);
+          const bcdHours = parseInt(hours.toString().padStart(2, '0'), 10);
+          const bcdMinutes = parseInt(minutes.toString().padStart(2, '0'), 10);
+          const bcdSeconds = parseInt(seconds.toString().padStart(2, '0'), 10);
+
+          // =格式: 秒 分 时 日 月 年(后两位)
+          const dateArrayBuffer = createBuffer(7, [
+            bcdSeconds,  // 秒
+            bcdMinutes,  // 分
+            bcdHours,    // 时
+            bcdDay,      // 日
+            bcdMonth,    // 月
+            yearLastTwo,     // 年(后两位)
+            yearFirstTwo,     // 年(后两位)
+          ]);
+
+          arrayBuffer = mergeArrayBuffer(createBuffer(5, [0x04, 0x0a, 0xa0, 0x15, 0x01]), dateArrayBuffer);
+          break;
+        case '18':
+          arrayBuffer = mergeArrayBuffer(createBuffer(5, [0x15, 0x0a, 0xa0, 0x18, 0x01]));
+          break;
+        default:
+        // Log.error("packages: afn[{}] match fail", afn);
+      }
+      return mergeArrayBuffer(
+        startBuffer,
+        hex2arrayBuffer(context.readMeterAddress), //旧地址
+        createBuffer(3, [0x00, 0x00, 0x00]), //旧地址厂商代码
+        arrayBuffer,
+        Buffer.from(addressCover(context.leftGenerateAddress.padStart(14, '0'))) //新地址 逆序
+      );
+    case '81':
+      switch (fn) {
+        //读地址
+        case '0a':
+          arrayBuffer = createBuffer(6, [0x23, 0x04, 0x81, 0x0a, 0x00, 0x02]);
+          break;
+      }
+      return mergeArrayBuffer(startBuffer, packBroadcastSevenMacAddr(), arrayBuffer);
+    case '01':
+      switch (fn) {
+        //进入检定状态
+        case '10-enter-verification':
+          arrayBuffer = createBuffer(7, [0x24, 0x05, 0x01, 0x10, 0x01, 0x01, 0x00]);
+          break;
+        //退出检定状态
+        case '10-return-verification':
+          arrayBuffer = createBuffer(7, [0x24, 0x05, 0x01, 0x10, 0x01, 0x02, 0x00]);
+          break;
+        case '12':
+          // 表温度标定 固定50度。
+          arrayBuffer = createBuffer(9, [0x24, 0x07, 0x01, 0x12, 0x01, 0x01, 0x00, 0x50, 0xe8]);
+          break;
+      }
+      return mergeArrayBuffer(startBuffer, packBroadcastSevenMacAddr(), arrayBuffer);
+    default:
+  }
+
+  return arrayBuffer;
+}
+
 
 export function packWireDeviceDataDomains(afn, fn, protocolID, context, type) {
   let deviceAddress = type === 'one' ? context.leftReadAddress : context.rightReadAddress

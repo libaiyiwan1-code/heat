@@ -1154,6 +1154,7 @@
                       this.configDetail.printLabel==='CT1000' ||
                       this.configDetail.printLabel==='ET01' ||
                       this.configDetail.printLabel==='WAC300N'||
+                      this.configDetail.printLabel === 'WAC330HE'||
                       this.configDetail.printLabel==='WAC300NH'"
                         v-show="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'"
                         @click="awaken(
@@ -1174,6 +1175,7 @@
                       this.configDetail.printLabel === 'NTP100C'||
                       this.configDetail.printLabel === 'CT1000'||
                       this.configDetail.printLabel === 'ET01'||
+                          this.configDetail.printLabel === 'WAC330HE'||
                         this.configDetail.printLabel==='WAC300N'||
                         this.configDetail.printLabel==='WAC300NH'
 "
@@ -1212,6 +1214,7 @@
                       this.configDetail.printLabel === 'CT1000'||
                       this.configDetail.printLabel === 'ET01'||
                         this.configDetail.printLabel==='WAC300N'||
+                            this.configDetail.printLabel === 'WAC330HE'||
                         this.configDetail.printLabel==='WAC300NH'
 "
                           @click="breakSelfTest(
@@ -2317,6 +2320,9 @@ export default {
       goodRecordList: [],
       uploadMesList: [],
       badRecordCounter: 0, // 记录全局不良序号
+      readMeterAddress:'',
+      readMeterInTemperature:undefined, //WAC330HE热表温度读取。
+      readMeterOutTemperature:undefined, //WAC330HE热表温度读取。
     };
   },
   /*移除监听器 */
@@ -2443,6 +2449,7 @@ export default {
       } else if (this.configForm.produceModel === 'WAC710CD' ||
         this.configForm.produceModel === 'WAC230CF' ||
         this.configForm.produceModel === 'WAC300CD' ||
+        this.configForm.produceModel === 'WAC330HE' ||
         this.configForm.produceModel === 'NTP100C' ||
         this.configForm.produceModel === 'CT1000' ||
         this.configForm.produceModel === 'ET01' ||
@@ -3851,6 +3858,7 @@ export default {
         } else if (this.configForm.produceModel === 'WAC710CD' ||
           this.configForm.produceModel === 'WAC230CF' ||
           this.configForm.produceModel === 'WAC300CD' ||
+          this.configForm.produceModel === 'WAC330HE' ||
           this.configForm.produceModel === 'NTP100C' ||
           this.configForm.produceModel === 'CT1000' ||
           this.configForm.produceModel === 'ET01' ||
@@ -3885,6 +3893,7 @@ export default {
         if (this.configForm.produceModel === 'WAC710CD' ||
           this.configForm.produceModel === 'WAC230CF' ||
           this.configForm.produceModel === 'WAC300CD' ||
+          this.configForm.produceModel === 'WAC330HE' ||
           this.configForm.produceModel === 'NTP100C' ||
           this.configForm.produceModel === 'NBT200' ||
           this.configForm.produceModel === 'CT1000' ||

@@ -2,7 +2,9 @@ import {
   decodeCheckInquireSelfTestCT1000,
   decodeCheckInquireSelfTestNTP100C,
   decodeCheckInquireSelfTestWAC230CF,
-  decodeCheckInquireSelfTestWAC300CD, decodeCheckInquireSelfTestWAC300N, decodeCheckInquireSelfTestWAC300NH,
+  decodeCheckInquireSelfTestWAC300CD,
+  decodeCheckInquireSelfTestWAC300N,
+  decodeCheckInquireSelfTestWAC300NH,
   decodeCheckInquireSelfTestWAC710CD
 } from "@/packBuffer/decode/inquireSelfTest";
 import {decodeCheckWriteTorqueConfigWAC710CD} from "@/packBuffer/decode/writeTorqueConfig";
@@ -34,7 +36,9 @@ import {decodeCheckReadSelfTestStatusWAC710CD} from "@/packBuffer/decode/nb/wac7
 import {decodeCheckReadSelfTestStatusWAC230CF} from "@/packBuffer/decode/nb/wac230cf/readSelfTestStatus";
 import {
   decodeCheckForcedTemperatureSetting,
-  decodeCheckReadAddress, decodeCheckWriteCleaningValveCycle, decodeCheckWriteTargetAdjustmentValue,
+  decodeCheckReadAddress,
+  decodeCheckWriteCleaningValveCycle,
+  decodeCheckWriteTargetAdjustmentValue,
   decodeCreditCardState,
   decodeCreditCardVerify,
   decodeDetectPanelState,
@@ -92,7 +96,8 @@ import {decodeCheckReadAddressNTP100C} from "@/packBuffer/decode/nb/ntp100c/read
 import {
   decodeGenerate10mACurrent,
   decodeGenerate20mACurrent,
-  decodeGenerate4mACurrent, decodeReadCurrent
+  decodeGenerate4mACurrent,
+  decodeReadCurrent
 } from "@/packBuffer/decode/nb/wac710cd/productionCurrent";
 import {decodeCheckReadAddressDongYuan} from "@/packBuffer/decode/wire/dongyuan/readAddress";
 import {decodeCheckReadAddressNBT200} from "@/packBuffer/decode/nb/nbt200/readAddress";
@@ -120,6 +125,12 @@ import {decodeReadDataWAC300NH} from "@/packBuffer/decode/nb/wac300nh/readData";
 import {decodeCheckReadTemperatureProbesWAC300NH} from "@/packBuffer/decode/nb/wac300nh/readProbesConfig";
 import {decodeCheckReadAddressWAC300NH} from "@/packBuffer/decode/nb/wac300nh/readAddress";
 import {decodeCheckReadAddressWAC300N} from "@/packBuffer/decode/nb/wac300n/readAddress";
+import {decodeCheckInquireSelfTestWAC330HE} from "@/packBuffer/decode/nb/wac330he/inquireSelfTest";
+import {
+  decodeCheckWriteTemperatureProbesConfigWAC330HE
+} from "@/packBuffer/decode/nb/wac330he/writeTemperatureProbesConfig";
+import {decodeCheckMeterEnterVerificationStatusWAC330HE,decodeCheckMeterReturnVerificationStatusWAC330HE} from "@/packBuffer/decode/nb/wac330he/meterVerificationStatus";
+import {decodeReadDataWAC330HE} from "@/packBuffer/decode/nb/wac330he/readData";
 
 
 /**
@@ -844,6 +855,116 @@ export const protocolIDMap = {
       readData: (context, data) => {
         return decodeReadDataWAC300NH(context, data);
       },
+      readTemperatureProbes: (context, data) => {
+        return decodeCheckReadTemperatureProbesWAC300NH(context, data);
+      },
+
+    },
+  },
+  'WAC330HE': {
+    protocolCode: `EN1434_0100`,
+    model: 38,  /*84移动|38电信*/
+    joinMode: 8,/*2移动|8电信*/
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': true,
+      'writeTemperatureProbesConfig': true,
+      'readData': true,
+      'selfTest': true,
+      'readAddress': false,
+      'writeValveAddress': false,
+      'readSelfTestStatus': true,
+      'readICCID': false,
+      'readIMEI': false,
+      'returnSelfTestStatus': true,
+      'awaken': false,
+      'meterSettingDate': false,
+      'meterReadAddress': false,
+      'meterWriteAddress': false,
+      'meterEnterVerificationStatus': false,
+      'meterReturnVerificationStatus': false,
+      'meterTemperatureCalibration': false,
+    },
+    protocolId: 102,
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 37,
+      'writeTemperatureProbesConfig': 37,
+      'readData': 132,
+      'selfTest': -1,
+      'readAddress': 21,
+      'writeValveAddress': 16,
+      'readSelfTestStatus': 76,
+      'readICCID': 36,
+      'readIMEI': 16,
+      'returnSelfTestStatus': 33,
+      'awaken': 16,
+      'meterSettingDate': 19,
+      'meterReadAddress': 20,
+      'meterWriteAddress': 19,
+      'meterEnterVerificationStatus': 21,
+      'meterReturnVerificationStatus': 21,
+      'meterTemperatureCalibration': -1,
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 70,
+      'writeTemperatureProbesConfig': 72,
+      'readData': 165,
+      'selfTest': -1,
+      'readAddress': 37,
+      'writeValveAddress': 37,
+      'readSelfTestStatus': 109,
+      'readICCID': 52,
+      'readIMEI': 47,
+      'returnSelfTestStatus': 70,
+      'awaken': 32,
+      'meterSettingDate': 42,
+      'meterReadAddress': 37,
+      'meterWriteAddress': 42,
+      'meterEnterVerificationStatus': 39,
+      'meterReturnVerificationStatus': 39,
+      'meterTemperatureCalibration': -1,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return decodeCheckInquireSelfTestWAC330HE(data);
+      },
+      writeTemperatureProbesConfig: (data) => {
+        return decodeCheckWriteTemperatureProbesConfigWAC330HE(data);
+      },
+      meterEnterVerificationStatus: (data) => {
+        return decodeCheckMeterEnterVerificationStatusWAC330HE(data);
+      },
+      meterReturnVerificationStatus: (data) => {
+        return decodeCheckMeterReturnVerificationStatusWAC330HE(data);
+      },
+      readData: (context, data) => {
+        return decodeReadDataWAC330HE(context, data);
+      },
+      readSelfTestStatus: (context, data) => {
+        return decodeCheckReadSelfTestStatusWAC300NH(context, data);
+      },
+      readICCID: (context, data) => {
+        return decodeCheckReadICCIDWAC300NH(context, data);
+      },
+      readIMEI: (context, data) => {
+        return decodeCheckReadIMEIWAC300NH(context, data);
+      },
+      readAddress: (context, data) => {
+        return decodeCheckReadAddressWAC300NH(context, data);
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return decodeCheckWriteAddressWAC300NH(leftGenerateAddress, data);
+      },
+      awaken: (data) => {
+        return decodeCheckAwakenWAC300NH(data);
+      },
+
       readTemperatureProbes: (context, data) => {
         return decodeCheckReadTemperatureProbesWAC300NH(context, data);
       },

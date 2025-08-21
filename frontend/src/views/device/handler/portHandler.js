@@ -13,7 +13,7 @@ export const checkPort = (context, type) => {
       context.createLeftSpanMessage('串口未打开', 'grey');
       return false
     }
-  } else if (type==='two') {
+  } else if (type === 'two') {
     if (context.portAttributes.selectedPortTwo === null || context.portAttributes.selectedPortTwo === undefined) {
       context.createLeftSpanMessage('请选择串口', 'grey');
       return false
@@ -22,7 +22,7 @@ export const checkPort = (context, type) => {
       context.createLeftSpanMessage('串口未打开', 'grey');
       return false
     }
-  }else if (type==='three'){
+  } else if (type === 'three') {
     if (context.portAttributes.selectedPortSignalSource === null || context.portAttributes.selectedPortSignalSource === undefined) {
       context.createLeftSpanMessage('请选择信号源串口', 'grey');
       return false
@@ -31,13 +31,22 @@ export const checkPort = (context, type) => {
       context.createLeftSpanMessage('信号源串口未打开', 'grey');
       return false
     }
-  }else if (type==='four'){
+  } else if (type === 'four') {
     if (context.portAttributes.selectedPortCurrentSource === null || context.portAttributes.selectedPortCurrentSource === undefined) {
       context.createLeftSpanMessage('请选择电流源串口', 'grey');
       return false
     }
     if (context.portAttributes.selectedPortCurrentSource) {
       context.createLeftSpanMessage('电流源串口未打开', 'grey');
+      return false
+    }
+  } else if (type === 'meter') {
+    if (context.portAttributes.selectedPortOne === null || context.portAttributes.selectedPortOne === undefined) {
+      context.createLeftSpanMessage('请选择串口', 'grey');
+      return false
+    }
+    if (context.portAttributes.portClosedOneStatus) {
+      context.createLeftSpanMessage('串口未打开', 'grey');
       return false
     }
   }
@@ -48,7 +57,7 @@ export const checkPort = (context, type) => {
 
 export const doOpenPort = (context, portName, parity, dataBits, baudRate, stopBits, type) => {
 
-  if (portName===null||portName===undefined){
+  if (portName === null || portName === undefined) {
     return
   }
   if (type === 'one') {
@@ -135,7 +144,7 @@ export const doOpenPort = (context, portName, parity, dataBits, baudRate, stopBi
 
     });
 
-  }else if (type === 'four') {
+  } else if (type === 'four') {
     return new Promise((resolve, reject) => {
       doCreatePort(context.portAttributes.serialPortCurrentSource, portName, '无', dataBits, 9600, stopBits, context, type);
       context.portAttributes.portClosedCurrentSourceStatus = false
@@ -168,10 +177,10 @@ export const doOpenPort = (context, portName, parity, dataBits, baudRate, stopBi
 
 
 export const doClosePort = (context, portName, type) => {
-  if (portName===null||portName===undefined){
+  if (portName === null || portName === undefined) {
     return
   }
-  console.log(portName,type)
+  console.log(portName, type)
   if (type === 'one') {
     if (context.portAttributes.serialPortOne !== null) {
       context.portAttributes.portClosedOneStatus = true
@@ -226,7 +235,7 @@ export const doClosePort = (context, portName, type) => {
       });
     }
 
-  }else if (type === 'four') {
+  } else if (type === 'four') {
     if (context.portAttributes.serialPortCurrentSource !== null) {
       context.portAttributes.portClosedCurrentSourceStatus = true
       context.portAttributes.serialPortCurrentSource.close((err) => {
@@ -268,7 +277,6 @@ const doPortListening = (context, portName, type) => {
         context.receivedData.globalReceivedOneData += hexString;
         // console.warn(`[${new Date().toISOString()}] 串口工具接收报文: ${context.receivedData.globalReceivedOneData}`);
       });
-
 
 
       console.log('监听串口成功', portName);
@@ -319,7 +327,7 @@ const doPortListening = (context, portName, type) => {
     } else {
       console.log('串口已经在监听中', portName);
     }
-  }else if (type === 'four') {
+  } else if (type === 'four') {
     if (context.portAttributes.serialPortCurrentSource.listenerCount('data') === 0) {
       console.log('监听串口', portName);
       context.portAttributes.serialPortCurrentSource.on('data', (data) => {
@@ -344,7 +352,7 @@ const doPortListening = (context, portName, type) => {
 }
 
 export const doCreatePort = (serialPort, portName, parity, dataBits, baudRate, stopBits, context, type) => {
-  if (type === 'one') {
+  if (type === 'one'||type==='meter') {
     if (serialPort === undefined || serialPort === null) {
       context.portAttributes.serialPortOne = new SerialPort({
         path: portName,
@@ -365,7 +373,7 @@ export const doCreatePort = (serialPort, portName, parity, dataBits, baudRate, s
       });
     }
 
-  } else if (type==='two'){
+  } else if (type === 'two') {
     if (serialPort === undefined || serialPort === null) {
       context.portAttributes.serialPortTwo = new SerialPort({
         path: portName,
@@ -385,7 +393,7 @@ export const doCreatePort = (serialPort, portName, parity, dataBits, baudRate, s
         }
       });
     }
-  }else if (type==='three'){
+  } else if (type === 'three') {
     if (serialPort === undefined || serialPort === null) {
       context.portAttributes.serialPortSignalSource = new SerialPort({
         path: portName,
@@ -405,7 +413,7 @@ export const doCreatePort = (serialPort, portName, parity, dataBits, baudRate, s
         }
       });
     }
-  }else if (type==='four'){
+  } else if (type === 'four') {
     if (serialPort === undefined || serialPort === null) {
       context.portAttributes.serialPortCurrentSource = new SerialPort({
         path: portName,
@@ -431,7 +439,7 @@ export const doCreatePort = (serialPort, portName, parity, dataBits, baudRate, s
 
 export function doWritePort(serialPort, arrayBuffer, type) {
 
-  if (type === 'one') {
+  if (type === 'one'||type==='meter') {
     return new Promise((resolve, reject) => {
       if (serialPort) {
         serialPort.write(arrayBuffer, (err) => {
@@ -475,7 +483,7 @@ export function doWritePort(serialPort, arrayBuffer, type) {
       }
     })
 
-  }else if (type === 'three') {
+  } else if (type === 'three') {
     return new Promise((resolve, reject) => {
       if (serialPort) {
         serialPort.write(arrayBuffer, (err) => {
@@ -523,7 +531,7 @@ export function doWritePort(serialPort, arrayBuffer, type) {
 }
 
 
-export function initializeAllSerialPorts(context,type) {
+export function initializeAllSerialPorts(context, type) {
   return new Promise((resolve, reject) => {
     context.portAttributes.selectedPortOne = null
     context.portAttributes.selectedPortTwo = null
@@ -549,9 +557,9 @@ export function initializeAllSerialPorts(context,type) {
       console.log('最新获取的串口', context.portAttributes.serialPortList);
       Log.info('最新获取的串口', context.portAttributes.serialPortList);
       const portPaths = context.portAttributes.serialPortList.map(port => port).join('、');
-      if (type==='one'){
+      if (type === 'one') {
         context.createLeftSpanMessage('当前可用的串口列表:' + portPaths, 'grey');
-      }else{
+      } else {
         // context.createRightSpanMessage('当前可用的串口列表:' + portPaths, 'grey');
       }
       resolve(); //解决回调触发
@@ -613,7 +621,7 @@ export function doHandleSelectChange(context, type) {
         }
       });
     }
-  }else if (type === 'four') {
+  } else if (type === 'four') {
     if (context.portAttributes.serialPortCurrentSource && context.portAttributes.serialPortCurrentSource.isOpen) {
       // 如果串口对象存在且是打开状态，则关闭串口
       context.portAttributes.serialPortCurrentSource.close((err) => {
