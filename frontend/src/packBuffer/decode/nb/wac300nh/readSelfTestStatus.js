@@ -172,7 +172,6 @@ export function decodeCheckReadSelfTestStatusWAC300NH(context, responseMessage) 
     console.error('自检不通过');
     Log.error('自检不通过');
     context.leftWorkPrompt = '自检失败(读自检状态不通过)'
-    context.buttonError('leftWorkPromptColor')
     context.receivedData.globalReceivedOneData = '';
     return true
   } else {

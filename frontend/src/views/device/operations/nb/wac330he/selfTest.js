@@ -3,7 +3,6 @@ import {playErrorAudio} from "@/utils/audioUtils";
 import {badRecordUpload, serialPortOperation} from "@/views/device/action/deviceAction";
 
 export const doSelfTestWAC330HE = async (context, protocolId, type) => {
-  type='meter'
   let requireSelfTestResult = await serialPortOperation(context, {
     actionType: 'selfTest',
     operationName: '自检询问',
@@ -62,7 +61,7 @@ export const doSelfTestWAC330HE = async (context, protocolId, type) => {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
     isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.meterEnterVerificationStatus,
-  }, type)
+  }, 'meter')
   if (meterEnterVerificationStatusResult) {
     await playErrorAudio(context)
     return true
@@ -86,7 +85,7 @@ export const doSelfTestWAC330HE = async (context, protocolId, type) => {
       },
       isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
       isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.meterTemperatureCalibration,
-    }, type)
+    }, 'meter')
     await new Promise(x => setTimeout(x, 2000));
   }
 
@@ -171,7 +170,7 @@ export const doMeterReturnVerificationStatus = async (context, protocolId, type)
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
     isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.meterReturnVerificationStatus,
-  }, type)
+  }, 'meter')
   if (meterReturnVerificationStatusResult) {
     await playErrorAudio(context)
     return true

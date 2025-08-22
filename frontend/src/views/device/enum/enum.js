@@ -137,6 +137,8 @@ import {decodeCheckReadICCIDWAC330HE} from "@/packBuffer/decode/nb/wac330he/read
 import {decodeCheckMeterReadAddressWAC330HE} from "@/packBuffer/decode/nb/wac330he/readMeterAddress";
 import {decodeCheckMeterWriteAddressWAC330HE} from "@/packBuffer/decode/nb/wac330he/writeMeterAddress";
 import {decodeCheckWriteAddressWAC330HE} from "@/packBuffer/decode/nb/wac330he/valveWriteAddress";
+import {decodeCheckAwakenWAC300HE} from "@/packBuffer/decode/nb/wac330he/awaken";
+import {decodeCheckReadAddressWAC330HE} from "@/packBuffer/decode/nb/wac330he/readValveAddress";
 
 
 /**
@@ -971,19 +973,14 @@ export const protocolIDMap = {
         return decodeCheckReadIMEIWAC330HE(context, data);
       },
       readAddress: (context, data) => {
-        return decodeCheckReadAddressWAC300NH(context, data);
+        return decodeCheckReadAddressWAC330HE(context, data);
       },
       writeAddress: (leftGenerateAddress, data) => {
         return decodeCheckWriteAddressWAC330HE(leftGenerateAddress, data);
       },
       awaken: (data) => {
-        return decodeCheckAwakenWAC300NH(data);
+        return decodeCheckAwakenWAC300HE(data);
       },
-
-      readTemperatureProbes: (context, data) => {
-        return decodeCheckReadTemperatureProbesWAC300NH(context, data);
-      },
-
     },
   },
   // 'WAC710C': {},

@@ -5,9 +5,6 @@ import {checkIMEI, generateAddress} from "@/utils/serviceUtils";
 import {doMeterReturnVerificationStatus} from "@/views/device/operations/nb/wac330he/selfTest";
 
 export async function writeAddressWAC330HE(protocolId, type, context) {
-  type = 'meter'
-
-
   let readSelfTestStatusResult = await serialPortOperation(context, {
     actionType: 'writeAddress',
     operationName: '地址写入（读自检状态）',
@@ -114,7 +111,7 @@ export async function writeAddressWAC330HE(protocolId, type, context) {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
     isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.meterSettingDate,
-  }, type)
+  }, 'meter')
   if (meterSettingDateResult) {
     await playErrorAudio(context)
     return true
@@ -191,7 +188,7 @@ export async function writeAddressWAC330HE(protocolId, type, context) {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
     isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.meterReadAddress,
-  }, type)
+  }, 'meter')
   if (readMeterAddress) {
     await playErrorAudio(context)
     return true
@@ -211,7 +208,7 @@ export async function writeAddressWAC330HE(protocolId, type, context) {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
     isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.meterWriteAddress,
-  }, type)
+  }, 'meter')
   if (writeMeterAddressResult) {
     await playErrorAudio(context)
     return true

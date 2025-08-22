@@ -254,7 +254,6 @@ async function waitForResponse(context, timeout, expectedLength, expectedLength2
 
 export async function handleError(context, operationName, message, actionType) {
   context.leftWorkPrompt = `${operationName}-操作失败`;
-  context.buttonError('leftWorkPromptColor')
   context.buttonError(actionType)
   context.createLeftSpanMessage(`${operationName}-${message}`, 'grey');
   context.receivedData.globalReceivedOneData = '';

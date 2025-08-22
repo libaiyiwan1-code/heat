@@ -30,6 +30,7 @@ import {checkRecentlyUploadedData} from "@/components/global/hemssdb";
 import moment from "moment";
 import {doSelfTestWAC330HE} from "@/views/device/operations/nb/wac330he/selfTest";
 import {writeAddressWAC330HE} from "@/views/device/operations/nb/wac330he/writeAddress";
+import {returnSelfTestWAC330HE} from "@/views/device/operations/nb/wac330he/returnSelfTest";
 
 const Log = require('ee-core/log');
 
@@ -236,7 +237,9 @@ export const doBreakSelfTest = async (context, protocolId, type) => {
     'ET01': returnSelfTestCT1000,
     'NTP100C': returnSelfTestNTP100C,
     'WAC300N': returnSelfTestWAC300N,
-    'WAC300NH': returnSelfTestWAC300NH
+    'WAC300NH': returnSelfTestWAC300NH,
+    'WAC330HE': returnSelfTestWAC330HE,
+
   };
   const produceModel = context.configForm.produceModel;
   const returnSelfTestFunction = returnSelfTestStrategies[produceModel];
@@ -292,7 +295,6 @@ export async function doWriteAddress(context, protocolId, type) {
       await productionLibraryRegistration(context)
       context.leftWorkPrompt = `地址写入成功`;
       await playSuccessAudio(context)
-      context.buttonSuccess('leftWorkPromptColor')
       context.buttonSuccess('writeAddress')
       setTimeout(() => {
         context.buttonWaiting('writeAddress');
@@ -301,22 +303,21 @@ export async function doWriteAddress(context, protocolId, type) {
       await nbDeviceRegister(context);
       context.leftWorkPrompt = `地址写入成功`;
       await playSuccessAudio(context)
-      context.buttonSuccess('leftWorkPromptColor')
       context.buttonSuccess('writeAddress')
       setTimeout(() => {
         context.buttonWaiting('writeAddress');
       }, 2000);
     }
-
+    context.leftGoodProductQuantity+=1
   } else {
     await nbDeviceRegister(context);
     context.leftWorkPrompt = `地址写入成功`;
     await playSuccessAudio(context)
-    context.buttonSuccess('leftWorkPromptColor')
     context.buttonSuccess('writeAddress')
     setTimeout(() => {
       context.buttonWaiting('writeAddress');
     }, 2000);
+    context.leftGoodProductQuantity+=1
   }
 
 
@@ -417,10 +418,7 @@ const checkNetWork = async (context, protocolId, type) => {
   }
   // 地址验证
   if (context.leftReadAddress !== context.leftGenerateAddress) {
-    if (!context.uploadAddressList.includes(context.leftReadAddress)) {
-      context.uploadAddressList.push(context.leftReadAddress)
-      context.leftBadProductQuantity += 1;
-    }
+    context.leftBadProductQuantity += 1;
     await badRecordUpload(context, '扫码地址验证联网', '扫码地址与设备地址不匹配', 'scanCode')
     await context.uploadMes(context.leftGenerateAddress, 0, '扫码地址验证联网(扫码地址与设备地址不匹配) ')
     context.leftBadProductQuantity += 1

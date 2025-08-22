@@ -124,7 +124,6 @@ export async function generateAddress(context) {
     Log.error('当前登录用户:' + context.routerParam.userId + '每日生产的地址数量超过999', productQuantity[0].quantity)
     context.leftWorkPrompt = `地址写入失败(当前账户超量生产)`;
     context.createLeftSpanMessage('当前登录用户:' + context.routerParam.userId + '每日生产的地址数量超过999', productQuantity[0].quantity, 'red');
-    context.buttonError('leftWorkPromptColor')
     context.buttonError('selfTest')
     await playErrorAudio(context)
     context.GoodProductQuantity += 1;
@@ -140,7 +139,6 @@ export async function generateAddress(context) {
     Log.error('生成地址不合格', address)
     context.leftWorkPrompt = `地址写入失败(生成地址非法)`;
     context.createLeftSpanMessage('生成地址非法:' + address, 'red');
-    context.buttonError('leftWorkPromptColor')
     context.buttonError('writeAddress')
     context.leftBadProductQuantity += 1;
     await playErrorAudio(context)
@@ -151,7 +149,6 @@ export async function generateAddress(context) {
     Log.error('生成地址非8位', address)
     context.leftWorkPrompt = `地址写入失败(生成地址非法)`;
     context.createLeftSpanMessage('生成地址非法:' + address, 'red');
-    context.buttonError('leftWorkPromptColor')
     context.buttonError('writeAddress')
     context.leftBadProductQuantity += 1;
     await playErrorAudio(context)
@@ -162,12 +159,8 @@ export async function generateAddress(context) {
   if (response.length > 0) {
     context.leftWorkPrompt = `地址写入失败(生成地址非法,生产库已存在该地址)`;
     context.createLeftSpanMessage('生产库已存在该地址 ,请重新写地址 :' + address, 'red');
-    context.buttonError('leftWorkPromptColor')
     context.buttonError('writeAddress')
-    if (!context.uploadAddressList.includes(context.leftGenerateAddress)) {
-      context.uploadAddressList.push(context.leftGenerateAddress)
-      context.leftBadProductQuantity += 1;
-    }
+    context.leftBadProductQuantity += 1;
     await playErrorAudio(context)
     return {notPass, address}
   }
@@ -215,26 +208,18 @@ export async function nbDeviceRegister(context) {
       await context.uploadMes(context.leftReadAddress, 1, '成功')
       await context.printLabel(true)
     } else {
-      if (!context.uploadAddressList.includes(context.leftReadAddress)) {
-        context.uploadAddressList.push(context.leftReadAddress)
-        context.leftBadProductQuantity += 1;
-      }
+      context.leftBadProductQuantity += 1;
       context.createLeftSpanMessage('生产入库失败', 'red');
       context.leftWorkPrompt = '地址写入失败(生产入库失败)';
-      context.buttonError('leftWorkPromptColor')
       context.buttonError('writeAddress')
       await playErrorAudio(context)
       Log.error('生产入库失败');
       console.error('生产入库失败')
     }
   } else {
-    if (!context.uploadAddressList.includes(context.leftReadAddress)) {
-      context.uploadAddressList.push(context.leftReadAddress)
-      context.leftBadProductQuantity += 1;
-    }
+    context.leftBadProductQuantity += 1;
     context.createLeftSpanMessage('平台注册失败', 'red');
     context.leftWorkPrompt = '地址写入失败(平台注册失败)';
-    context.buttonError('leftWorkPromptColor')
     context.buttonError('writeAddress')
     await playErrorAudio(context)
     Log.error('平台注册失败');
@@ -274,13 +259,9 @@ export async function productionLibraryRegistration(context){
     await context.uploadMes(context.leftReadAddress, 1, '成功')
     await context.printLabel(true)
   } else {
-    if (!context.uploadAddressList.includes(context.leftReadAddress)) {
-      context.uploadAddressList.push(context.leftReadAddress)
-      context.leftBadProductQuantity += 1;
-    }
+    context.leftBadProductQuantity += 1;
     context.createLeftSpanMessage('生产入库失败', 'red');
-    context.leftWorkPrompt = '地址写入失败(生产入库失败)';
-    context.buttonError('leftWorkPromptColor')
+    context.leftWorkPrompt = '地址写入-失败(生产入库失败)';
     context.buttonError('writeAddress')
     await playErrorAudio(context)
     Log.error('生产入库失败');
@@ -292,7 +273,6 @@ export const checkIMEI = async (context) => {
   let imeiExist = await checkIMEIExist(context.imei);
   if (imeiExist.length > 0) {
     if (imeiExist[0].imei !== '' || imeiExist[0].imei !== undefined) {
-      context.buttonError('leftWorkPromptColor')
       await badRecordUpload(context, '平台注册', 'IMEI已存在:'+context.imei, 'writeAddress')
       await context.uploadMes(context.leftGenerateAddress,0,'平台注册(IMEI已存在)'+context.imei)
       context.leftBadProductQuantity += 1;
