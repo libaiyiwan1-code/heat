@@ -129,8 +129,14 @@ import {decodeCheckInquireSelfTestWAC330HE} from "@/packBuffer/decode/nb/wac330h
 import {
   decodeCheckWriteTemperatureProbesConfigWAC330HE
 } from "@/packBuffer/decode/nb/wac330he/writeTemperatureProbesConfig";
-import {decodeCheckMeterEnterVerificationStatusWAC330HE,decodeCheckMeterReturnVerificationStatusWAC330HE} from "@/packBuffer/decode/nb/wac330he/meterVerificationStatus";
+import {decodeCheckMeterEnterVerificationStatusWAC330HE,decodeCheckMeterReturnVerificationStatusWAC330HE,decodeCheckMeterSettingDateWAC330HE} from "@/packBuffer/decode/nb/wac330he/meterVerificationStatus";
 import {decodeReadDataWAC330HE} from "@/packBuffer/decode/nb/wac330he/readData";
+import {decodeCheckReadSelfTestStatusWAC330HE} from "@/packBuffer/decode/nb/wac330he/readSelfTestStatus";
+import {decodeCheckReadIMEIWAC330HE} from "@/packBuffer/decode/nb/wac330he/readIMEI";
+import {decodeCheckReadICCIDWAC330HE} from "@/packBuffer/decode/nb/wac330he/readICCID";
+import {decodeCheckMeterReadAddressWAC330HE} from "@/packBuffer/decode/nb/wac330he/readMeterAddress";
+import {decodeCheckMeterWriteAddressWAC330HE} from "@/packBuffer/decode/nb/wac330he/writeMeterAddress";
+import {decodeCheckWriteAddressWAC330HE} from "@/packBuffer/decode/nb/wac330he/valveWriteAddress";
 
 
 /**
@@ -943,23 +949,32 @@ export const protocolIDMap = {
       meterReturnVerificationStatus: (data) => {
         return decodeCheckMeterReturnVerificationStatusWAC330HE(data);
       },
+      meterSettingDate: (data) => {
+        return decodeCheckMeterSettingDateWAC330HE(data);
+      },
+      meterReadAddress: (context,data) => {
+        return decodeCheckMeterReadAddressWAC330HE(context,data);
+      },
+      meterWriteAddress: (context,data) => {
+        return decodeCheckMeterWriteAddressWAC330HE(context,data);
+      },
       readData: (context, data) => {
         return decodeReadDataWAC330HE(context, data);
       },
       readSelfTestStatus: (context, data) => {
-        return decodeCheckReadSelfTestStatusWAC300NH(context, data);
+        return decodeCheckReadSelfTestStatusWAC330HE(context, data);
       },
       readICCID: (context, data) => {
-        return decodeCheckReadICCIDWAC300NH(context, data);
+        return decodeCheckReadICCIDWAC330HE(context, data);
       },
       readIMEI: (context, data) => {
-        return decodeCheckReadIMEIWAC300NH(context, data);
+        return decodeCheckReadIMEIWAC330HE(context, data);
       },
       readAddress: (context, data) => {
         return decodeCheckReadAddressWAC300NH(context, data);
       },
       writeAddress: (leftGenerateAddress, data) => {
-        return decodeCheckWriteAddressWAC300NH(leftGenerateAddress, data);
+        return decodeCheckWriteAddressWAC330HE(leftGenerateAddress, data);
       },
       awaken: (data) => {
         return decodeCheckAwakenWAC300NH(data);

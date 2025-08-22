@@ -400,24 +400,27 @@ export function packMeterDataDomains(afn, fn, context) {
             bcdDay,      // 日
             bcdMonth,    // 月
             yearLastTwo,     // 年(后两位)
-            yearFirstTwo,     // 年(后两位)
+            yearFirstTwo,     // 年(前两位)
           ]);
-
           arrayBuffer = mergeArrayBuffer(createBuffer(5, [0x04, 0x0a, 0xa0, 0x15, 0x01]), dateArrayBuffer);
+          arrayBuffer = mergeArrayBuffer(startBuffer, packBroadcastSevenMacAddr(), arrayBuffer)
           break;
+        //写热表地址
         case '18':
           arrayBuffer = mergeArrayBuffer(createBuffer(5, [0x15, 0x0a, 0xa0, 0x18, 0x01]));
+          arrayBuffer = mergeArrayBuffer(
+            startBuffer,
+            Buffer.from(addressCover(context.readMeterAddress)), //旧地址
+            createBuffer(3, [0x00, 0x00, 0x00]), //旧地址厂商代码
+            arrayBuffer,
+            Buffer.from(addressCover(context.leftGenerateAddress)),
+            createBuffer(3, [0x00, 0x00, 0x00])); //新地址厂商代码
+          // ), //新地址 逆序
           break;
         default:
         // Log.error("packages: afn[{}] match fail", afn);
       }
-      return mergeArrayBuffer(
-        startBuffer,
-        hex2arrayBuffer(context.readMeterAddress), //旧地址
-        createBuffer(3, [0x00, 0x00, 0x00]), //旧地址厂商代码
-        arrayBuffer,
-        Buffer.from(addressCover(context.leftGenerateAddress.padStart(14, '0'))) //新地址 逆序
-      );
+      return arrayBuffer
     case '81':
       switch (fn) {
         //读地址

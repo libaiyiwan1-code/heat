@@ -1,0 +1,243 @@
+import {badRecordUpload, serialPortOperation} from "@/views/device/action/deviceAction";
+import {protocolIDMap} from "@/views/device/enum/enum";
+import {playErrorAudio} from "@/utils/audioUtils";
+import {checkIMEI, generateAddress} from "@/utils/serviceUtils";
+import {doMeterReturnVerificationStatus} from "@/views/device/operations/nb/wac330he/selfTest";
+
+export async function writeAddressWAC330HE(protocolId, type, context) {
+  type = 'meter'
+
+
+  let readSelfTestStatusResult = await serialPortOperation(context, {
+    actionType: 'writeAddress',
+    operationName: '地址写入（读自检状态）',
+    cmdType: 'f0',                         // afn 的命令类型
+    cmdCode: 'dd',                         // fn 的命令码
+    protocolId: protocolId,
+    maxRetries: context.maxRetries,
+    expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readSelfTestStatus'],
+    expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['readSelfTestStatus'],
+    timeout: context.timeout,
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readSelfTestStatus(context, context.receivedData.globalReceivedOneData),
+    preprocess: () => {
+    },
+    isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
+    isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readSelfTestStatus,
+  }, type)
+  if (readSelfTestStatusResult) {
+    await playErrorAudio(context)
+    return true
+  }
+
+  if (context.version.toString() !== context.configDetail.version.toString()) {
+    await badRecordUpload(context, '版本号不一致', '设备版本号:' + context.version + '配置版本号：' + context.configDetail.version, 'writeAddress')
+    await context.uploadMes(context.leftGenerateAddress, 0, '版本号不一致,设备版本号:' + context.version + '配置版本号：' + context.configDetail.version)
+    context.leftBadProductQuantity += 1
+    await playErrorAudio(context)
+    return true
+  } else {
+    context.createLeftSpanMessage('版本号一致,设备版本号:' + context.version + '配置版本号：' + context.configDetail.version, 'grey')
+  }
+
+  //退出热表检定状态。
+  let result = await doMeterReturnVerificationStatus(context, protocolId, type)
+  if (result) {
+    await playErrorAudio(context)
+    return true
+  }
+
+
+  let readDataResult = await serialPortOperation(context, {
+    actionType: 'writeAddress',
+    operationName: '读数据',
+    cmdType: '90',                         // afn 的命令类型
+    cmdCode: '20',                         // fn 的命令码
+    protocolId: protocolId,
+    maxRetries: context.maxRetries,
+    expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readData'],
+    expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['readData'],
+    timeout: context.timeout,
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readData(context.receivedData.globalReceivedOneData),
+    preprocess: () => {
+    },
+    isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
+    isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readData,
+  }, type)
+  if (readDataResult) {
+    await playErrorAudio(context)
+    return true
+  }
+  //判断热表进回温是否合格，不合格退出检定 ，合格也退出检定
+  if (!(context.readMeterOutTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
+    context.readMeterOutTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
+    await badRecordUpload(context, '回温温度误差过大', +context.readMeterOutTemperature, 'writeAddress')
+    await context.uploadMes(context.leftGenerateAddress, 0, '回温温度误差过大:' + context.readMeterOutTemperature)
+    context.leftBadProductQuantity += 1
+    await doMeterReturnVerificationStatus(context, protocolId, type)
+    await playErrorAudio(context)
+    return
+  }
+  context.createLeftSpanMessage('热表回温验证成功:' + context.readMeterOutTemperature, 'grey')
+  if (!(context.readMeterInTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
+    context.readMeterInTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
+    await badRecordUpload(context, '回温温度误差过大', +context.readMeterInTemperature, 'writeAddress')
+    await context.uploadMes(context.leftGenerateAddress, 0, '回温温度误差过大:' + context.readMeterInTemperature)
+    context.leftBadProductQuantity += 1
+    await doMeterReturnVerificationStatus(context, protocolId, type)
+    await playErrorAudio(context)
+    return
+  }
+  context.createLeftSpanMessage('热表进温验证成功:' + context.readMeterInTemperature, 'grey')
+  //判断状态字退出检定是否成功
+  if (context.whetherVerificationState) {
+    await badRecordUpload(context, '热表退出检定', '退出失败', 'writeAddress')
+    await context.uploadMes(context.leftGenerateAddress, 0, '热表退出检定:失败')
+    context.leftBadProductQuantity += 1
+    await playErrorAudio(context)
+    return
+  }
+
+
+  //热表设置时间
+  let meterSettingDateResult = await serialPortOperation(context, {
+    actionType: 'writeAddress',
+    operationName: '热表校时',
+    cmdType: 'a0',                         // afn 的命令类型
+    cmdCode: '15',                         // fn 的命令码
+    protocolId: protocolId,
+    maxRetries: context.maxRetries,
+    expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['meterSettingDate'],
+    expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['meterSettingDate'],
+    timeout: context.timeout,
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.meterSettingDate(context.receivedData.globalReceivedOneData),
+    preprocess: () => {
+    },
+    isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
+    isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.meterSettingDate,
+  }, type)
+  if (meterSettingDateResult) {
+    await playErrorAudio(context)
+    return true
+  }
+
+  let notPass = await generateAddress(context)
+  if (notPass) {
+    await playErrorAudio(context)
+    return true
+  }
+
+  if (context.configDetail.communication === '无线') {
+    let readIMEIResult = await serialPortOperation(context, {
+      actionType: 'writeAddress',
+      operationName: '地址写入（读IEMI）',
+      cmdType: '05',                         // afn 的命令类型
+      cmdCode: '0b',                         // fn 的命令码
+      protocolId: protocolId,
+      maxRetries: context.maxRetries,
+      expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readIMEI'],
+      expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['readIMEI'],
+      timeout: context.timeout,
+      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readIMEI(context, context.receivedData.globalReceivedOneData),
+      preprocess: () => {
+      },
+      isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
+      isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readIMEI,
+    }, type)
+    if (readIMEIResult) {
+      await playErrorAudio(context)
+      return true
+    }
+    //校验imei
+    if (await checkIMEI(context)) {
+      await playErrorAudio(context)
+      return true
+    }
+    //热表写地址 、阀门写地址
+    let readICCIDResult = await serialPortOperation(context, {
+      actionType: 'writeAddress',
+      operationName: '地址写入（读ICCID）',
+      cmdType: '05',                         // afn 的命令类型
+      cmdCode: '08',                         // fn 的命令码
+      protocolId: protocolId,
+      maxRetries: context.maxRetries,
+      expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readICCID'],
+      expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['readICCID'],
+      timeout: context.timeout,
+      validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readICCID(context, context.receivedData.globalReceivedOneData),
+      preprocess: () => {
+      },
+      isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
+      isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.readICCID,
+    }, type)
+    if (readICCIDResult) {
+      await playErrorAudio(context)
+      return true
+    }
+  }
+
+
+  let readMeterAddress = await serialPortOperation(context, {
+    actionType: 'writeAddress',
+    operationName: '地址写入（读热表地址）',
+    cmdType: '81',                         // afn 的命令类型
+    cmdCode: '0a',                         // fn 的命令码
+    protocolId: protocolId,
+    maxRetries: context.maxRetries,
+    expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['meterReadAddress'],
+    expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['meterReadAddress'],
+    timeout: context.timeout,
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.meterReadAddress(context, context.receivedData.globalReceivedOneData),
+    preprocess: () => {
+    },
+    isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
+    isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.meterReadAddress,
+  }, type)
+  if (readMeterAddress) {
+    await playErrorAudio(context)
+    return true
+  }
+  let writeMeterAddressResult = await serialPortOperation(context, {
+    actionType: 'writeAddress',
+    operationName: '地址写入（写热表地址）',
+    cmdType: '03',                         // afn 的命令类型
+    cmdCode: '06',                         // fn 的命令码
+    protocolId: protocolId,
+    maxRetries: context.maxRetries,
+    expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['meterWriteAddress'],
+    expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['meterWriteAddress'],
+    timeout: context.timeout,
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.meterWriteAddress(context, context.receivedData.globalReceivedOneData),
+    preprocess: () => {
+    },
+    isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
+    isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.meterWriteAddress,
+  }, type)
+  if (writeMeterAddressResult) {
+    await playErrorAudio(context)
+    return true
+  }
+
+
+  let writeAddressResult = await serialPortOperation(context, {
+    actionType: 'writeAddress',
+    operationName: '地址写入（阀门写地址）',
+    cmdType: '03',                         // afn 的命令类型
+    cmdCode: '06',                         // fn 的命令码
+    protocolId: protocolId,
+    maxRetries: context.maxRetries,
+    expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['writeAddress'],
+    expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['writeAddress'],
+    timeout: context.timeout,
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.writeAddress(context.leftGenerateAddress, context.receivedData.globalReceivedOneData),
+    preprocess: () => {
+    },
+    isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
+    isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.writeAddress,
+  }, type)
+  if (writeAddressResult) {
+    await playErrorAudio(context)
+    return true
+  }
+  return false
+
+}

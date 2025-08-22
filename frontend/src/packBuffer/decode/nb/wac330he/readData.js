@@ -3,7 +3,7 @@ import {
   decodeGetReadInTemperature,
   decodeGetReadOutTemperature
 } from "@/packBuffer/decode/nb/wac300nh/decodeValue";
-import Log from "ee-core/log";
+const Log = require('ee-core/log');
 
 export function decodeReadDataWAC330HE(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
@@ -46,6 +46,8 @@ export function decodeReadDataWAC330HE(context, responseMessage) {
     //解析温度
     context.readMeterInTemperature = Number(responseDataView.getUint16(57, true).toString(16)) * 0.01
     context.readMeterOutTemperature = Number(responseDataView.getUint16(59, true).toString(16)) * 0.01
+    //解析状态字        0x20===0x20 =鉴定状态
+    context.whetherVerificationState = (responseDataView.getUint8(127) & 0x20 === 0x20)
   }
 }
 

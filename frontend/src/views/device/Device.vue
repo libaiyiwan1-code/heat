@@ -229,6 +229,21 @@
                       placeholder="需手动录入"
                     ></a-input>
                   </a-form-item>
+                  <a-form-item label="通信方式" v-show="this.isNBDevice===true"
+                                             v-if="this.configForm.produceModel==='WAC330HE'">
+                  <a-select
+                    v-model:value="this.configForm.communication"
+                    style="width: 7vw; margin-left: 4.7vw"
+                    placeholder="需手动录入"
+                  >
+                    <a-select-option
+                      v-for="item in this.communicationList"
+                      :value="item"
+                    >
+                      {{ item }}
+                    </a-select-option>
+                  </a-select>
+                </a-form-item>
 
                 </a-col>
               </a-row>
@@ -507,6 +522,10 @@
                   <div class="hlm-card-configInfo-body-info-line" v-if="this.configForm.produceModel!=='东元热表'">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">程序版本:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.version }}</span>
+                  </div>
+                  <div class="hlm-card-configInfo-body-info-line" v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel==='WAC330HE'">
+                    <span class="label hlm-card-nb-configInfo-body-info-line-label">通信方式:</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{ this.configDetail.communication }}</span>
                   </div>
 
                 </a-col>
@@ -1156,7 +1175,10 @@
                       this.configDetail.printLabel==='WAC300N'||
                       this.configDetail.printLabel === 'WAC330HE'||
                       this.configDetail.printLabel==='WAC300NH'"
-                        v-show="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'"
+                        v-show="
+                        this.configForm.produceModel!=='东元热表'
+                        &&this.configForm.produceModel!=='NBT200'
+                        &&this.configDetail.communication==='无线'"
                         @click="awaken(
                         protocolIDMap[this.configForm.produceModel].protocolId,'one'
                         )"
@@ -1170,7 +1192,7 @@
 
               <a-button type="primary" block
                         v-if="
-                      this.configDetail.printLabel === 'WAC710CD'||
+                      (this.configDetail.printLabel === 'WAC710CD'||
                       this.configDetail.printLabel === 'WAC300CD'||
                       this.configDetail.printLabel === 'NTP100C'||
                       this.configDetail.printLabel === 'CT1000'||
@@ -1178,6 +1200,7 @@
                           this.configDetail.printLabel === 'WAC330HE'||
                         this.configDetail.printLabel==='WAC300N'||
                         this.configDetail.printLabel==='WAC300NH'
+                        )&&this.configDetail.communication==='无线'
 "
                         @click="scanCodeVerification(
                         protocolIDMap[this.configForm.produceModel].protocolId,'one'
@@ -1765,6 +1788,7 @@ export default {
   components: {CustomTitleBar},
   data() {
     return {
+      communicationList:['有线','无线'],
       printLabelWidth: 0,
       printLabelHeight: 0,
       leftScanAddressMissionStop: false,
@@ -1863,6 +1887,7 @@ export default {
         screenDisplay: '轮显',
         produceModel: undefined,
         customizePrintLabel: undefined,
+        communication: undefined,
         pressureProbes: '无探头',
         torques: '25Nm',
         currentSource: '无'
@@ -1900,6 +1925,7 @@ export default {
         whetherDoubleRowPrinting: undefined,//是否双行打印
         paperSize: undefined,//标签纸尺寸
         printerName: undefined,
+        communication:'无线',//通信方式
       },
       diffTemperature: 0.2, //温度偏差值±0.2
       leftGenerateAddress: data.leftGenerateAddress,
@@ -2087,6 +2113,7 @@ export default {
         adjustDeadZone: false,// 调节死区
         proportionalAdjustment: false, //定比例调节值
         heatingDate: false, // 供暖日期是否展示
+
       },
       operatorData: {
         '0': '移动',
@@ -2323,6 +2350,8 @@ export default {
       readMeterAddress:'',
       readMeterInTemperature:undefined, //WAC330HE热表温度读取。
       readMeterOutTemperature:undefined, //WAC330HE热表温度读取。
+      whetherVerificationState:false, //是否退出检定状态
+
     };
   },
   /*移除监听器 */
@@ -2757,6 +2786,8 @@ export default {
         this.configForm.customizePrintLabel = 'WAC300N'
       } else if (value === 'WAC300NH') {
         this.configForm.customizePrintLabel = 'WAC300NH'
+      }else if(value==='WAC330HE'){
+        this.configForm.customizePrintLabel = 'WAC330HE'
       } else {
         this.configForm.customizePrintLabel = undefined
       }
@@ -3882,6 +3913,9 @@ export default {
         this.configDetail.printLabel = this.configForm.produceModel
         this.configDetail.customizePrintLabel = this.configForm.customizePrintLabel
         this.configDetail.pressureProbes = this.configForm.pressureProbes
+        if(this.configForm.produceModel==='WAC330HE'){
+          this.configDetail.communication = this.configForm.communication
+        }
         if (this.configForm.produceModel === 'WAC710CD') {
           this.configDetail.torques = this.configForm.torques
         }

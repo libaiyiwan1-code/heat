@@ -243,6 +243,50 @@ export async function nbDeviceRegister(context) {
 
 
 }
+
+
+export async function productionLibraryRegistration(context){
+  //生产入库
+  const productionData = {
+    userid: context.routerParam.userId, // 生产账号id
+    customerid: null, // 出厂客户id
+    valveModel: context.productName, // 阀门型号
+    valveVersion: context.version, // 阀门版本号
+    protocolid: context.protocolId, // 协议ID号
+    IMEI: context.imei,
+    netprovider: context.netprovider, // 运营商（00：无 01：电信，02：移动）
+    macaddr: context.leftGenerateAddress, // 设备8位地址
+    produceDate: new Date(), // 生产日期
+    deliverDate: null, // 出库日期
+    description: null, // 描述
+    status: 0, // 状态
+    iccid: context.iccid, // ICCID
+    customer: null, // 定制厂家
+    expireDate: null, // SIM卡到期时间
+    TempProbeAddr: context.readDeviceTemperatureProbes, //温度探头
+    PressProbe: context.readDevicePressureProbes, //压力探头
+    TorqueNM: context.torque,//扭矩
+  };
+
+  let insertResult = await insertNBValueProduce(productionData);
+  if (insertResult) {
+    context.createLeftSpanMessage('生产入库成功', 'grey');
+    await context.uploadMes(context.leftReadAddress, 1, '成功')
+    await context.printLabel(true)
+  } else {
+    if (!context.uploadAddressList.includes(context.leftReadAddress)) {
+      context.uploadAddressList.push(context.leftReadAddress)
+      context.leftBadProductQuantity += 1;
+    }
+    context.createLeftSpanMessage('生产入库失败', 'red');
+    context.leftWorkPrompt = '地址写入失败(生产入库失败)';
+    context.buttonError('leftWorkPromptColor')
+    context.buttonError('writeAddress')
+    await playErrorAudio(context)
+    Log.error('生产入库失败');
+    console.error('生产入库失败')
+  }
+}
 export const checkIMEI = async (context) => {
   let notPass = true
   let imeiExist = await checkIMEIExist(context.imei);

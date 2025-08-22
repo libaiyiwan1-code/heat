@@ -14,7 +14,7 @@ import {returnSelfTestCT1000} from "@/views/device/operations/nb/ct1000/returnSe
 import {returnSelfTestWAC300CD} from "@/views/device/operations/nb/wac300cd/returnSelfTest";
 import {returnSelfTestWAC710CD} from "@/views/device/operations/nb/wac710cd/returnSelfTest";
 import {returnSelfTestWAC230CF} from "@/views/device/operations/nb/wac230cf/returnSelfTest";
-import {nbDeviceRegister} from "@/utils/serviceUtils";
+import {nbDeviceRegister, productionLibraryRegistration} from "@/utils/serviceUtils";
 import {writeAddressCT1000} from "@/views/device/operations/nb/ct1000/writeAddress";
 import {writeAddressNTP100C} from "@/views/device/operations/nb/ntp100c/writeAddress";
 import {writeAddressWAC230CF} from "@/views/device/operations/nb/wac230cf/writeAddress";
@@ -29,6 +29,7 @@ import {writeAddressWAC300NH} from "@/views/device/operations/nb/wac300nh/writeA
 import {checkRecentlyUploadedData} from "@/components/global/hemssdb";
 import moment from "moment";
 import {doSelfTestWAC330HE} from "@/views/device/operations/nb/wac330he/selfTest";
+import {writeAddressWAC330HE} from "@/views/device/operations/nb/wac330he/writeAddress";
 
 const Log = require('ee-core/log');
 
@@ -48,7 +49,7 @@ export const doSelfTest = async (context, protocolId, type) => {
     'NTP100C': doSelfTestNTP100C,
     'WAC300N': doSelfTestWAC300N,
     'WAC300NH': doSelfTestWAC300NH,
-    'WAC330HE':doSelfTestWAC330HE
+    'WAC330HE': doSelfTestWAC330HE
   };
   const produceModel = context.configForm.produceModel;
   const selfTestFunction = selfTestStrategies[produceModel];
@@ -271,7 +272,8 @@ export async function doWriteAddress(context, protocolId, type) {
     'ET01': writeAddressCT1000,
     'NTP100C': writeAddressNTP100C,
     'WAC300N': writeAddressWAC300N,
-    'WAC300NH': writeAddressWAC300NH
+    'WAC300NH': writeAddressWAC300NH,
+    'WAC330HE': writeAddressWAC330HE
   };
   const produceModel = context.configForm.produceModel;
   const writeAddressFunction = writeAddressStrategies[produceModel];
@@ -283,14 +285,39 @@ export async function doWriteAddress(context, protocolId, type) {
     }, 2000);
     return;
   }
-  await nbDeviceRegister(context);
-  context.leftWorkPrompt = `地址写入成功`;
-  await playSuccessAudio(context)
-  context.buttonSuccess('leftWorkPromptColor')
-  context.buttonSuccess('writeAddress')
-  setTimeout(() => {
-    context.buttonWaiting('writeAddress');
-  }, 2000);
+
+  if (context.configDetail.printLabel === 'WAC330HE') {
+    // 表阀一体 区分联网方式 有线不注册平台、无线注册平台
+    if (context.configDetail.communication === '有线') {
+      await productionLibraryRegistration(context)
+      context.leftWorkPrompt = `地址写入成功`;
+      await playSuccessAudio(context)
+      context.buttonSuccess('leftWorkPromptColor')
+      context.buttonSuccess('writeAddress')
+      setTimeout(() => {
+        context.buttonWaiting('writeAddress');
+      }, 2000);
+    } else {
+      await nbDeviceRegister(context);
+      context.leftWorkPrompt = `地址写入成功`;
+      await playSuccessAudio(context)
+      context.buttonSuccess('leftWorkPromptColor')
+      context.buttonSuccess('writeAddress')
+      setTimeout(() => {
+        context.buttonWaiting('writeAddress');
+      }, 2000);
+    }
+
+  } else {
+    await nbDeviceRegister(context);
+    context.leftWorkPrompt = `地址写入成功`;
+    await playSuccessAudio(context)
+    context.buttonSuccess('leftWorkPromptColor')
+    context.buttonSuccess('writeAddress')
+    setTimeout(() => {
+      context.buttonWaiting('writeAddress');
+    }, 2000);
+  }
 
 
 }
@@ -511,7 +538,7 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
   };
   if (context.configForm.produceModel === 'NTP100C' || context.configForm.produceModel === 'WAC710CD' || context.configForm.produceModel === 'WAC300CD'
     || context.configForm.produceModel === 'CT1000' || context.configForm.produceModel === 'WAC230CF' || context.configForm.produceModel === 'WAC300N'
-    || context.configForm.produceModel === 'WAC300NH' || context.configForm.produceModel === 'ET01'|| context.configForm.produceModel === 'WAC330HE'
+    || context.configForm.produceModel === 'WAC300NH' || context.configForm.produceModel === 'ET01' || context.configForm.produceModel === 'WAC330HE'
   ) {
     await ipc.send(ipcApiRoute.printDoubleRowLabel4020, params)
   } else {
