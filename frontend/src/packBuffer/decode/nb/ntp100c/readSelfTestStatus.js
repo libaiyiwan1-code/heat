@@ -178,7 +178,7 @@ export function decodeCheckReadSelfTestStatusNTP100C(context, responseMessage) {
     inPressureSensorNotPass ||
     outPressureNotPass
   ) {
-    context.createLeftSpanMessage('自检不通过', 'red');
+    context.createLeftSpanMessage('自检不通过', 'grey');
     console.error('自检不通过');
     Log.error('自检不通过');
     context.leftWorkPrompt = '自检失败(读自检状态不通过)'

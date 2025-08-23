@@ -1,7 +1,8 @@
 import {calculateCSByte, hex2arrayBuffer} from "@/packBuffer/common/comUtil";
+
 const Log = require('ee-core/log');
 
-export function decodeCheckWriteAddressWAC330HE(context, responseMessage) {
+export function decodeCheckWriteAddressWAC330HE(leftGenerateAddress, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   let responseDataView = new DataView(messageBuffer)
   // 跳过红外长度
@@ -17,12 +18,16 @@ export function decodeCheckWriteAddressWAC330HE(context, responseMessage) {
     return true
   }
   // 验证基础报文
-  let notPass = innerView.getUint8(0) !== 0x80
+  let notPass = innerView.getUint8(0) !== 0x80 || innerView.getUint8(1) !== 0x66
   if (!notPass) {
-    const splicingAddress = innerView.getUint32(1, false);
+    const splicingAddress = innerView.getUint32(2, false).toString(16);
+
     //地址对比
-    console.log('要修改的地址:' + context.leftGenerateAddress, '报文返回的地址' + splicingAddress)
-    return splicingAddress !== context.leftGenerateAddress;
+    console.log('要修改的地址:' + leftGenerateAddress, '报文返回的地址' + splicingAddress)
+    if (splicingAddress !== leftGenerateAddress) {
+      notPass = splicingAddress !== leftGenerateAddress;
+    }
   }
+
   return notPass
 }

@@ -13,7 +13,7 @@ export const doSelfTestWAC330HE = async (context, protocolId, type) => {
     expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['inquireSelfTest'],
     expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['inquireSelfTest'],
     timeout: context.timeout,
-    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.inquireSelfTest(context.receivedData.globalReceivedOneData),
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.inquireSelfTest(context,context.receivedData.globalReceivedOneData),
     preprocess: () => {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
@@ -34,7 +34,7 @@ export const doSelfTestWAC330HE = async (context, protocolId, type) => {
     expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['writeTemperatureProbesConfig'],
     expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['writeTemperatureProbesConfig'],
     timeout: context.timeout,
-    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.writeTemperatureProbesConfig(context.receivedData.globalReceivedOneData),
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.writeTemperatureProbesConfig(context,context.receivedData.globalReceivedOneData),
     preprocess: () => {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
@@ -100,7 +100,7 @@ export const doSelfTestWAC330HE = async (context, protocolId, type) => {
     expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readData'],
     expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['readData'],
     timeout: context.timeout,
-    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readData(context.receivedData.globalReceivedOneData),
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readData(context,context.receivedData.globalReceivedOneData),
     preprocess: () => {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
@@ -118,19 +118,19 @@ export const doSelfTestWAC330HE = async (context, protocolId, type) => {
     context.leftBadProductQuantity += 1
     await doMeterReturnVerificationStatus(context, protocolId, type)
     await playErrorAudio(context)
-    return
+    return true
   }
   context.createLeftSpanMessage('热表回温验证成功:' + context.readMeterOutTemperature, 'grey')
   if (!(context.readMeterInTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
     context.readMeterInTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
-    await badRecordUpload(context, '回温温度误差过大', +context.readMeterInTemperature, 'selfTest')
-    await context.uploadMes(context.leftGenerateAddress, 0, '回温温度误差过大:' + context.readMeterInTemperature)
+    await badRecordUpload(context, '进温温度误差过大', +context.readMeterInTemperature, 'selfTest')
+    await context.uploadMes(context.leftGenerateAddress, 0, '进温温度误差过大:' + context.readMeterInTemperature)
     context.leftBadProductQuantity += 1
     await doMeterReturnVerificationStatus(context, protocolId, type)
     await playErrorAudio(context)
-    return
+    return true
   }
-  context.createLeftSpanMessage('热表进温验证成功:' + context.readMeterInTemperature, 'grey')
+  context.createLeftSpanMessage('热表进回温验证成功,进温:' + context.readMeterInTemperature.toFixed(2) + '回温:' + Number(context.readMeterOutTemperature).toFixed(2), 'grey')
   await doMeterReturnVerificationStatus(context, protocolId, type)
 
   await serialPortOperation(context, {

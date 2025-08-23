@@ -279,7 +279,8 @@ export function packDataDomains(afn, fn, protocolID, context) {
           arrayBuffer = createBuffer(4, [0x03, 0xff, 0xfd, 0x00]);
           break;
         case '06':
-          arrayBuffer = createBuffer(5, [0x03, 0xff, 0x06, 0x00, parseInt(protocolID.toString(), 16)]);
+          console.log('协议id:',parseInt(protocolID.toString(), 10))
+          arrayBuffer = createBuffer(5, [0x03, 0xff, 0x06, 0x00, protocolID]);
           arrayBuffer = mergeArrayBuffer(arrayBuffer, hex2arrayBuffer(context.leftGenerateAddress))
           break;
         case 'fc':
@@ -370,27 +371,28 @@ export function packDataDomains(afn, fn, protocolID, context) {
 
 export function packMeterDataDomains(afn, fn, context) {
   let arrayBuffer = null;
-  let startBuffer = createBuffer(2, [0x68, 0x20]);
+  let startBuffer = createBuffer(2, [0x68, 0x55]);
+  let start2Buffer = createBuffer(2, [0x68, 0x20]);
   switch (afn) {
     case 'a0':
       switch (fn) {
         case '15':
           // 获取当前时间并转换为BCD码
           const now = new Date();
-          const year = now.getFullYear();
+          const year = now.getFullYear().toString();
           const month = now.getMonth() + 1; // 月份从0开始，需要+1
           const day = now.getDate();
           const hours = now.getHours();
           const minutes = now.getMinutes();
           const seconds = now.getSeconds();
           // 转换为BCD码（如2022年取后两位22）
-          const yearFirstTwo = parseInt(year.slice(0, 2), 10); // 前两位：20
-          const yearLastTwo = parseInt(year.slice(-2), 10);    // 后两位
-          const bcdMonth = parseInt(month.toString().padStart(2, '0'), 10);
-          const bcdDay = parseInt(day.toString().padStart(2, '0'), 10);
-          const bcdHours = parseInt(hours.toString().padStart(2, '0'), 10);
-          const bcdMinutes = parseInt(minutes.toString().padStart(2, '0'), 10);
-          const bcdSeconds = parseInt(seconds.toString().padStart(2, '0'), 10);
+          const yearFirstTwo = parseInt(year.slice(0, 2), 16); // 前两位：20
+          const yearLastTwo = parseInt(year.slice(-2), 16);    // 后两位
+          const bcdMonth = parseInt(month.toString().padStart(2, '0'), 16);
+          const bcdDay = parseInt(day.toString().padStart(2, '0'), 16);
+          const bcdHours = parseInt(hours.toString().padStart(2, '0'), 16);
+          const bcdMinutes = parseInt(minutes.toString().padStart(2, '0'), 16);
+          const bcdSeconds = parseInt(seconds.toString().padStart(2, '0'), 16);
 
           // =格式: 秒 分 时 日 月 年(后两位)
           const dateArrayBuffer = createBuffer(7, [
@@ -403,14 +405,14 @@ export function packMeterDataDomains(afn, fn, context) {
             yearFirstTwo,     // 年(前两位)
           ]);
           arrayBuffer = mergeArrayBuffer(createBuffer(5, [0x04, 0x0a, 0xa0, 0x15, 0x01]), dateArrayBuffer);
-          arrayBuffer = mergeArrayBuffer(startBuffer, packBroadcastSevenMacAddr(), arrayBuffer)
+          arrayBuffer = mergeArrayBuffer(start2Buffer, packBroadcastSevenMacAddr(), arrayBuffer)
           break;
         //写热表地址
         case '18':
           arrayBuffer = mergeArrayBuffer(createBuffer(5, [0x15, 0x0a, 0xa0, 0x18, 0x01]));
           arrayBuffer = mergeArrayBuffer(
-            startBuffer,
-            Buffer.from(addressCover(context.readMeterAddress)), //旧地址
+            start2Buffer,
+            hex2arrayBuffer(context.readMeterAddress), //旧地址
             createBuffer(3, [0x00, 0x00, 0x00]), //旧地址厂商代码
             arrayBuffer,
             Buffer.from(addressCover(context.leftGenerateAddress)),

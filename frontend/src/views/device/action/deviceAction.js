@@ -136,9 +136,8 @@ export const serialPortOperation = async (context, config, type) => {
       }
 
 
-      console.log('data:', data)
-      console.log('发包:', arrayBuffer2Hex(packBuffer))
-      if ((!data.toLowerCase().includes(arrayBuffer2Hex(packBuffer).toLowerCase())) && isInfraredDevice && operationName !== '自检开启') {
+      if ((!data.toLowerCase().includes(arrayBuffer2Hex(packBuffer).toLowerCase())) && isInfraredDevice
+        && operationName !== '自检开启'&& operationName !== '热表温度标定') {
         console.warn('此红外设备回包不包含自发自收，单独处理报文合并！！！')
         data = arrayBuffer2Hex(mergeArrayBuffer(packBuffer, hex2arrayBuffer(data)))
         console.warn('合并自发自收：', data)
@@ -249,6 +248,13 @@ async function waitForResponse(context, timeout, expectedLength, expectedLength2
     }
 
   }
+  const durationMs = Date.now() - startTime;
+  const durationSec = (durationMs / 1000).toFixed(2);
+
+  console.log(`执行时长: ${durationSec} 秒`);
+  Log.info(`执行时长: ${durationSec} 秒`);
+
+
   return pass;
 }
 

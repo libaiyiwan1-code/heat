@@ -23,12 +23,12 @@ export function decodeCheckMeterWriteAddressWAC330HE(context, responseMessage) {
     innerView.getUint8(12) !== 0x18;
   if (!notPass) {
     let newAddress = context.leftGenerateAddress;
-    let responseAddress = innerView.getUint32(2, false).toString(16)
-    console.warn('写热表地址：', newAddress, '报文返回热表地址：', arrayBuffer2Hex(addressCover(responseAddress)))
+    let responseAddress = innerView.getUint32(2, false).toString(16).padStart(8,'0')
+    console.warn('写热表地址：', newAddress, '报文返回热表地址(需要逆序读)：', responseAddress)
     if (newAddress !== arrayBuffer2Hex(addressCover(responseAddress))) {
-      Log.info(`设备 【WAC330HE】热表写地址 写入地址与返回地址不符，写入地址:${newAddress},返回地址:${arrayBuffer2Hex(addressCover(responseAddress))}`)
-      console.log(`设备 【WAC330HE】热表写地址 写入地址与返回地址不符，写入地址:${newAddress},返回地址:${arrayBuffer2Hex(addressCover(responseAddress))}`)
-      context.createLeftSpanMessage(`写入地址与返回地址不符，写入地址:${newAddress},返回地址:${arrayBuffer2Hex(addressCover(responseAddress))}`, 'red')
+      Log.info(`设备 【WAC330HE】热表写地址 写入地址与返回地址不符，写入地址:${newAddress},返回地址:${addressCover(responseAddress)}`)
+      console.log(`设备 【WAC330HE】热表写地址 写入地址与返回地址不符，写入地址:${newAddress},返回地址:${addressCover(responseAddress)}`)
+      context.createLeftSpanMessage(`写入地址与返回地址不符，写入地址:${newAddress},返回地址:${addressCover(responseAddress)}`, 'red')
       notPass = true
     }
   }

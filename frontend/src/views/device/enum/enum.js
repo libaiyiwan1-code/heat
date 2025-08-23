@@ -939,11 +939,11 @@ export const protocolIDMap = {
       stopBits: 1
     },
     validateResponse: {
-      inquireSelfTest: (data) => {
-        return decodeCheckInquireSelfTestWAC330HE(data);
+      inquireSelfTest: (context,data) => {
+        return decodeCheckInquireSelfTestWAC330HE(context,data);
       },
-      writeTemperatureProbesConfig: (data) => {
-        return decodeCheckWriteTemperatureProbesConfigWAC330HE(data);
+      writeTemperatureProbesConfig: (context,data) => {
+        return decodeCheckWriteTemperatureProbesConfigWAC330HE(context,data);
       },
       meterEnterVerificationStatus: (data) => {
         return decodeCheckMeterEnterVerificationStatusWAC330HE(data);
@@ -975,7 +975,7 @@ export const protocolIDMap = {
       readAddress: (context, data) => {
         return decodeCheckReadAddressWAC330HE(context, data);
       },
-      writeAddress: (leftGenerateAddress, data) => {
+      writeValveAddress: (leftGenerateAddress, data) => {
         return decodeCheckWriteAddressWAC330HE(leftGenerateAddress, data);
       },
       awaken: (data) => {

@@ -33,7 +33,7 @@
                       v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'">
                     配置项</h1>
                   <a-form-item label="压力探头" v-show="this.isNBDevice===true"
-                               v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'">
+                               v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'&&this.configForm.produceModel!=='WAC330HE'">
                     <a-select
                       v-model:value="this.configForm.pressureProbes"
                       style="width: 7vw; margin-left: 3vw"
@@ -49,7 +49,7 @@
                     </a-select>
                   </a-form-item>
                   <a-form-item label="测温类型" v-show="this.isNBDevice===true"
-                               v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'">
+                               v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'&&this.configForm.produceModel!=='WAC330HE'">
                     <a-select
                       v-model:value="this.configForm.temperatureProbes"
                       style="width: 7vw; margin-left: 3vw"
@@ -173,7 +173,7 @@
                   <!--                  ></a-input-number>-->
                   <!--                </a-form-item>-->
                   <a-form-item label="温度误差"
-                               v-show="this.isNBDevice===true && this.configForm.temperatureProbes!=='无探头'">
+                               v-show="this.isNBDevice===true && this.configForm.temperatureProbes!=='无探头'||this.configForm.produceModel==='WAC330HE'">
                     <a-input-number
                       v-model:value="this.configForm.temperatureDiff"
                       style="width: 7vw; margin-left: 4.8vw"
@@ -230,20 +230,20 @@
                     ></a-input>
                   </a-form-item>
                   <a-form-item label="通信方式" v-show="this.isNBDevice===true"
-                                             v-if="this.configForm.produceModel==='WAC330HE'">
-                  <a-select
-                    v-model:value="this.configForm.communication"
-                    style="width: 7vw; margin-left: 4.7vw"
-                    placeholder="需手动录入"
-                  >
-                    <a-select-option
-                      v-for="item in this.communicationList"
-                      :value="item"
+                               v-if="this.configForm.produceModel==='WAC330HE'">
+                    <a-select
+                      v-model:value="this.configForm.communication"
+                      style="width: 7vw; margin-left: 4.7vw"
+                      placeholder="需手动录入"
                     >
-                      {{ item }}
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
+                      <a-select-option
+                        v-for="item in this.communicationList"
+                        :value="item"
+                      >
+                        {{ item }}
+                      </a-select-option>
+                    </a-select>
+                  </a-form-item>
 
                 </a-col>
               </a-row>
@@ -478,18 +478,22 @@
                   <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configDetail.pressureProbes==='压差'&&this.configDetail.currentSource==='有'">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">源设误差:</span>
-                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.cs_device_err+' mA' }}</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{
+                        configDetail.cs_device_err + ' mA'
+                      }}</span>
                   </div>
                   <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configDetail.pressureProbes==='压差'&&this.configDetail.currentSource==='有'">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">信源误差:</span>
-                    <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.sig_cs_err+' mA' }}</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{
+                        configDetail.sig_cs_err + ' mA'
+                      }}</span>
                   </div>
                   <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configDetail.pressureProbes==='压差'&&this.configDetail.currentSource==='无'">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">信设误差:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{
-                        configDetail.sig_device_err+' mA'
+                        configDetail.sig_device_err + ' mA'
                       }}</span>
                   </div>
                   <div class="hlm-card-configInfo-body-info-line" v-show="configDetail.printLabel==='WAC710CD'">
@@ -523,9 +527,12 @@
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">程序版本:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.version }}</span>
                   </div>
-                  <div class="hlm-card-configInfo-body-info-line" v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel==='WAC330HE'">
+                  <div class="hlm-card-configInfo-body-info-line"
+                       v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel==='WAC330HE'">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">通信方式:</span>
-                    <span class="value hlm-card-configInfo-body-info-line-value">{{ this.configDetail.communication }}</span>
+                    <span class="value hlm-card-configInfo-body-info-line-value">{{
+                        this.configDetail.communication
+                      }}</span>
                   </div>
 
                 </a-col>
@@ -1788,7 +1795,7 @@ export default {
   components: {CustomTitleBar},
   data() {
     return {
-      communicationList:['有线','无线'],
+      communicationList: ['有线', '无线'],
       printLabelWidth: 0,
       printLabelHeight: 0,
       leftScanAddressMissionStop: false,
@@ -1925,7 +1932,7 @@ export default {
         whetherDoubleRowPrinting: undefined,//是否双行打印
         paperSize: undefined,//标签纸尺寸
         printerName: undefined,
-        communication:'无线',//通信方式
+        communication: '无线',//通信方式
       },
       diffTemperature: 0.2, //温度偏差值±0.2
       leftGenerateAddress: data.leftGenerateAddress,
@@ -1953,7 +1960,7 @@ export default {
       protocolId: undefined,
       version: undefined,
       netprovider: 2,
-      imei: undefined,
+      imei: '',
       torqueStr: undefined,
       torque: undefined,
       iccid: undefined,
@@ -2347,10 +2354,10 @@ export default {
       goodRecordList: [],
       uploadMesList: [],
       badRecordCounter: 0, // 记录全局不良序号
-      readMeterAddress:'',
-      readMeterInTemperature:undefined, //WAC330HE热表温度读取。
-      readMeterOutTemperature:undefined, //WAC330HE热表温度读取。
-      whetherVerificationState:false, //是否退出检定状态
+      readMeterAddress: '',
+      readMeterInTemperature: undefined, //WAC330HE热表温度读取。
+      readMeterOutTemperature: undefined, //WAC330HE热表温度读取。
+      whetherVerificationState: false, //是否退出检定状态
 
     };
   },
@@ -2396,8 +2403,8 @@ export default {
       let filteredGoodProduceList = await findGoodRecordList(this.routerParam.token, this.routerParam.workNumber, this.routerParam.machineNumber)
       this.badRecordList = filteredList.data.data
       this.goodRecordList = filteredGoodProduceList.data.data
-      if (this.badRecordList!==undefined&&this.badRecordList!==null&&this.badRecordList.length>0) {
-        this.leftBadProductQuantity=this.badRecordList.length
+      if (this.badRecordList !== undefined && this.badRecordList !== null && this.badRecordList.length > 0) {
+        this.leftBadProductQuantity = this.badRecordList.length
         this.badRecordList.forEach(item => {
           if (item.address === null) {
             item.address = ''
@@ -2407,8 +2414,8 @@ export default {
           this.createFailSpanMessage(msg, 'red');
         });
       }
-      if (this.goodRecordList!==undefined&&this.goodRecordList!==null&&this.goodRecordList.length>0) {
-        this.leftGoodProductQuantity=this.goodRecordList.length
+      if (this.goodRecordList !== undefined && this.goodRecordList !== null && this.goodRecordList.length > 0) {
+        this.leftGoodProductQuantity = this.goodRecordList.length
       }
 
     }
@@ -2450,10 +2457,10 @@ export default {
       let printList = await getPrintListByProductName(this.configForm.produceModel)
 
       if (printList.length !== undefined && printList.length !== 0) {
-           this.customizePrintLabelList=printList.map((item) => item.printtag)
+        this.customizePrintLabelList = printList.map((item) => item.printtag)
       }
       //打印列表包含产品型号则产品型号默认取那个
-      if (this.customizePrintLabelList!==undefined&&this.customizePrintLabelList!==null&&this.customizePrintLabelList.length>0) {
+      if (this.customizePrintLabelList !== undefined && this.customizePrintLabelList !== null && this.customizePrintLabelList.length > 0) {
         let matched = this.customizePrintLabelList.find(item => item === this.configForm.produceModel);
         if (matched) {
           this.configForm.customizePrintLabel = matched;
@@ -2780,13 +2787,13 @@ export default {
         this.configForm.customizePrintLabel = 'NTP100C'
       } else if (value === 'CT1000') {
         this.configForm.customizePrintLabel = 'CT1000'
-      } else if (value==='ET01'){
+      } else if (value === 'ET01') {
         this.configForm.customizePrintLabel = 'ET01'
-      }else if (value === 'WAC300N') {
+      } else if (value === 'WAC300N') {
         this.configForm.customizePrintLabel = 'WAC300N'
       } else if (value === 'WAC300NH') {
         this.configForm.customizePrintLabel = 'WAC300NH'
-      }else if(value==='WAC330HE'){
+      } else if (value === 'WAC330HE') {
         this.configForm.customizePrintLabel = 'WAC330HE'
       } else {
         this.configForm.customizePrintLabel = undefined
@@ -3909,11 +3916,16 @@ export default {
         this.configDetail.version = this.configForm.version
         this.configDetail.temperature = this.configForm.temperature
         this.configDetail.processFocus = this.configForm.processFocus
+        this.configDetail.pressureProbes = this.configForm.pressureProbes
+        if (this.configForm.produceModel === 'WAC330HE') {
+          this.configDetail.temperatureProbe = '无探头'
+          this.configDetail.pressureProbes = '无探头'
+        }
         this.configDetail.screenDisplay = this.configForm.screenDisplay
         this.configDetail.printLabel = this.configForm.produceModel
         this.configDetail.customizePrintLabel = this.configForm.customizePrintLabel
-        this.configDetail.pressureProbes = this.configForm.pressureProbes
-        if(this.configForm.produceModel==='WAC330HE'){
+
+        if (this.configForm.produceModel === 'WAC330HE') {
           this.configDetail.communication = this.configForm.communication
         }
         if (this.configForm.produceModel === 'WAC710CD') {
@@ -4086,7 +4098,7 @@ export default {
       let dataBits = protocolIDMap[this.configForm.produceModel].portAttribute.dataBits
       let baudRate = protocolIDMap[this.configForm.produceModel].portAttribute.baudRate
       let stopBits = protocolIDMap[this.configForm.produceModel].portAttribute.stopBits
-      this.createLeftSpanMessage('当前打开串口 波特率：' + baudRate+'校验位:'+parity,'grey')
+      this.createLeftSpanMessage('当前打开串口 波特率：' + baudRate + '校验位:' + parity, 'grey')
       console.log('串口属性：', portName, parity, dataBits, baudRate, stopBits)
       if (!this.isNBDevice) {
         if (type === 'one') {

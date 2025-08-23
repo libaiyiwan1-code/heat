@@ -1,5 +1,5 @@
 import {calculateCSByte, hex2arrayBuffer} from "@/packBuffer/common/comUtil";
-import Log from "ee-core/log";
+const Log = require('ee-core/log');
 
 export function decodeCheckAwakenWAC300HE(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)

@@ -22,7 +22,7 @@ export function decodeCheckMeterReadAddressWAC330HE(context, responseMessage) {
     innerView.getUint8(11) !== 0x81 ||
     innerView.getUint8(12) !== 0x0A;
   if (!notPass) {
-    context.readMeterAddress = innerView.getUint32(2, false).toString(16)
+    context.readMeterAddress = innerView.getUint32(2, false).toString(16).padStart(8,'0')
     console.warn('读热表8位地址：', context.readMeterAddress)
   }
   return notPass

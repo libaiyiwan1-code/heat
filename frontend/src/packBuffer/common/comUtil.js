@@ -39,7 +39,7 @@ export const mergeArrayBuffer = (...arrays) => {
 
 /**
  * ArrayBuffer 转换为十六进制字符串
- * @param {Array} buffer - 要转换的 ArrayBuffer
+ * @param {ArrayBuffer} buffer - 要转换的 ArrayBuffer
  * @returns {string} - 转换后的十六进制字符串
  */
 export const arrayBuffer2Hex = (buffer) => {

@@ -1,31 +1,31 @@
-import {calculateCSByte, hex2arrayBuffer, mergeArrayBuffer} from "@/packBuffer/common/comUtil";
+import {arrayBuffer2Hex, calculateCSByte, hex2arrayBuffer, mergeArrayBuffer} from "@/packBuffer/common/comUtil";
 
 const Log = require('ee-core/log');
 
-export function decodeCheckInquireSelfTestWAC330HE(responseMessage) {
+export function decodeCheckInquireSelfTestWAC330HE(context,responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   // 跳过红外回包长度
   let skipLength = 33
   let headerLength = 4
-  let innerStartIndex = 19
-  let innerBodyLength = 14 // 内层包长度 (不含CS和16)
+  let innerStartIndex = 19  //内层包68起始
+  let innerBodyLength = 14 // 内层CS校验和长度 (不包含FE FE FE,不含CS和16)
+  let outerBodyLength = 12 // 外层CS校验和长度 (不含CS和16)
   let slicedBuffer = messageBuffer.slice(skipLength)
   let responseDataView = new DataView(slicedBuffer);
   let responseOuterCSValue = responseDataView.getUint8(responseDataView.byteLength - 2)
   let responseInnerCSValue = responseDataView.getUint8(responseDataView.byteLength - 4)
   let innerEnd = innerStartIndex + innerBodyLength
   let innerBuffer = slicedBuffer.slice(innerStartIndex, innerEnd) //截取内层包
-  let outerBuffer = slicedBuffer.slice(headerLength, innerStartIndex) //截取外层包
-  let innerCSFromMsg = responseDataView.getUint8(innerEnd) // F6
-  let mergeBuffer = mergeArrayBuffer(outerBuffer, innerBuffer, [innerCSFromMsg, 0x16])
-  console.log(mergeBuffer)
+  let outerBuffer = slicedBuffer.slice(headerLength, headerLength + outerBodyLength) //截取外层包
   let innerCSCalc = calculateCSByte(innerBuffer)
+  let mergeBuffer = mergeArrayBuffer(outerBuffer, [0xFE, 0XFE, 0XFE], innerBuffer, [innerCSCalc, 0x16])
   let outerCSCalc = calculateCSByte(mergeBuffer)
   console.log("设备 【WAC330HE】 自检询问 内层CS 来自报文:", responseInnerCSValue, '计算的内层包：', innerCSCalc)
-  Log.info("设备 【WAC330HE】 自检询问 内层CS 来自报文:", responseOuterCSValue, '计算的内层包：', outerCSCalc)
+  console.log("设备 【WAC330HE】 自检询问 外层CS 来自报文:", responseOuterCSValue, '计算的外层包：', outerCSCalc)
   if ((responseInnerCSValue !== innerCSCalc) || (responseOuterCSValue !== outerCSCalc)) {
     console.log("内外层CS校验失败")
     Log.info('设备 【WAC330HE】自检询问 报文校验失败(CS验证错误)')
+    context.createLeftSpanMessage('自检询问-CS校验失败', 'red');
     return true
   }
   // 验证基础报文

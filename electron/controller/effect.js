@@ -149,6 +149,7 @@ class EffectController extends Controller {
         win.center();
         win.show();
         win.focus();
+        win.openDevTools();
         win.webContents.on('ipc-message', (event, channel, ...args) => {
             const currentWindow = win;
             //channel 接收主进程的操作通知。

@@ -54,7 +54,7 @@ export async function writeAddressWAC330HE(protocolId, type, context) {
     expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readData'],
     expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['readData'],
     timeout: context.timeout,
-    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readData(context.receivedData.globalReceivedOneData),
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readData(context,context.receivedData.globalReceivedOneData),
     preprocess: () => {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
@@ -72,26 +72,27 @@ export async function writeAddressWAC330HE(protocolId, type, context) {
     context.leftBadProductQuantity += 1
     await doMeterReturnVerificationStatus(context, protocolId, type)
     await playErrorAudio(context)
-    return
+    return true
   }
   context.createLeftSpanMessage('热表回温验证成功:' + context.readMeterOutTemperature, 'grey')
   if (!(context.readMeterInTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
     context.readMeterInTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
-    await badRecordUpload(context, '回温温度误差过大', +context.readMeterInTemperature, 'writeAddress')
-    await context.uploadMes(context.leftGenerateAddress, 0, '回温温度误差过大:' + context.readMeterInTemperature)
+    await badRecordUpload(context, '进温温度误差过大', +context.readMeterInTemperature, 'writeAddress')
+    await context.uploadMes(context.leftGenerateAddress, 0, '进温温度误差过大:' + context.readMeterInTemperature)
     context.leftBadProductQuantity += 1
     await doMeterReturnVerificationStatus(context, protocolId, type)
     await playErrorAudio(context)
-    return
+    return true
   }
-  context.createLeftSpanMessage('热表进温验证成功:' + context.readMeterInTemperature, 'grey')
+  context.createLeftSpanMessage('热表进回温验证成功,进温:' + context.readMeterInTemperature.toFixed(2) + '回温:' + Number(context.readMeterOutTemperature).toFixed(2), 'grey')
+
   //判断状态字退出检定是否成功
   if (context.whetherVerificationState) {
     await badRecordUpload(context, '热表退出检定', '退出失败', 'writeAddress')
     await context.uploadMes(context.leftGenerateAddress, 0, '热表退出检定:失败')
     context.leftBadProductQuantity += 1
     await playErrorAudio(context)
-    return
+    return true
   }
 
 
@@ -196,8 +197,8 @@ export async function writeAddressWAC330HE(protocolId, type, context) {
   let writeMeterAddressResult = await serialPortOperation(context, {
     actionType: 'writeAddress',
     operationName: '地址写入（写热表地址）',
-    cmdType: '03',                         // afn 的命令类型
-    cmdCode: '06',                         // fn 的命令码
+    cmdType: 'a0',                         // afn 的命令类型
+    cmdCode: '18',                         // fn 的命令码
     protocolId: protocolId,
     maxRetries: context.maxRetries,
     expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['meterWriteAddress'],
@@ -214,7 +215,7 @@ export async function writeAddressWAC330HE(protocolId, type, context) {
     return true
   }
 
-
+  console.log('写阀门地址协议id',protocolId.toString())
   let writeAddressResult = await serialPortOperation(context, {
     actionType: 'writeAddress',
     operationName: '地址写入（阀门写地址）',
@@ -222,14 +223,14 @@ export async function writeAddressWAC330HE(protocolId, type, context) {
     cmdCode: '06',                         // fn 的命令码
     protocolId: protocolId,
     maxRetries: context.maxRetries,
-    expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['writeAddress'],
-    expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['writeAddress'],
+    expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['writeValveAddress'],
+    expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['writeValveAddress'],
     timeout: context.timeout,
-    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.writeAddress(context.leftGenerateAddress, context.receivedData.globalReceivedOneData),
+    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.writeValveAddress(context.leftGenerateAddress, context.receivedData.globalReceivedOneData),
     preprocess: () => {
     },
     isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
-    isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.writeAddress,
+    isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.writeValveAddress,
   }, type)
   if (writeAddressResult) {
     await playErrorAudio(context)
