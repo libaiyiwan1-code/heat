@@ -49,7 +49,7 @@ export function decodeReadDataWAC330HE(context, responseMessage) {
     context.readMeterInTemperature = Number(responseDataView.getUint16(57, true)) * 0.01
     context.readMeterOutTemperature = Number(responseDataView.getUint16(59, true)) * 0.01
     //解析状态字        0x20===0x20 =检定状态
-    context.whetherVerificationState = (responseDataView.getUint8(127) & 0x20 === 0x20)
+    context.whetherVerificationState = (responseDataView.getUint8(127) & 0x20 )=== 0x20
     console.log('热表进温：', context.readMeterInTemperature, '热表回温：', context.readMeterOutTemperature, '检定状态：', context.whetherVerificationState)
   }
 }

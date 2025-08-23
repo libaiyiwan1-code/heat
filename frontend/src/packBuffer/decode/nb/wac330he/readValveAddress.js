@@ -17,11 +17,11 @@ export function decodeCheckReadAddressWAC330HE(context, responseMessage) {
     return true
   }
   // 验证基础报文
-  let notPass = innerView.getUint8(0) !== 0x80 ||
-    innerView.getUint8(10) !== 0x05 ||
-    innerView.getUint8(11) !== 0x06;
+  let notPass =  innerView.getUint8(6) !== 0x05 ||
+    innerView.getUint8(8) !== 0x06;
   if (!notPass) {
-    context.leftReadAddress = innerBuffer.getUint32(2, false).toString(16)
+    context.leftReadAddress = innerView.getUint32(2, false).toString(16)
+    console.log('读阀门地址解析：', context.leftReadAddress)
   }
   return notPass
 }

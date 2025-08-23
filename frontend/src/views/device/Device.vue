@@ -447,15 +447,16 @@
             <div v-if="this.isNBDevice===true">
               <a-row style="width: calc(680/1920*100vw);height: calc(206/1080*100vh) ">
                 <a-col class="hlm-card-nb-configInfo-body-left-column"
-                       v-if="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'">
-                  <div class="hlm-card-configInfo-body-info-line">
+                       v-if="this.configForm.produceModel!=='东元热表'
+                       &&this.configForm.produceModel!=='NBT200'">
+                  <div class="hlm-card-configInfo-body-info-line" v-if="this.configForm.produceModel!=='WAC330HE'">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">测温类型:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{
                         configDetail.temperatureProbe
                       }}</span>
                   </div>
 
-                  <div class="hlm-card-configInfo-body-info-line">
+                  <div class="hlm-card-configInfo-body-info-line" v-if="this.configForm.produceModel!=='WAC330HE'">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">压力探头:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{
                         configDetail.pressureProbes

@@ -20,10 +20,12 @@ export function decodeCheckReadIMEIWAC330HE(context, responseMessage) {
     return true
   }
   // 验证基础报文
-  let notPass = innerView.getUint8(10) !== 0x05 ||
-    innerView.getUint8(12) !== 0x0B;
+  let notPass = innerView.getUint8(6) !== 0x05 ||
+    innerView.getUint8(8) !== 0x0B;
   if (!notPass) {
-    let imei = decodeGetIMEI(responseMessage, false)
+    console.log(responseMessage)
+    let imei = decodeGetIMEI(responseMessage, true)
+    console.log('imei:', imei)
     if (checkIMEI(imei)) {
       context.createLeftSpanMessage('IMEI不合法', 'red')
       notPass = true

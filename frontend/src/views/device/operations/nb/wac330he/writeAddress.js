@@ -53,7 +53,7 @@ export async function writeAddressWAC330HE(protocolId, type, context) {
     maxRetries: context.maxRetries,
     expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readData'],
     expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['readData'],
-    timeout: context.timeout,
+    timeout: 3500,
     validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.readData(context,context.receivedData.globalReceivedOneData),
     preprocess: () => {
     },
@@ -174,26 +174,26 @@ export async function writeAddressWAC330HE(protocolId, type, context) {
   }
 
 
-  let readMeterAddress = await serialPortOperation(context, {
-    actionType: 'writeAddress',
-    operationName: '地址写入（读热表地址）',
-    cmdType: '81',                         // afn 的命令类型
-    cmdCode: '0a',                         // fn 的命令码
-    protocolId: protocolId,
-    maxRetries: context.maxRetries,
-    expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['meterReadAddress'],
-    expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['meterReadAddress'],
-    timeout: context.timeout,
-    validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.meterReadAddress(context, context.receivedData.globalReceivedOneData),
-    preprocess: () => {
-    },
-    isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
-    isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.meterReadAddress,
-  }, 'meter')
-  if (readMeterAddress) {
-    await playErrorAudio(context)
-    return true
-  }
+  // let readMeterAddress = await serialPortOperation(context, {
+  //   actionType: 'writeAddress',
+  //   operationName: '地址写入（读热表地址）',
+  //   cmdType: '81',                         // afn 的命令类型
+  //   cmdCode: '0a',                         // fn 的命令码
+  //   protocolId: protocolId,
+  //   maxRetries: context.maxRetries,
+  //   expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['meterReadAddress'],
+  //   expectedLength2: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength2['meterReadAddress'],
+  //   timeout: context.timeout,
+  //   validateResponse: () => protocolIDMap[context.configForm.produceModel].validateResponse.meterReadAddress(context, context.receivedData.globalReceivedOneData),
+  //   preprocess: () => {
+  //   },
+  //   isInfraredDevice: protocolIDMap[context.configForm.produceModel].isInfraredDevice,
+  //   isTransparentTransmissionProtocol: protocolIDMap[context.configForm.produceModel].isDeviceActionTransparentTransmissionProtocol.meterReadAddress,
+  // }, 'meter')
+  // if (readMeterAddress) {
+  //   await playErrorAudio(context)
+  //   return true
+  // }
   let writeMeterAddressResult = await serialPortOperation(context, {
     actionType: 'writeAddress',
     operationName: '地址写入（写热表地址）',
@@ -215,7 +215,6 @@ export async function writeAddressWAC330HE(protocolId, type, context) {
     return true
   }
 
-  console.log('写阀门地址协议id',protocolId.toString())
   let writeAddressResult = await serialPortOperation(context, {
     actionType: 'writeAddress',
     operationName: '地址写入（阀门写地址）',

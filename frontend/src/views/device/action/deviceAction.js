@@ -102,6 +102,8 @@ export const serialPortOperation = async (context, config, type) => {
             context.createLeftSpanMessage(`${operationName}失败-进行重试 次数:${retries}`, 'grey');
           }
           console.warn('等待响应超时，进行重试:', retries);
+          //等待 1.5秒。
+          await new Promise(resolve => setTimeout(resolve, 1500));
           continue;
         }
 
@@ -131,7 +133,7 @@ export const serialPortOperation = async (context, config, type) => {
         } else if (type === 'four') {
           context.createLeftSpanMessage(`${operationName}-红外检测失败,进行重试,次数:${retries}`, 'grey');
         }
-        await new Promise(resolve => setTimeout(resolve, 900));
+        await new Promise(resolve => setTimeout(resolve, 1500));
         continue;
       }
 
@@ -158,6 +160,8 @@ export const serialPortOperation = async (context, config, type) => {
         if (context.isNBDevice) {
           retries++;
           context.createLeftSpanMessage(`${operationName}报文验证失败-进行重试,次数:${retries}`, 'grey');
+          //等待 1.5秒。
+          await new Promise(resolve => setTimeout(resolve, 1500));
           continue;
         } else {
           notPass = true;

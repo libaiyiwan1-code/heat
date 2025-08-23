@@ -412,8 +412,7 @@ export function packMeterDataDomains(afn, fn, context) {
           arrayBuffer = mergeArrayBuffer(createBuffer(5, [0x15, 0x0a, 0xa0, 0x18, 0x01]));
           arrayBuffer = mergeArrayBuffer(
             start2Buffer,
-            hex2arrayBuffer(context.readMeterAddress), //旧地址
-            createBuffer(3, [0x00, 0x00, 0x00]), //旧地址厂商代码
+            packBroadcastSevenMacAddr(),
             arrayBuffer,
             Buffer.from(addressCover(context.leftGenerateAddress)),
             createBuffer(3, [0x00, 0x00, 0x00])); //新地址厂商代码

@@ -903,7 +903,7 @@ export const protocolIDMap = {
       'writeValveAddress': 16,
       'readSelfTestStatus': 76,
       'readICCID': 36,
-      'readIMEI': 16,
+      'readIMEI': 31,
       'returnSelfTestStatus': 33,
       'awaken': 16,
       'meterSettingDate': 19,

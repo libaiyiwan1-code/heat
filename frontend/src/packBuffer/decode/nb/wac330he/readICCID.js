@@ -1,4 +1,4 @@
-import {calculateCSByte, checkIMEI, hex2arrayBuffer} from "@/packBuffer/common/comUtil";
+import {calculateCSByte, checkICCID, checkIMEI, hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 import {decodeGetICCID} from "@/packBuffer/decode/decode";
 
 const Log = require('ee-core/log');
@@ -20,16 +20,16 @@ export function decodeCheckReadICCIDWAC330HE(context, responseMessage) {
     return true
   }
   // 验证基础报文
-  let notPass = innerView.getUint8(10) !== 0x05 ||
-    innerView.getUint8(12) !== 0x08;
+  let notPass = innerView.getUint8(6) !== 0x05 ||
+    innerView.getUint8(8) !== 0x08;
   if (!notPass) {
-    let imei = decodeGetICCID(responseMessage, false)
-    if (checkIMEI(imei)) {
-      context.createLeftSpanMessage('IMEI不合法', 'red')
+    let iccid = decodeGetICCID(responseMessage, true)
+    if (checkICCID(iccid)) {
+      context.createLeftSpanMessage('ICCID不合法', 'red')
       notPass = true
     }
 
-    context.imei = imei
+    context.iccid = iccid
   }
   return notPass
 }
