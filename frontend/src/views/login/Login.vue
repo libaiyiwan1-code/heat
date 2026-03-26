@@ -287,14 +287,17 @@ export default {
           message.error('账户或密码错误!');
           return;
         }
-
+        let routePath
         // ===== 5. 版本校验 =====
         // productModel = 'WAC300NY' //TODO 测试用 待删除
         if (this.routerParam.produceMachine===0){
-          const routePath = await this.handleVersionCheck(productModel);
+           routePath = await this.handleVersionCheck(productModel);
           if (routePath !== null) {
             message.success('登录成功');
           }
+        }else{
+          routePath = '#/device';
+           message.success('登录成功');
         }
         // ===== 6. 路由跳转 =====
         await this.openNewWindow(routePath, username, productModel);
