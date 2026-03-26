@@ -1,0 +1,6 @@
+export {inquireSelfTest} from './inquireSelfTest'
+export {writeTemperatureProbe} from './writeConfig'
+export {writePressureProbe} from './writeConfig'
+export {readSelfTestStatus} from './readSelfTestStatus'
+export {writeAddress} from './writeAddress'
+export {readData} from './readData'

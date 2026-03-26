@@ -4,6 +4,7 @@ const { Service } = require('ee-core');
 const Storage = require('ee-core/storage');
 const _ = require('lodash');
 const path = require('path');
+const Log = require("ee-core/log");
 
 /**
  * json数据存储
@@ -15,13 +16,37 @@ class JsondbService extends Service {
     super(ctx);
 
     // jsondb数据库
-    this.jsonFile = 'demo';
+    this.jsonFile = 'param';
     this.demoDB = Storage.connection(this.jsonFile);  
     this.demoDBKey = {
-      test_data: 'test_data'
+      param: ''
     };
   }
 
+  async savParam(data) {
+    // 只提取需要保存的字段
+    const saveData = {
+      imei: data.imei,
+      iccid: data.iccid,
+      version: data.version,
+      date: data.date,
+      deviceId: data.deviceId,
+    };
+
+    try {
+      // 入库到 arc_produce_param 表
+      const result = this.demoDB.db
+          .get('arc_produce_param')
+          .push(saveData)
+          .write();
+
+      Log.info(`新增生产参数记录到 arc_produce_param:`, result);
+      return result;
+    } catch (error) {
+      Log.error(`保存生产参数到 arc_produce_param 失败:`, error);
+      throw error;
+    }
+  }
   /*
    * 增 Test data
    */

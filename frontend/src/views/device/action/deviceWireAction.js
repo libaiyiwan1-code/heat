@@ -1,5 +1,7 @@
 import {
   creditCard,
+  deviceReadsCurrent,
+  deviceReadsVoltage,
   faceplateCommunication,
   factoryConditionFullyClose,
   factoryConditionFullyOpen,
@@ -7,18 +9,45 @@ import {
   fullOpenCalibrationOperations,
   inTemperatureCalibration,
   mainAndAuxiliaryValvesVerify,
+  output20MAActualCurrentValueCalibration,
+  output4MAActualCurrentValueCalibration,
   outTemperatureCalibration,
+  readCurrentAmmeterInputLoop,
+  readCurrentAmmeterOutputLoop,
   readInAndOutTemperature,
   readValveState,
   readVersion,
+  readVoltageAmmeterInputLoop,
+  readVoltageAmmeterOutputLoop,
   separationAlarm,
+  sourceOutputs10V,
+  sourceOutputs12mA,
+  sourceOutputs1V,
+  sourceOutputs20mA,
+  sourceOutputs4mA,
+  sourceOutputs5V,
   writeAddressOperations,
-  writeAllConfig, writeCleaningValveCycle,
-  writeForcedTemperatureSetting, writeHeatingDate,
-  writePowerOffAndWirelessError, writeProbesConfig
+  writeAllConfig,
+  writeCleaningValveCycle,
+  writeFixedOutput10V,
+  writeFixedOutput1V,
+  writeFixedOutput20MA,
+  writeFixedOutput4MA,
+  writeForcedTemperatureSetting,
+  writeHeatingDate,
+  writeInput10vActuals,
+  writeInput1vActuals,
+  writeOutput10vActuals,
+  writeOutput1vActuals,
+  writePowerOffAndWirelessError,
+  writeProbesConfig,
+  writesActualInputCurrentValue20MA,
+  writesActualInputCurrentValue4MA,
+  writeWorkChannel010V,
+  writeWorkChannel110V,
+  writeWorkChannel420mA
 } from "@/views/device/operations/wireDeviceOperations";
 import {addressCover, arrayBuffer2Hex} from "@/packBuffer/common/comUtil";
-import button from "@/views/device/button";
 
 const Log = require('ee-core/log');
 
@@ -27,23 +56,24 @@ const Log = require('ee-core/log');
  *
  *
  * */
-export const writeCompleteConfiguration = async (protocolId, type, context, buttonColor) => {
+export const writeCompleteConfiguration = async (protocolId, type, context, buttonColor, isInfraredDevice) => {
   console.warn('当前生产软件生产型号：' + context.wireValveCardForm.model)
   if (context.wireValveCardForm.model.includes('VAC20') ||
     context.wireValveCardForm.model.includes('VAC30') ||
     context.wireValveCardForm.model.includes('VAC40')
+    // ||
+    // context.wireValveCardForm.model.includes('VAC13')
   ) {
     console.warn('写配置：', context.wireValveCardForm.model)
     Log.warn('写配置：', context.wireValveCardForm.model)
-    if (await writeConfigAC02(protocolId, type, context, buttonColor)) {
+    if (await writeConfigAC02(protocolId, type, context, buttonColor, isInfraredDevice)) {
       return true;
     }
-    console.warn('writeConfigAC02')
-    if (await writeConfigA026(protocolId, type, context, buttonColor)) {
+
+    if (await writeConfigA026(protocolId, type, context, buttonColor, isInfraredDevice)) {
       return true;
     }
-    console.warn('writeConfigA026')
-    return await writeConfigA022(protocolId, type, context, buttonColor);
+    return await writeConfigA022(protocolId, type, context, buttonColor, isInfraredDevice);
   } else if (context.wireValveCardForm.model.includes('VAC10')) {
     console.warn('写配置：', context.wireValveCardForm.model)
     Log.warn('写配置：', context.wireValveCardForm.model)
@@ -152,13 +182,13 @@ export const writeCleaningValveCycleA02C = async (protocolId, type, context, but
  * 配置写入 写电源断电、无线异常
  *
  * */
-export const writeConfigA026 = async (protocolId, type, context, buttonColor) => {
+export const writeConfigA026 = async (protocolId, type, context, buttonColor, isInfraredDevice) => {
   //判断是否需要写电源断电 无线异常
   let powerState = context.wireValveCardFormShow.powerState
   let wirelessAnomaly = context.wireValveCardFormShow.wirelessAnomaly
 
   if (powerState || wirelessAnomaly) {
-    let result = await writePowerOffAndWirelessError(protocolId, type, context);
+    let result = await writePowerOffAndWirelessError(protocolId, type, context, isInfraredDevice);
     if (result) {
       context.buttonError(buttonColor)
       return result
@@ -173,7 +203,7 @@ export const writeConfigA026 = async (protocolId, type, context, buttonColor) =>
  * 写强制设温
  *
  * */
-export const writeConfigA022 = async (protocolId, type, context, buttonColor) => {
+export const writeConfigA022 = async (protocolId, type, context, buttonColor, isInfraredDevice) => {
   let strongTemperatureSetting = context.wireValveCardFormShow.strongTemperatureSetting
   let forcedTemperature = context.wireValveCardFormShow.forcedTemperature
   let temperatureUpperLimit = context.wireValveCardFormShow.temperatureUpperLimit
@@ -184,7 +214,7 @@ export const writeConfigA022 = async (protocolId, type, context, buttonColor) =>
   console.warn('temperatureDownLimit:', temperatureDownLimit)
   if (strongTemperatureSetting || forcedTemperature || temperatureUpperLimit || temperatureDownLimit) {
     console.warn('写A022')
-    let result = await writeForcedTemperatureSetting(protocolId, type, context);
+    let result = await writeForcedTemperatureSetting(protocolId, type, context, isInfraredDevice);
     if (result) {
       context.buttonError(buttonColor)
       return result
@@ -243,28 +273,28 @@ export const writeConfigAC02 = async (protocolId, type, context, buttonColor) =>
  * 版本匹配
  *
  * */
-export const deviceVersionMatch = async (protocolId, type, context, buttonColor) => {
-  let result = await readVersion(protocolId, type, context);
+export const deviceVersionMatch = async (protocolId, type, context, buttonColor, isInfraredDevice) => {
+  let result = await readVersion(protocolId, type, context, isInfraredDevice);
   if (result) {
     context.buttonError(buttonColor)
     return true;
   }
   if (context.readVersion === '' || context.readVersion === undefined) {
-    if (type==='one'){
-      context.createLeftSpanMessage('版本不匹配,设备版本：' + context.readVersion+'配置版本：'+context.wireValveCardForm.version, 'red');
-    }else{
-      context.createRightSpanMessage('版本不匹配,设备版本：' + context.readVersion+'配置版本：'+context.wireValveCardForm.version, 'red');
+    if (type === 'one') {
+      context.createLeftSpanMessage('版本不匹配,设备版本：' + context.readVersion + '配置版本：' + context.wireValveCardForm.version, 'red');
+    } else {
+      context.createRightSpanMessage('版本不匹配,设备版本：' + context.readVersion + '配置版本：' + context.wireValveCardForm.version, 'red');
     }
     context.buttonError(buttonColor)
     return true
   }
-  let result1 = context.wireValveCardForm.version !== context.readVersion
+  let result1 = context.wireValveCardForm.version !== context.readVersion.toString()
   if (result1) {
     context.buttonError(buttonColor)
-    if (type==='one'){
-      context.createLeftSpanMessage('版本不匹配,设备版本：' + context.readVersion+'配置版本：'+context.wireValveCardForm.version, 'red');
-    }else{
-      context.createRightSpanMessage('版本不匹配,设备版本：' + context.readVersion+'配置版本：'+context.wireValveCardForm.version, 'red');
+    if (type === 'one') {
+      context.createLeftSpanMessage('版本不匹配,设备版本：' + context.readVersion + '配置版本：' + context.wireValveCardForm.version, 'red');
+    } else {
+      context.createRightSpanMessage('版本不匹配,设备版本：' + context.readVersion + '配置版本：' + context.wireValveCardForm.version, 'red');
     }
     return true
   }
@@ -277,8 +307,8 @@ export const deviceVersionMatch = async (protocolId, type, context, buttonColor)
  * 地址写入
  *
  * */
-export const deviceWriteAddress = async (protocolId, type, context, buttonColor) => {
-  let result = await writeAddressOperations(protocolId, type, context)
+export const deviceWriteAddress = async (protocolId, type, context, buttonColor, isInfraredDevice) => {
+  let result = await writeAddressOperations(protocolId, type, context, isInfraredDevice)
   if (result) {
     context.buttonError(buttonColor)
     return result
@@ -290,9 +320,9 @@ export const deviceWriteAddress = async (protocolId, type, context, buttonColor)
  * 全开标定
  *
  * */
-export const fullOpenCalibration = async (protocolId, type, context, buttonColor) => {
+export const fullOpenCalibration = async (protocolId, type, context, buttonColor, isInfraredDevice) => {
 
-  let result = await fullOpenCalibrationOperations(protocolId, type, context);
+  let result = await fullOpenCalibrationOperations(protocolId, type, context, isInfraredDevice);
   if (result) {
     context.buttonError(buttonColor)
   }
@@ -303,9 +333,10 @@ export const fullOpenCalibration = async (protocolId, type, context, buttonColor
  * 全关标定
  *
  * */
-export const fullCloseCalibration = async (protocolId, type, context, buttonColor) => {
+export const fullCloseCalibration = async (protocolId, type, context, buttonColor, isInfraredDevice) => {
+
   // await new Promise(resolve => setTimeout(resolve, 2000));
-  let result = await fullOffCalibrationOperations(protocolId, type, context);
+  let result = await fullOffCalibrationOperations(protocolId, type, context, isInfraredDevice);
   if (result) {
     context.buttonError(buttonColor)
     return result
@@ -320,6 +351,14 @@ export const fullCloseCalibration = async (protocolId, type, context, buttonColo
  *
  * */
 export const panelCommunication = async (protocolId, type, context, buttonColor) => {
+  if (
+    context.configForm.produceModel === 'VAC130-4/20mA' || context.configForm.produceModel === 'VAC130-0/10V' || context.configForm.produceModel === 'VAC130-1/10V' ||
+    context.configForm.produceModel === 'VAC130H-4/20mA' || context.configForm.produceModel === 'VAC130H-0/10V' || context.configForm.produceModel === 'VAC130H-1/10V'
+
+  ) {
+    return false
+  }
+
   if (context.wireValveCardForm.operatorLine === '3') {
     type === 'one' ? context.leftWorkPrompt = '开、关温控面板一次' : context.rightWorkPrompt = '开、关温控面板一次'
     let notPass = true
@@ -328,9 +367,9 @@ export const panelCommunication = async (protocolId, type, context, buttonColor)
     while (true) {  //强制结束条件
       await new Promise(resolve => setTimeout(resolve, 1000));
       if (endTime - Date.now() <= 0) {
-        if (type==='one'){
+        if (type === 'one') {
           context.createLeftSpanMessage('面板通信超时，流程失败', 'red');
-        }else{
+        } else {
           context.createRightSpanMessage('面板通信超时，流程失败', 'red');
         }
         console.log(`超时退出 当前时间: ${Date.now()}, 结束时间: ${endTime}, 时间差: ${endTime - Date.now()}`);
@@ -359,6 +398,14 @@ export const panelCommunication = async (protocolId, type, context, buttonColor)
  *
  * */
 export const swipeCardFunction = async (protocolId, type, context, buttonColor) => {
+  if (
+    context.configForm.produceModel === 'VAC130-4/20mA' || context.configForm.produceModel === 'VAC130-0/10V' || context.configForm.produceModel === 'VAC130-1/10V' ||
+    context.configForm.produceModel === 'VAC130H-4/20mA' || context.configForm.produceModel === 'VAC130H-0/10V' || context.configForm.produceModel === 'VAC130H-1/10V'
+
+  ) {
+    return false
+  }
+
   if (context.wireValveCardFormShow.swipeCard) {
     type === 'one' ? context.leftWorkPrompt = '请刷卡一次' : context.rightWorkPrompt = '请刷卡一次'
     let notPass = true
@@ -367,9 +414,9 @@ export const swipeCardFunction = async (protocolId, type, context, buttonColor) 
     while (true) { //强制结束条件
       await new Promise(resolve => setTimeout(resolve, 1000));
       if (endTime - Date.now() <= 0) {
-        if (type==='one'){
+        if (type === 'one') {
           context.createLeftSpanMessage('刷卡超时，流程失败', 'red');
-        }else{
+        } else {
           context.createRightSpanMessage('刷卡超时，流程失败', 'red');
         }
         console.log(`超时退出 当前时间: ${Date.now()}, 结束时间: ${endTime}, 时间差: ${endTime - Date.now()}`);
@@ -397,6 +444,14 @@ export const swipeCardFunction = async (protocolId, type, context, buttonColor) 
  * 分离警报验证
  * */
 export const deviceSeparationAlarm = async (protocolId, type, context, buttonColor) => {
+  if (
+    context.configForm.produceModel === 'VAC130-4/20mA' || context.configForm.produceModel === 'VAC130-0/10V' || context.configForm.produceModel === 'VAC130-1/10V' ||
+    context.configForm.produceModel === 'VAC130H-4/20mA' || context.configForm.produceModel === 'VAC130H-0/10V' || context.configForm.produceModel === 'VAC130H-1/10V'
+
+  ) {
+    return false
+  }
+
   if (context.wireValveCardFormShow.separateWarn) {
     //1. 分离
     let result1 = await deviceSeparationAlarmNoneClose(protocolId, type, context)
@@ -434,9 +489,9 @@ export const deviceSeparationAlarmNoneClose = async (protocolId, type, context) 
   while (true) { //强制结束条件
     await new Promise(resolve => setTimeout(resolve, 1000));
     if (endTime - Date.now() <= 0) {
-      if (type==='one'){
+      if (type === 'one') {
         context.createLeftSpanMessage('分离超时，流程失败', 'red');
-      }else{
+      } else {
         context.createRightSpanMessage('分离超时，流程失败', 'red');
       }
       console.log(`超时退出 当前时间: ${Date.now()}, 结束时间: ${endTime}, 时间差: ${endTime - Date.now()}`);
@@ -470,9 +525,9 @@ export const deviceSeparationAlarmClose = async (protocolId, type, context) => {
   while (true) { //强制结束条件
     await new Promise(resolve => setTimeout(resolve, 1000));
     if (endTime - Date.now() <= 0) {
-      if (type==='one'){
+      if (type === 'one') {
         context.createLeftSpanMessage('闭合超时，流程失败', 'red');
-      }else{
+      } else {
         context.createRightSpanMessage('闭合超时，流程失败', 'red');
       }
       console.log(`超时退出 当前时间: ${Date.now()}, 结束时间: ${endTime}, 时间差: ${endTime - Date.now()}`);
@@ -495,6 +550,14 @@ export const deviceSeparationAlarmClose = async (protocolId, type, context) => {
  *
  * */
 export const deviceMainAndAuxiliaryValves = async (protocolId, type, context, buttonColor) => {
+  if (
+    context.configForm.produceModel === 'VAC130-4/20mA' || context.configForm.produceModel === 'VAC130-0/10V' || context.configForm.produceModel === 'VAC130-1/10V' ||
+    context.configForm.produceModel === 'VAC130H-4/20mA' || context.configForm.produceModel === 'VAC130H-0/10V' || context.configForm.produceModel === 'VAC130H-1/10V'
+
+  ) {
+    return false
+  }
+
 
   if (context.wireValveCardFormShow.mainAuxiliaryValve) {
     type === 'one' ? context.leftWorkPrompt = '请连接主副阀' : context.rightWorkPrompt = '请连接主副阀'
@@ -505,9 +568,9 @@ export const deviceMainAndAuxiliaryValves = async (protocolId, type, context, bu
     while (true) { //强制结束条件
       await new Promise(resolve => setTimeout(resolve, 1000));
       if (endTime - Date.now() <= 0) {
-        if (type==='one'){
+        if (type === 'one') {
           context.createLeftSpanMessage('主副阀检测超时，流程失败', 'red');
-        }else{
+        } else {
           context.createRightSpanMessage('主副阀检测超时，流程失败', 'red');
         }
         console.log(`超时退出 当前时间: ${Date.now()}, 结束时间: ${endTime}, 时间差: ${endTime - Date.now()}`);
@@ -546,7 +609,7 @@ export const doScanVerification = async (protocolId, type, context, buttonColor)
     context.rightErrorScanValveAddress = context.rightGenerateAddress;
     context.rightGenerateAddress = '';
   }
-
+  context.isScanCodeStatus = true
   // context.focusInput(type)
   let breakStatus = false
   //   获取扫码数据对比
@@ -558,7 +621,7 @@ export const doScanVerification = async (protocolId, type, context, buttonColor)
   const startTime = Date.now();
   const endTime = startTime + context.scanAddressTestTimeout; // 15000 ms = 15秒
   while (true) {
-    await new Promise(resolve => setTimeout(resolve, 1000)); // 1s检查一次 扫码是否匹配
+    await new Promise(resolve => setTimeout(resolve, 200)); // 1s检查一次 扫码是否匹配
     if (endTime - Date.now() <= 0) {
       if (type === 'one') {
         context.leftGenerateAddress = context.leftErrorScanValveAddress;
@@ -567,60 +630,79 @@ export const doScanVerification = async (protocolId, type, context, buttonColor)
         context.rightGenerateAddress = context.rightErrorScanValveAddress;
         context.rightErrorScanValveAddress = ''
       }
-      if (type==='one'){
+      if (type === 'one') {
         context.createLeftSpanMessage('扫码超时，流程失败', 'red');
-      }else{
+      } else {
         context.createRightSpanMessage('扫码超时，流程失败', 'red');
       }
       console.log(`超时退出 当前时间: ${Date.now()}, 结束时间: ${endTime}, 时间差: ${endTime - Date.now()}`);
       breakStatus = true
       break
     }
-    // 处理扫码数据
+
     if (type === 'one') {
-      if (context.leftGenerateAddress !== '') {
+      if (context.leftGenerateAddress.length === 8 && context.isLeftScanCompleted) {
         let scanValueAddress = arrayBuffer2Hex(addressCover(context.leftGenerateAddress)) + context.workDetail.vendorCode
-        console.warn('扫码地址：', scanValueAddress)
+        console.warn('扫码的地址:' + context.leftGenerateAddress +
+          '扫码逆序后地址：' + arrayBuffer2Hex(addressCover(context.leftGenerateAddress)) +
+          '供应商代码：' + context.workDetail.vendorCode +
+          '最终扫码地址：' + scanValueAddress +
+          '设备地址：' + valveAddress)
+        Log.info(
+          '扫码的地址:' + context.leftGenerateAddress +
+          '扫码逆序后地址：' + arrayBuffer2Hex(addressCover(context.leftGenerateAddress)) +
+          '供应商代码：' + context.workDetail.vendorCode +
+          '最终扫码地址：' + scanValueAddress +
+          '设备地址：' + valveAddress
+        )
         console.warn('设备读取地址：', valveAddress)
         if (scanValueAddress.toLowerCase() === valveAddress.toLowerCase()) {
-          if (type==='one'){
+          if (type === 'one') {
             context.createLeftSpanMessage('扫码成功', 'grey');
-          }else{
+          } else {
             context.createRightSpanMessage('扫码成功', 'grey');
           }
           console.warn('扫码成功')
+          context.leftGenerateAddress = ''
+          context.isLeftScanCompleted = false
           break;
         } else {
-          if (type==='one'){
-            context.createLeftSpanMessage('扫码不匹配，扫码地址：'+scanValueAddress+'设备地址：'+valveAddress, 'red');
-          }else{
-            context.createRightSpanMessage('扫码不匹配，扫码地址：'+scanValueAddress+'设备地址：'+valveAddress, 'red');
+          if (type === 'one') {
+            context.createLeftSpanMessage('扫码不匹配，扫码地址：' + scanValueAddress + '设备地址：' + valveAddress, 'red');
+          } else {
+            context.createRightSpanMessage('扫码不匹配，扫码地址：' + scanValueAddress + '设备地址：' + valveAddress, 'red');
           }
+          context.leftGenerateAddress = ''
           breakStatus = true
+          context.isLeftScanCompleted = false
           break
         }
 
       }
     } else {
-      if (context.rightGenerateAddress !== '') {
+      if (context.rightGenerateAddress.length === 8 && context.isRightScanCompleted) {
         let scanValueAddress = arrayBuffer2Hex(addressCover(context.rightGenerateAddress)) + context.workDetail.vendorCode
         console.warn('扫码地址：', scanValueAddress)
         console.warn('设备读取地址：', valveAddress)
         if (scanValueAddress.toLowerCase() === valveAddress.toLowerCase()) {
-          if (type==='one'){
+          if (type === 'one') {
             context.createLeftSpanMessage('扫码成功', 'grey');
-          }else{
+          } else {
             context.createRightSpanMessage('扫码成功', 'grey');
           }
           console.warn('扫码成功')
+          context.rightGenerateAddress = ''
+          context.isRightScanCompleted = false
           break;
         } else {
-          if (type==='one'){
-            context.createLeftSpanMessage('扫码不匹配，扫码地址：'+scanValueAddress+'设备地址：'+valveAddress, 'red');
-          }else{
-            context.createRightSpanMessage('扫码不匹配，扫码地址：'+scanValueAddress+'设备地址：'+valveAddress, 'red');
+          if (type === 'one') {
+            context.createLeftSpanMessage('扫码不匹配，扫码地址：' + scanValueAddress + '设备地址：' + valveAddress, 'red');
+          } else {
+            context.createRightSpanMessage('扫码不匹配，扫码地址：' + scanValueAddress + '设备地址：' + valveAddress, 'red');
           }
           breakStatus = true
+          context.rightGenerateAddress = ''
+          context.isRightScanCompleted = false
           break
         }
 
@@ -629,14 +711,13 @@ export const doScanVerification = async (protocolId, type, context, buttonColor)
 
 
   }
-
+  context.isScanCodeStatus = false
   if (breakStatus) {
     context.buttonError(buttonColor)
     console.warn('扫码失败:地址不匹配')
     notPassResult = true
     return notPassResult
   }
-
 
   type === 'one' ? context.leftWorkPrompt = '数据验证中，请等待' : context.rightWorkPrompt = '数据验证中，请等待'
   if (context.wireValveCardForm.temperatureProbe !== '0') {
@@ -805,47 +886,53 @@ export const doScanVerification = async (protocolId, type, context, buttonColor)
       if (context.wireValveCardForm.temperatureProbe === '1') {
         // 只判断回温
         if (Math.abs(context.leftOutTemperature - referenceTemperature) >= threshold) {
-          context.createLeftSpanMessage('回温验证失败当前回温：'+context.leftOutTemperature, 'red');
+          context.createLeftSpanMessage('回温验证失败当前回温：' + context.leftOutTemperature, 'red');
           notPassResult = true
         }
+        context.createLeftSpanMessage(' 回温:' + context.leftOutTemperature + ',回温验证成功', 'green');
       } else if (context.wireValveCardForm.temperatureProbe === '2') {
         // 只判断进温
         if (Math.abs(context.leftInTemperature - referenceTemperature) >= threshold) {
-          context.createLeftSpanMessage('进温验证失败当前进温：'+context.leftInTemperature, 'red');
+          context.createLeftSpanMessage('进温验证失败当前进温：' + context.leftInTemperature, 'red');
           notPassResult = true
         }
+        context.createLeftSpanMessage(' 进温:' + context.leftInTemperature + ',进温验证成功', 'green');
       } else if (context.wireValveCardForm.temperatureProbe === '3') {
         if (Math.abs(context.leftOutTemperature - referenceTemperature) >= threshold) {
-          context.createLeftSpanMessage('回温验证失败当前回温：'+context.leftOutTemperature, 'red');
+          context.createLeftSpanMessage('回温验证失败当前回温：' + context.leftOutTemperature, 'red');
           notPassResult = true
         }
         if (Math.abs(context.leftInTemperature - referenceTemperature) >= threshold) {
-          context.createLeftSpanMessage('进温验证失败当前进温：'+context.leftInTemperature, 'red');
+          context.createLeftSpanMessage('进温验证失败当前进温：' + context.leftInTemperature, 'red');
           notPassResult = true
         }
+        context.createLeftSpanMessage('进温:' + context.leftInTemperature + ' 回温:' + context.leftOutTemperature + ',进回温验证成功', 'green');
       }
     } else if (type === 'two') {
       if (context.wireValveCardForm.temperatureProbe === '1') {
         // 只判断回温
         if (Math.abs(context.leftOutTemperature - referenceTemperature) >= threshold) {
-          context.createRightSpanMessage('回温验证失败当前回温：'+context.rightOutTemperature, 'red');
+          context.createRightSpanMessage('回温验证失败当前回温：' + context.rightOutTemperature, 'red');
           notPassResult = true
         }
+        context.createLeftSpanMessage(' 回温:' + context.rightOutTemperature + ',回温验证成功', 'green');
       } else if (context.wireValveCardForm.temperatureProbe === '2') {
         // 只判断进温
         if (Math.abs(context.rightInTemperature - referenceTemperature) >= threshold) {
-          context.createRightSpanMessage('进温验证失败当前进温：'+context.rightInTemperature, 'red');
+          context.createRightSpanMessage('进温验证失败当前进温：' + context.rightInTemperature, 'red');
           notPassResult = true
         }
+        context.createLeftSpanMessage('进温:' + context.rightInTemperature + ',进温验证成功', 'green');
       } else if (context.wireValveCardForm.temperatureProbe === '3') {
         if (Math.abs(context.leftOutTemperature - referenceTemperature) >= threshold) {
-          context.createRightSpanMessage('回温验证失败当前回温：'+context.rightOutTemperature, 'red');
+          context.createRightSpanMessage('回温验证失败当前回温：' + context.rightOutTemperature, 'red');
           notPassResult = true
         }
         if (Math.abs(context.rightInTemperature - referenceTemperature) >= threshold) {
-          context.createRightSpanMessage('进温验证失败当前进温：'+context.rightInTemperature, 'red');
+          context.createRightSpanMessage('进温验证失败当前进温：' + context.rightInTemperature, 'red');
           notPassResult = true
         }
+        context.createLeftSpanMessage('进温:' + context.rightInTemperature + ' 回温:' + context.rightOutTemperature + ',进回温验证成功', 'green');
       }
 
     }
@@ -854,56 +941,67 @@ export const doScanVerification = async (protocolId, type, context, buttonColor)
       context.buttonError(buttonColor)
       return true
     }
+    if (type === 'one') {
 
+    } else if (type === 'two') {
 
-  }
-
-
-  //验证阀门状态
-  let result = await readValveState(protocolId, type, context)
-  if (result) {
-    if (type==='one'){
-      context.createLeftSpanMessage('读取阀门状态失败', 'red');
-    }else{
-      context.createRightSpanMessage('读取阀门状态失败', 'red');
     }
-    context.buttonError(buttonColor)
-    console.error('读取阀门状态失败')
-    notPassResult = true
-    return notPassResult
+
+
   }
-  console.log('阀门状态：', context.leftValveState)
-  console.log('出厂状态 0 全开，1全关：', context.wireValveCardForm.factoryOpening)
+
+
   //出厂状态 0 全开  1 全关
-  if (type === 'one') {
-    if (context.wireValveCardForm.factoryOpening === '0' && (context.leftValveState === '故障' || context.leftValveState === '阀关')) {
-      console.error('阀故障或出厂状态不匹配')
-      context.createLeftSpanMessage('阀故障或出厂状态不匹配', 'red');
+  if (context.configForm.produceModel !== 'VAC130-4/20mA' && context.configForm.produceModel !== 'VAC130-0/10V' && context.configForm.produceModel !== 'VAC130-1/10V' &&
+    context.configForm.produceModel !== 'VAC130H-4/20mA' && context.configForm.produceModel !== 'VAC130H-0/10V' && context.configForm.produceModel !== 'VAC130H-1/10V'
+  ) {
+    //验证阀门状态
+    let result = await readValveState(protocolId, type, context)
+    if (result) {
+      if (type === 'one') {
+        context.createLeftSpanMessage('读取阀门状态失败', 'red');
+      } else {
+        context.createRightSpanMessage('读取阀门状态失败', 'red');
+      }
       context.buttonError(buttonColor)
-      notPassResult = true
-      return notPassResult
-    } else if (context.wireValveCardForm.factoryOpening === '1' && (context.leftValveState === '故障' || context.leftValveState === '阀开')) {
-      console.error('阀故障或出厂状态不匹配')
-      context.createLeftSpanMessage('阀故障或出厂状态不匹配', 'red');
-      context.buttonError(buttonColor)
-      notPassResult = true
-      return notPassResult
-    }
-  } else {
-    if (context.wireValveCardForm.factoryOpening === '0' && (context.rightValveState === '故障' || context.rightValveState === '阀关')) {
-      console.error('阀故障或出厂状态不匹配')
-      context.buttonError(buttonColor)
-      context.createRightSpanMessage('阀故障或出厂状态不匹配', 'red');
-      notPassResult = true
-      return notPassResult
-    } else if (context.wireValveCardForm.factoryOpening === '1' && (context.rightValveState === '故障' || context.rightValveState === '阀开')) {
-      console.error('阀故障或出厂状态不匹配')
-      context.buttonError(buttonColor)
-      context.createRightSpanMessage('阀故障或出厂状态不匹配', 'red');
+      console.error('读取阀门状态失败')
       notPassResult = true
       return notPassResult
     }
+    console.log('阀门状态：', context.leftValveState)
+    console.log('出厂状态 0 全开，1全关：', context.wireValveCardForm.factoryOpening)
+    if (type === 'one') {
+      if (context.wireValveCardForm.factoryOpening === '0' && (context.leftValveState === '故障' || context.leftValveState === '阀关')) {
+        console.error('阀故障或出厂状态不匹配')
+        context.createLeftSpanMessage('阀故障或出厂状态不匹配', 'red');
+        context.buttonError(buttonColor)
+        notPassResult = true
+        return notPassResult
+      } else if (context.wireValveCardForm.factoryOpening === '1' && (context.leftValveState === '故障' || context.leftValveState === '阀开')) {
+        console.error('阀故障或出厂状态不匹配')
+        context.createLeftSpanMessage('阀故障或出厂状态不匹配', 'red');
+        context.buttonError(buttonColor)
+        notPassResult = true
+        return notPassResult
+      }
+    } else {
+      if (context.wireValveCardForm.factoryOpening === '0' && (context.rightValveState === '故障' || context.rightValveState === '阀关')) {
+        console.error('阀故障或出厂状态不匹配')
+        context.buttonError(buttonColor)
+        context.createRightSpanMessage('阀故障或出厂状态不匹配', 'red');
+        notPassResult = true
+        return notPassResult
+      } else if (context.wireValveCardForm.factoryOpening === '1' && (context.rightValveState === '故障' || context.rightValveState === '阀开')) {
+        console.error('阀故障或出厂状态不匹配')
+        context.buttonError(buttonColor)
+        context.createRightSpanMessage('阀故障或出厂状态不匹配', 'red');
+        notPassResult = true
+        return notPassResult
+      }
+    }
+
   }
+
   console.warn('notPassResult', notPassResult)
   context.buttonSuccess(buttonColor)
   return notPassResult
@@ -915,6 +1013,14 @@ export const doScanVerification = async (protocolId, type, context, buttonColor)
  *
  * */
 export const writeOutFactoryOpenCondition = async (protocolId, type, context, buttonColor) => {
+  if (
+    context.configForm.produceModel === 'VAC130-4/20mA' || context.configForm.produceModel === 'VAC130-0/10V' || context.configForm.produceModel === 'VAC130-1/10V' ||
+    context.configForm.produceModel === 'VAC130H-4/20mA' || context.configForm.produceModel === 'VAC130H-0/10V' || context.configForm.produceModel === 'VAC130H-1/10V'
+
+  ) {
+    return false
+  }
+
   await new Promise(resolve => setTimeout(resolve, 2000));
   if (context.wireValveCardFormShow.factoryOpening) {
     if (context.wireValveCardForm.factoryOpening === '1') {
@@ -936,6 +1042,613 @@ export const writeOutFactoryOpenCondition = async (protocolId, type, context, bu
         return result
       }
     }
+  }
+}
+
+
+/**
+ * 输入标定
+ * */
+
+export const enterCalibration = async (protocolId, type, context, buttonColor, isInfraredDevice) => {
+  let result
+  //写工作模式
+  if (context.configForm.produceModel === 'VAC130-4/20mA' || context.configForm.produceModel === 'VAC130H-4/20mA') {
+    //写工作模式4~20mA
+    result = await writeWorkChannel420mA(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      console.error('与4-20mA工装设备通信失败')
+      context.createLeftSpanMessage('与4-20mA工装设备通信失败', 'red');
+      return result
+    }
+  } else if (context.configForm.produceModel === 'VAC130-0/10V' || context.configForm.produceModel === 'VAC130H-0/10V') {
+    //写工作模式0~10V
+    result = await writeWorkChannel010V(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      console.error('与0-10V工装设备通信失败')
+      context.createLeftSpanMessage('与0-10V工装设备通信失败', 'red');
+      return result
+    }
+  } else if (context.configForm.produceModel === 'VAC130-1/10V' || context.configForm.produceModel === 'VAC130H-1/10V') {
+    //写工作模式1~10V
+    result = await writeWorkChannel110V(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      console.error('与1-10V工装设备通信失败')
+      context.createLeftSpanMessage('与1-10V工装设备通信失败', 'red');
+      return result
+    }
+  }
+  if (context.configForm.produceModel === 'VAC130-4/20mA' || context.configForm.produceModel === 'VAC130H-4/20mA') {
+    result = await sourceOutputs4mA(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      console.error('与4-20mA工装设备通信失败')
+      context.createLeftSpanMessage('与4-20mA工装设备通信失败', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('请等待电流表值稳定...2s', 'grey');
+    await new Promise(x => setTimeout(x, 2000)) //等待2s
+    result = await readCurrentAmmeterInputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取电流表输入实际值失败', 'red');
+      return result
+    }
+    result = await writesActualInputCurrentValue4MA(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('4ma标定AD值失败', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('4ma标定AD值成功', 'green');
+    result = await sourceOutputs20mA(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('与4-20mA工装设备通信失败', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('请等待电流表值稳定...5s', 'grey');
+    await new Promise(x => setTimeout(x, 5000)) //等待5s
+    result = await readCurrentAmmeterInputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取电流表输入实际值失败', 'red');
+      return result
+    }
+    result = await writesActualInputCurrentValue20MA(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('20ma标定AD值失败', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('20ma标定AD值成功', 'green');
+    context.createLeftSpanMessage('电流模拟量输入标定完成', 'green');
+    context.buttonSuccess(buttonColor)
+    return result
+  } else if (context.configForm.produceModel === 'VAC130-0/10V' || context.configForm.produceModel === 'VAC130H-0/10V') {
+    result = await sourceOutputs1V(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      console.error('与0-10V工装设备通信失败')
+      context.createLeftSpanMessage('与0-10V工装设备通信失败', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('请等待电压表值稳定...5s', 'grey');
+    await new Promise(x => setTimeout(x, 5000)) //等待2s
+    result = await readVoltageAmmeterInputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取电压表输入实际值失败', 'red');
+      return result
+    }
+    result = await writeInput1vActuals(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('1V输入标定AD值失败', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('1V输入标定AD值成功', 'green');
+    result = await sourceOutputs10V(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('与0-10V工装设备通信失败', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('请等待电压表值稳定...5s', 'grey');
+    await new Promise(x => setTimeout(x, 5000)) //等待5s
+    result = await readVoltageAmmeterInputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取电压表输入实际值失败', 'red');
+      return result
+    }
+    result = await writeInput10vActuals(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('10V输入标定AD值失败', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('10V输入标定AD值成功', 'green');
+    context.createLeftSpanMessage('电压模拟量输入标定完成', 'green');
+    context.buttonSuccess(buttonColor)
+    return result
+
+  } else if (context.configForm.produceModel === 'VAC130-1/10V' || context.configForm.produceModel === 'VAC130H-1/10V') {
+    result = await sourceOutputs1V(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      console.error('与1-10V工装设备通信失败')
+      context.createLeftSpanMessage('与1-10V工装设备通信失败', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('请等待电压表值稳定...5s', 'grey');
+    await new Promise(x => setTimeout(x, 5000)) //等待2s
+    result = await readVoltageAmmeterInputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取电压表输入实际值失败', 'red');
+      return result
+    }
+    result = await writeInput1vActuals(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('1V输入标定AD值失败', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('1V输入标定AD值成功', 'green');
+    result = await sourceOutputs10V(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('与1-10V工装设备通信失败', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('请等待电压表值稳定...5s', 'grey');
+    await new Promise(x => setTimeout(x, 5000)) //等待5s
+    result = await readVoltageAmmeterInputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取电压表输入实际值失败', 'red');
+      return result
+    }
+    result = await writeInput10vActuals(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('10V输入标定AD值失败', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('10V输入标定AD值成功', 'green');
+    context.createLeftSpanMessage('电压模拟量输入标定完成', 'green');
+    context.buttonSuccess(buttonColor)
+    return result
+
+  }
+
+}
+
+/**
+ * 输出标定
+ * */
+export const outputCalibration = async (protocolId, type, context, buttonColor, isInfraredDevice) => {
+  if (context.configForm.produceModel === 'VAC130-4/20mA' || context.configForm.produceModel === 'VAC130H-4/20mA') {
+    let result
+    result = await writeFixedOutput4MA(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      return result
+    }
+    context.createLeftSpanMessage('请等待电流表值稳定...10s', 'grey');
+    await new Promise(x => setTimeout(x, 10000)) //等待10s
+    result = await readCurrentAmmeterOutputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取电流表输出实际值失败', 'red');
+      return result
+    }
+    result = await output4MAActualCurrentValueCalibration(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('写入电流值范围不合格', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('输出4ma标定完成', 'green');
+    result = await writeFixedOutput20MA(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      return result
+    }
+    context.createLeftSpanMessage('请等待电流表值稳定...30s', 'grey');
+    await new Promise(x => setTimeout(x, 30000)) //等待30s
+    result = await readCurrentAmmeterOutputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取电流表输出实际值失败', 'red');
+      return result
+    }
+    result = await output20MAActualCurrentValueCalibration(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('写入电流值范围不合格', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('输出20ma标定完成', 'green');
+    context.createLeftSpanMessage('电流模拟量输出标定完成', 'green');
+
+    context.buttonSuccess(buttonColor)
+    return result
+
+  } else if (context.configForm.produceModel === 'VAC130-0/10V' || context.configForm.produceModel === 'VAC130H-0/10V') {
+    let result
+    result = await writeFixedOutput1V(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      return result
+    }
+    context.createLeftSpanMessage('请等待电压表值稳定...10s', 'grey');
+    await new Promise(x => setTimeout(x, 10000)) //等待10s
+    result = await readVoltageAmmeterOutputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取电压表输出实际值失败', 'red');
+      return result
+    }
+    result = await writeOutput1vActuals(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('写入电压值范围不合格', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('输出1V标定完成', 'green');
+    result = await writeFixedOutput10V(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      return result
+    }
+    context.createLeftSpanMessage('请等待电压表值稳定...10s', 'grey');
+    await new Promise(x => setTimeout(x, 10000)) //等待10s
+    result = await readVoltageAmmeterOutputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取电压表输出实际值失败', 'red');
+      return result
+    }
+    result = await writeOutput10vActuals(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('写入电流值范围不合格', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('输出10V标定完成', 'green');
+    context.createLeftSpanMessage('电流模拟量输出标定完成', 'green');
+
+    context.buttonSuccess(buttonColor)
+    return result
+
+
+  } else if (context.configForm.produceModel === 'VAC130-1/10V' || context.configForm.produceModel === 'VAC130H-1/10V') {
+    let result
+    result = await writeFixedOutput1V(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      return result
+    }
+    context.createLeftSpanMessage('请等待电压表值稳定...10s', 'grey');
+    await new Promise(x => setTimeout(x, 10000)) //等待10s
+    result = await readVoltageAmmeterOutputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取电压表输出实际值失败', 'red');
+      return result
+    }
+    result = await writeOutput1vActuals(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('写入电压值范围不合格', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('输出1V标定完成', 'green');
+    result = await writeFixedOutput10V(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      return result
+    }
+    context.createLeftSpanMessage('请等待电压表值稳定...10s', 'grey');
+    await new Promise(x => setTimeout(x, 10000)) //等待10s
+    result = await readVoltageAmmeterOutputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取电压表输出实际值失败', 'red');
+      return result
+    }
+    result = await writeOutput10vActuals(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('写入电流值范围不合格', 'red');
+      return result
+    }
+    context.createLeftSpanMessage('输出10V标定完成', 'green');
+    context.createLeftSpanMessage('电流模拟量输出标定完成', 'green');
+
+    context.buttonSuccess(buttonColor)
+    return result
+
+
+  }
+}
+
+
+/**
+ * 标定验证
+ * */
+export const calibrationVerification = async (protocolId, type, context, buttonColor, isInfraredDevice) => {
+  let result
+  if (context.configForm.produceModel === 'VAC130-4/20mA' || context.configForm.produceModel === 'VAC130H-4/20mA') {
+    result = await sourceOutputs12mA(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      return result
+    }
+    context.createLeftSpanMessage('请等待电流表值稳定...20s', 'grey');
+    await new Promise(x => setTimeout(x, 20000)) //等待6s
+    result = await deviceReadsCurrent(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取设备电流失败', 'red');
+      return result
+    }
+    let currentOutValue
+    let currentEnterValue
+    //读电流源输入,输出 与设备实际值对比
+    result = await readCurrentAmmeterInputLoop(protocolId, type, context)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取输入电流表实际值失败', 'red');
+      return result
+    }
+    currentEnterValue = parseFloat(context.ammeterReadCurrentValue)
+    console.log('[标定验证] 电流表读输入电流:', currentEnterValue)
+    result = await readCurrentAmmeterOutputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取输出电流表实际值失败', 'red');
+      return result
+    }
+    // 电流表读取的输出电流值
+    currentOutValue = parseFloat(context.ammeterReadCurrentValue)
+    console.log('[标定验证] 电流表读输出电流:', currentOutValue)
+
+    // 获取设备实际电流和允许误差范围
+    let deviceCurrent = parseFloat(context.vac130DeviceCurrentValue)
+    let difference = parseFloat(context.configDetail.analogError) // 允许误差百分比
+
+    console.warn(
+      '电流表输入:', currentEnterValue,
+      '电流表输出:', currentOutValue,
+      'VAC130 4-20设备电流:', deviceCurrent,
+      '允许误差±:', difference + '%'
+    )
+    // -------------------------------
+    // 电流表输入 vs 设备电流 误差判断
+    // -------------------------------
+    let errorEnter = Math.abs(currentEnterValue - deviceCurrent) / deviceCurrent;
+    errorEnter = parseFloat(errorEnter.toFixed(3)) // 保留三位精度
+
+    if (errorEnter > difference / 100) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage(
+        `输入电流偏差超出允许范围：误差 ${(errorEnter * 100).toFixed(3)}% > ${difference}%`, 'red'
+      );
+      console.error(`[输入误差超限] 实测: ${currentEnterValue} / 设备: ${deviceCurrent}`)
+      result = true
+      return result
+    } else {
+      context.createLeftSpanMessage(`[输入误差合格] ${errorEnter * 100}% <= ${difference}%`)
+      console.log(`[输入误差合格] ${errorEnter * 100}% <= ${difference}%`)
+    }
+
+    // -------------------------------
+    // 电流表输出 vs 设备电流 误差判断
+    // -------------------------------
+    let errorOut = Math.abs(currentOutValue - deviceCurrent) / deviceCurrent
+    errorOut = parseFloat(errorOut.toFixed(3))
+
+    if (errorOut > difference / 100) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage(
+        `输出电流偏差超出允许范围：误差 ${(errorOut * 100).toFixed(3)}% > ${difference}%`, 'red'
+      );
+      console.error(`[输出误差超限] 实测: ${currentEnterValue} / 设备: ${deviceCurrent}`)
+      result = true
+      return result
+    } else {
+      result = false
+      context.createLeftSpanMessage(`[输出误差合格] ${errorOut * 100}% <= ${difference}%`)
+      console.log(`[输出误差合格] ${errorOut * 100}% <= ${difference}%`)
+      context.createLeftSpanMessage('4-20mA标定验证合格', 'green');
+    }
+
+    context.buttonSuccess(buttonColor)
+    return result
+  } else if (context.configForm.produceModel === 'VAC130-0/10V' || context.configForm.produceModel === 'VAC130H-0/10V') {
+
+    result = await sourceOutputs5V(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      return result
+    }
+    context.createLeftSpanMessage('请等待电压表值稳定...20s', 'grey');
+    await new Promise(x => setTimeout(x, 20000)) //等待6s
+    result = await deviceReadsVoltage(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取设备电压失败', 'red');
+      return result
+    }
+    let voltageOutValue
+    let voltageEnterValue
+    //读电压源输入,输出 与设备实际值对比
+    result = await readVoltageAmmeterInputLoop(protocolId, type, context)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取输入电压表实际值失败', 'red');
+      return result
+    }
+    voltageEnterValue = parseFloat(context.voltmeterReadVoltageValue)
+    console.log('[标定验证] 电压表读输入电压:', voltageEnterValue)
+    result = await readVoltageAmmeterOutputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取输出电压表实际值失败', 'red');
+      return result
+    }
+    // 电压表读取的输出电压值
+    voltageOutValue = parseFloat(context.voltmeterReadVoltageValue)
+    console.log('[标定验证] 电压表读输出电压:', voltageOutValue)
+
+    // 获取设备实际电流和允许误差范围
+    let deviceVoltage = parseFloat(context.vac130DeviceVoltageValue)
+    let difference = parseFloat(context.configDetail.analogError) // 允许误差百分比
+
+    console.warn(
+      '电压表输入:', voltageEnterValue,
+      '电压表输出:', voltageOutValue,
+      'VAC130 0-10V设备电压:', deviceVoltage,
+      '允许误差±:', difference + '%'
+    )
+    // -------------------------------
+    // 电压表输入 vs 设备电压 误差判断
+    // -------------------------------
+    let errorEnter = Math.abs(voltageEnterValue - deviceVoltage) / 9;
+    errorEnter = parseFloat(errorEnter.toFixed(3)) // 保留三位精度
+
+    if (errorEnter > difference / 100) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage(
+        `输入电压偏差超出允许范围：误差 ${(errorEnter * 100).toFixed(3)}% > ${difference}%`, 'red'
+      );
+      console.error(`[输入误差超限] 实测: ${voltageEnterValue} / 设备: ${deviceVoltage}`)
+      result = true
+      return result
+    } else {
+      context.createLeftSpanMessage(`[输入误差合格] ${errorEnter * 100}% <= ${difference}%`)
+      console.log(`[输入误差合格] ${errorEnter * 100}% <= ${difference}%`)
+    }
+
+    // -------------------------------
+    // 电压表输出 vs 设备电压 误差判断
+    // -------------------------------
+    let errorOut = Math.abs(voltageOutValue - deviceVoltage) / 9
+    errorOut = parseFloat(errorOut.toFixed(3))
+
+    if (errorOut > difference / 100) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage(
+        `输出电压偏差超出允许范围：误差 ${(errorOut * 100).toFixed(3)}% > ${difference}%`, 'red'
+      );
+      console.error(`[输出误差超限] 实测: ${voltageEnterValue} / 设备: ${deviceVoltage}`)
+      result = true
+      return result
+    } else {
+      result = false
+      context.createLeftSpanMessage(`[输出误差合格] ${errorOut * 100}% <= ${difference}%`)
+      console.log(`[输出误差合格] ${errorOut * 100}% <= ${difference}%`)
+      context.createLeftSpanMessage('0-10V标定验证合格', 'green');
+    }
+
+    context.buttonSuccess(buttonColor)
+    return result
+
+  } else if (context.configForm.produceModel === 'VAC130-1/10V' || context.configForm.produceModel === 'VAC130H-1/10V') {
+    result = await sourceOutputs5V(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      return result
+    }
+    context.createLeftSpanMessage('请等待电压表值稳定...20s', 'grey');
+    await new Promise(x => setTimeout(x, 20000)) //等待6s
+    result = await deviceReadsVoltage(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取设备电流失败', 'red');
+      return result
+    }
+    let voltageOutValue
+    let voltageEnterValue
+    //读电压源输入,输出 与设备实际值对比
+    result = await readVoltageAmmeterInputLoop(protocolId, type, context)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取输入电压表实际值失败', 'red');
+      return result
+    }
+    voltageEnterValue = parseFloat(context.voltmeterReadVoltageValue)
+    console.log('[标定验证] 电压表读输入电压:', voltageEnterValue)
+    result = await readVoltageAmmeterOutputLoop(protocolId, type, context, isInfraredDevice)
+    if (result) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage('读取输出电流表实际值失败', 'red');
+      return result
+    }
+    // 电压表读取的输出电压值
+    voltageOutValue = parseFloat(context.voltmeterReadVoltageValue)
+    console.log('[标定验证] 电压表读输出电压:', voltageOutValue)
+
+    // 获取设备实际电流和允许误差范围
+    let deviceVoltage = parseFloat(context.vac130DeviceVoltageValue)
+    let difference = parseFloat(context.configDetail.analogError) // 允许误差百分比
+
+    console.warn(
+      '电压表输入:', voltageEnterValue,
+      '电压表输出:', voltageOutValue,
+      'VAC130 1-10V设备电压:', deviceVoltage,
+      '允许误差±:', difference + '%'
+    )
+    // -------------------------------
+    // 电压表输入 vs 设备电压 误差判断
+    // -------------------------------
+    let errorEnter = Math.abs(voltageEnterValue - deviceVoltage) / 9;
+    errorEnter = parseFloat(errorEnter.toFixed(3)) // 保留三位精度
+
+    if (errorEnter > difference / 100) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage(
+        `输入电压偏差超出允许范围：误差 ${(errorEnter * 100).toFixed(3)}% > ${difference}%`, 'red'
+      );
+      console.error(`[输入误差超限] 实测: ${voltageEnterValue} / 设备: ${deviceVoltage}`)
+      result = true
+      return result
+    } else {
+      context.createLeftSpanMessage(`[输入误差合格] ${errorEnter * 100}% <= ${difference}%`)
+      console.log(`[输入误差合格] ${errorEnter * 100}% <= ${difference}%`)
+    }
+
+    // -------------------------------
+    // 电压表输出 vs 设备电压 误差判断
+    // -------------------------------
+    let errorOut = Math.abs(voltageOutValue - deviceVoltage) / 9
+    errorOut = parseFloat(errorOut.toFixed(3))
+
+    if (errorOut > difference / 100) {
+      context.buttonError(buttonColor)
+      context.createLeftSpanMessage(
+        `输出电压偏差超出允许范围：误差 ${(errorOut * 100).toFixed(3)}% > ${difference}%`, 'red'
+      );
+      console.error(`[输出误差超限] 实测: ${voltageEnterValue} / 设备: ${deviceVoltage}`)
+      result = true
+      return result
+    } else {
+      result = false
+      context.createLeftSpanMessage(`[输出误差合格] ${errorOut * 100}% <= ${difference}%`)
+      console.log(`[输出误差合格] ${errorOut * 100}% <= ${difference}%`)
+      context.createLeftSpanMessage('1-10V标定验证合格', 'green');
+    }
+
+    context.buttonSuccess(buttonColor)
+    return result
+
+
   }
 }
 
@@ -967,6 +1680,14 @@ async function awaitExecuteNext(type, context) {
  *
  * */
 export const deviceTemperatureCalibration = async (protocolId, type, context, buttonColor) => {
+  if (
+    context.configForm.produceModel === 'VAC130-4/20mA' || context.configForm.produceModel === 'VAC130-0/10V' || context.configForm.produceModel === 'VAC130-1/10V' ||
+    context.configForm.produceModel === 'VAC130H-4/20mA' || context.configForm.produceModel === 'VAC130H-0/10V' || context.configForm.produceModel === 'VAC130H-1/10V'
+
+  ) {
+    return false
+  }
+
   let notPass = false
   const temperatureProbe = context.wireValveCardForm.temperatureProbe;
   if (temperatureProbe === '1' || temperatureProbe === '2' || temperatureProbe === '3') {
@@ -981,9 +1702,9 @@ export const deviceTemperatureCalibration = async (protocolId, type, context, bu
     for (const calibrationFn of calibrations) {
       const result = await calibrationFn(protocolId, type, context);
       if (result) {
-        if (type==='one'){
+        if (type === 'one') {
           context.createLeftSpanMessage('温度标定失败', 'red');
-        }else{
+        } else {
           context.createRightSpanMessage('温度标定失败', 'red');
         }
         notPass = true

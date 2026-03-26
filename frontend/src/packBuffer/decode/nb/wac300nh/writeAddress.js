@@ -1,7 +1,6 @@
 import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
-import {decodeCheckAwakenWAC300NH} from "@/packBuffer/decode/nb/wac300nh/awaken";
 
-export function decodeCheckWriteAddressWAC300NH(valveAddress, responseMessage) {
+export function writeAddress(valveAddress, responseMessage) {
   let splicingAddress = '';
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)

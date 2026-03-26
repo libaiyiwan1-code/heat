@@ -1,0 +1,10 @@
+export {inquireSelfTest} from './inquireSelfTest'
+export {awaken} from './awaken'
+export {exitSelfTest} from './exitSelfTest'
+export {readAddress} from './readAddress'
+export {readData} from './readData'
+export {readICCID} from './readICCID'
+export {readIMEI} from './readIMEI'
+export {readSelfTestStatus} from './readSelfTestStatus'
+export {writeAddress} from './writeAddress'
+

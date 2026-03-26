@@ -8,22 +8,40 @@ export default {
   nbDeviceButton: {
     color: {
       selfTest: '#FF770F',
+      calibration4to20mA: '#FF770F',
       writeAddress: '#FF770F',
       awaken: '#FF770F',
       breakSelfTest: '#FF770F',
       labelPrint: '#FF770F',
       quadraticVerify:'#FF770F',
-      scanCode:'#FF770F'
+      scanCode:'#FF770F',
+      zeroMpaDemarcate:'#FF770F',
+      onePointSixMpaDemarcate:'#FF770F',
+      deviceInspection:'#FF770F',
+      powerInspection:'#FF770F',
+      readSelfTestStatus:'#FF770F',
+      singleChannelCalibration:'#FF770F',
+      doubleChannelCalibration:'#FF770F',
+      readTemperature:'#FF770F',
 
     },
     disabledStatus: {
       selfTest: false,
+      calibration4to20mA:false,
       writeAddress: false,
       awaken: false,
       breakSelfTest: false,
       labelPrint: false,
       quadraticVerify:false,
-      scanCode:false
+      scanCode:false,
+      zeroMpaDemarcate:false,
+      onePointSixMpaDemarcate:false,
+      deviceInspection:false,
+      powerInspection:false,
+      readSelfTestStatus:false,
+      singleChannelCalibration:false,
+      doubleChannelCalibration:false,
+      readTemperature:false,
     }
   },
   wireDeviceButton: {
@@ -34,6 +52,9 @@ export default {
       closeCalibrationOneColor: 'grey',
       openCalibrationOneColor: 'grey',
       panelCommunicationOneColor: 'grey',
+      enterCalibrationOneColor: 'grey',
+      outputCalibrationOneColor: 'grey',
+      calibrationVerificationOneColor: 'grey',
       swipeCardFunctionOneColor: 'grey',
       separationAlarmOneColor: 'grey',
       mainAuxiliaryValveOneColor: 'grey',
@@ -96,6 +117,8 @@ export default {
       factoryStatusWriteTwo: true,
       scanVerificationTwo: true,
       processTwo: false,
+      printLabelOne:false,
+      printLabelTwo:false,
     }
   },
 };

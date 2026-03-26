@@ -1,9 +1,8 @@
 import {checkIMEI, hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 import {decodeGetIMEI} from "@/packBuffer/decode/decode";
-import {decodeCheckAwakenWAC300NH} from "@/packBuffer/decode/nb/wac300nh/awaken";
 
 
-export function decodeCheckReadIMEIWAC300NH(context, responseMessage) {
+export function readIMEI(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =

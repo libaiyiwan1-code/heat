@@ -4,7 +4,7 @@ import {decodeGetICCID} from "@/packBuffer/decode/decode";
 const Log = require('ee-core/log');
 
 
-export function decodeCheckReadICCIDWAC330HE(context, responseMessage) {
+export function readICCID(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   let responseDataView = new DataView(messageBuffer)
   // 跳过红外长度

@@ -27,6 +27,7 @@ const ipcApiRoute = {
   someJobByPool: 'controller.framework.someJobByPool',
   hello: 'controller.framework.hello',
   openSoftware: 'controller.framework.openSoftware',
+  saveProduceParam: 'controller.framework.saveProduceParam',
 
   // os
   messageShow: 'controller.os.messageShow',
@@ -48,6 +49,8 @@ const ipcApiRoute = {
   getPath: 'controller.os.getPath',
 
   // hardware
+  printAddressSingleRowLabelWAC330HE: 'controller.hardware.printAddressSingleRowLabelWAC330HE',/*50*12单排*/
+  printDoubleRowLabel3012LPC230: 'controller.hardware.printDoubleRowLabel3012LPC230',/*50*12单排*/
   printDoubleRowLabel4020: 'controller.hardware.printDoubleRowLabel4020',
   printAddressSingleRowLabelVAC5012: 'controller.hardware.printAddressSingleRowLabelVAC5012',
   printAddressSingleRowLabelWAC5012: 'controller.hardware.printAddressSingleRowLabelWAC5012',
@@ -61,7 +64,8 @@ const ipcApiRoute = {
   printStatus: 'controller.hardware.printStatus',
   printAddressAndModel: 'controller.hardware.printAddressAndModel',
   printSuccessMessage:'controller.hardware.printSuccessMessage',
-
+  doPrint: 'controller.hardware.doPrint',
+  doPrintTest: 'controller.hardware.doPrintTest',
   // effect
   selectFile: 'controller.effect.selectFile',
   loginWindow: 'controller.effect.loginWindow',

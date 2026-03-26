@@ -163,7 +163,7 @@ export function decodeGetProductNameWAC300CD(responseMessage) {
   return productName
 
 }
-export function decodeCheckReadSelfTestStatusWAC300CD(context, responseMessage) {
+export function readSelfTestStatus(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   let dataView = new DataView(messageBuffer)
   let baseCheck =

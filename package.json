@@ -1,9 +1,18 @@
 {
-  "name": "ee",
-  "version": "1.0.0",
-  "description": "A fast, desktop software development framework",
+  "name": "hlm-production-tool-setup",
+  "version": "1.0.1",
+  "build": {
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "http://192.168.0.158:876/updates/latest.yml"
+      }
+    ]
+  },
+  "description": "海龙马生产工具",
   "main": "main.js",
   "scripts": {
+    "prebuild-installer": "node update-version.js",
     "build": "vite build",
     "preview": "vite preview",
     "dev": "ee-bin dev",
@@ -11,7 +20,7 @@
     "dev-electron": "ee-bin dev --serve=electron",
     "dev-go": "ee-bin dev --serve=go",
     "dev-python": "ee-bin exec --cmds=python",
-    "build-frontend": "ee-bin build --cmds=frontend && ee-bin move --flag=frontend_dist",
+    "build-frontend": "node update-version.js && ee-bin build --cmds=frontend && ee-bin move --flag=frontend_dist",
     "build-go-w": "ee-bin move --flag=go_static,go_config,go_package,go_images && ee-bin build --cmds=go_build_w",
     "build-go-m": "ee-bin move --flag=go_static,go_config,go_package,go_images && ee-bin build --cmds=go_build_m",
     "build-go-l": "ee-bin move --flag=go_static,go_config,go_package,go_images && ee-bin build --cmds=go_build_l",
@@ -60,18 +69,22 @@
     "ee-bin": "^1.5.0",
     "electron": "^21.4.4",
     "electron-builder": "^23.6.0",
+    "electron-rebuild": "^3.2.9",
     "eslint": "^5.13.0",
     "eslint-plugin-prettier": "^3.0.1",
     "nodemon": "^2.0.16",
     "vite": "^5.1.6"
   },
   "dependencies": {
+    "@thiagoelg/node-printer": "^0.6.2",
     "ant-design-vue": "^4.0.0-rc.6",
     "better-sqlite3": "^8.4.0",
     "bwip-js": "^4.3.2",
     "dayjs": "^1.10.7",
     "ee-core": "^2.9.2",
+    "electron-log": "^5.4.3",
     "electron-updater": "^5.3.0",
+    "ipp": "^2.0.1",
     "jsbarcode": "^3.11.6",
     "less": "^4.2.0",
     "lodash": "^4.17.21",
@@ -80,9 +93,12 @@
     "mysql": "^2.18.1",
     "node": "^21.7.1",
     "node-pre-gyp": "^0.17.0",
+    "node-thermal-printer": "^4.5.0",
+    "printer-lp": "^1.0.3",
     "qr-image": "^3.2.0",
     "serialport": "^12.0.0",
     "systeminformation": "^5.25.11",
+    "usb": "^2.16.0",
     "vue-barcode": "^1.3.0",
     "yarn": "^1.22.22"
   }

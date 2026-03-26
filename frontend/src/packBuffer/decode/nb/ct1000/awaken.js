@@ -1,6 +1,6 @@
 import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 
-export function decodeCheckAwakenCT1000(responseMessage) {
+export function awaken(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   let dataView = new DataView(messageBuffer)
   return dataView.getUint8(16) !== 0X68 ||

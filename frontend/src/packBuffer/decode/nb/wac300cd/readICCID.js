@@ -3,7 +3,7 @@ import {decodeGetICCID} from "@/packBuffer/decode/decode";
 
 
 
-export function decodeCheckReadICCIDWAC300CD(context,responseMessage) {
+export function readICCID(context,responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =

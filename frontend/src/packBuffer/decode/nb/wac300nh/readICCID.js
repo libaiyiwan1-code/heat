@@ -1,10 +1,9 @@
 import {checkICCID, checkIMEI, hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 import {decodeGetICCID} from "@/packBuffer/decode/decode";
-import {decodeCheckAwakenWAC300NH} from "@/packBuffer/decode/nb/wac300nh/awaken";
 
 
 
-export function decodeCheckReadICCIDWAC300NH(context,responseMessage) {
+export function readICCID(context,responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =

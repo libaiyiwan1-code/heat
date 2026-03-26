@@ -1,5 +1,4 @@
 'use strict';
-
 const path = require('path');
 
 /**
@@ -12,13 +11,10 @@ module.exports = (appInfo) => {
      * @author 李柏毅
      * @date 2025年7月15日
      * 应用title 版本号显示 每次打包自己手动定义
-     * 规则：
-     *      有线：
-     *          2.0.001 001累加
-     *      无线：
-     *          2.1.001 001累加    2.1起 包含VAC系列。
+     * version 通过package.json 读取，在生命周期中读取写入
+     *
      * */
-    config.version = '2.1.006'
+    config.version = undefined
     /**
      * 开发者工具
      */
@@ -164,6 +160,10 @@ module.exports = (appInfo) => {
         mainExit: false,
         childExit: true,
         rendererExit: true,
+        // 新增 crashLog 配置
+        crashLogPath: path.join(__dirname, '../../logs/crash.log'), // 日志文件路径
+        // 定时写性能快照的间隔（毫秒）
+        perfInterval: 2000,
     };
 
     /**

@@ -15,11 +15,6 @@ export function decodeGetReadOutTemperature(responseMessage) {
 }
 
 
-export function decodeGetTemperatureProbesWAC300CDConfig(responseMessage) {
-  let messageBuffer = hex2arrayBuffer(responseMessage);
-  let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(64)
-}
 export function decodeGetTemperatureProbesNTP100CConfig(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
@@ -35,5 +30,7 @@ export function decodeReadAddress(responseMessage, isCover = false) {
   responseMessage = responseMessage.replace(/\s/g, '');
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
-  return dataView.getUint32(22, isCover).toString(16)
+  return      dataView.getUint32(22, isCover)
+      .toString(16)
+      .padStart(8, '0')
 }

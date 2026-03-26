@@ -49,6 +49,24 @@ export const checkPort = (context, type) => {
       context.createLeftSpanMessage('串口未打开', 'grey');
       return false
     }
+  }else if (type === 'voltmeter') {
+    if (context.portAttributes.selectedPortVoltageSource === null || context.portAttributes.selectedPortVoltageSource === undefined) {
+      context.createLeftSpanMessage('请选择电压表串口', 'grey');
+      return false
+    }
+    if (context.portAttributes.portClosedOneStatus) {
+      context.createLeftSpanMessage('电压表串口未打开', 'grey');
+      return false
+    }
+  }else if (type === '485') {
+    if (context.portAttributes.selectedPort485 === null || context.portAttributes.selectedPort485 === undefined) {
+      context.createLeftSpanMessage('请选择485串口', 'grey');
+      return false
+    }
+    if (context.portAttributes.portClosed485Status) {
+      context.createLeftSpanMessage('485串口未打开', 'grey');
+      return false
+    }
   }
 
   return true
@@ -79,6 +97,7 @@ export const doOpenPort = (context, portName, parity, dataBits, baudRate, stopBi
           Log.error('Failed to open port:', err.message);
           reject(err);
         } else {
+          context.createLeftSpanMessage('当前打开串口 波特率：' + baudRate + '校验位:' + parity, 'grey')
           // 串口打开成功
           console.log(context.portAttributes.serialPortOne.isPaused());
           Log.info(portName + ':串口暂停状态:', context.portAttributes.serialPortOne.isPaused());
@@ -105,6 +124,7 @@ export const doOpenPort = (context, portName, parity, dataBits, baudRate, stopBi
           Log.error('Failed to open port:', err.message);
           reject(err);
         } else {
+          context.createLeftSpanMessage('当前打开串口 波特率：' + baudRate + '校验位:' + parity, 'grey')
           // 串口打开成功
           console.log(context.portAttributes.serialPortTwo.isPaused());
           Log.info(portName + ':串口暂停状态:', context.portAttributes.serialPortTwo.isPaused());
@@ -131,6 +151,7 @@ export const doOpenPort = (context, portName, parity, dataBits, baudRate, stopBi
           Log.error('Failed to open port:', err.message);
           reject(err);
         } else {
+          context.createLeftSpanMessage('当前打开串口 波特率：' + baudRate + '校验位:' + parity, 'grey')
           // 串口打开成功
           console.log(context.portAttributes.serialPortSignalSource.isPaused());
           Log.info(portName + ':串口暂停状态:', context.portAttributes.serialPortSignalSource.isPaused());
@@ -146,7 +167,10 @@ export const doOpenPort = (context, portName, parity, dataBits, baudRate, stopBi
 
   } else if (type === 'four') {
     return new Promise((resolve, reject) => {
+      baudRate=9600
+      parity='无'
       doCreatePort(context.portAttributes.serialPortCurrentSource, portName, '无', dataBits, 9600, stopBits, context, type);
+
       context.portAttributes.portClosedCurrentSourceStatus = false
       context.portAttributes.serialPortCurrentSource.open((err) => {
         if (err) {
@@ -157,12 +181,75 @@ export const doOpenPort = (context, portName, parity, dataBits, baudRate, stopBi
           Log.error('Failed to open port:', err.message);
           reject(err);
         } else {
+          context.createLeftSpanMessage('当前打开串口 波特率：' + baudRate + '校验位:' + parity, 'grey')
           console.log(context.portAttributes.serialPortCurrentSource)
           // 串口打开成功
           console.log(context.portAttributes.serialPortCurrentSource.isPaused());
           Log.info(portName + ':串口暂停状态:', context.portAttributes.serialPortCurrentSource.isPaused());
           console.log(context.portAttributes.serialPortCurrentSource.isOpen);
           Log.info(portName + ':串口打开状态:', context.portAttributes.serialPortCurrentSource.isOpen);
+          context.createLeftSpanMessage('串口：' + portName + '打开成功', 'grey');
+          doPortListening(context, portName, type);
+          resolve();
+        }
+      });
+
+    });
+
+  }else if (type === 'voltmeter') {
+    return new Promise((resolve, reject) => {
+      baudRate=9600
+      parity='无'
+      doCreatePort(context.portAttributes.serialPortVoltageSource, portName, parity, dataBits, baudRate, stopBits, context, type);
+
+      context.portAttributes.portClosedVoltageSourceStatus = false
+      context.portAttributes.serialPortVoltageSource.open((err) => {
+        if (err) {
+          // 串口打开失败
+          context.createLeftSpanMessage('串口：' + portName + '打开失败', 'grey');
+          context.portAttributes.serialPortVoltageSource = null;
+          console.error('Failed to open port:', err.message);
+          Log.error('Failed to open port:', err.message);
+          reject(err);
+        } else {
+          context.createLeftSpanMessage('当前打开串口 波特率：' + baudRate + '校验位:' + parity, 'grey')
+          console.log(context.portAttributes.serialPortVoltageSource)
+          // 串口打开成功
+          console.log(context.portAttributes.serialPortVoltageSource.isPaused());
+          Log.info(portName + ':串口暂停状态:', context.portAttributes.serialPortVoltageSource.isPaused());
+          console.log(context.portAttributes.serialPortVoltageSource.isOpen);
+          Log.info(portName + ':串口打开状态:', context.portAttributes.serialPortVoltageSource.isOpen);
+          context.createLeftSpanMessage('串口：' + portName + '打开成功', 'grey');
+          doPortListening(context, portName, type);
+          resolve();
+        }
+      });
+
+    });
+
+  }else if (type === '485') {
+    return new Promise((resolve, reject) => {
+      baudRate=9600
+      parity='无'
+      doCreatePort(context.portAttributes.serialPort485, portName, parity, dataBits, baudRate, stopBits, context, type);
+
+      context.portAttributes.portClosed485Status = false
+      context.portAttributes.serialPort485.open((err) => {
+        if (err) {
+          // 串口打开失败
+          context.createLeftSpanMessage('串口：' + portName + '打开失败', 'grey');
+          context.portAttributes.serialPort485 = null;
+          console.error('Failed to open port:', err.message);
+          Log.error('Failed to open port:', err.message);
+          reject(err);
+        } else {
+          context.createLeftSpanMessage('当前打开串口 波特率：' + baudRate + '校验位:' + parity, 'grey')
+          console.log(context.portAttributes.serialPort485)
+          // 串口打开成功
+          console.log(context.portAttributes.serialPort485.isPaused());
+          Log.info(portName + ':串口暂停状态:', context.portAttributes.serialPort485.isPaused());
+          console.log(context.portAttributes.serialPort485.isOpen);
+          Log.info(portName + ':串口打开状态:', context.portAttributes.serialPort485.isOpen);
           context.createLeftSpanMessage('串口：' + portName + '打开成功', 'grey');
           doPortListening(context, portName, type);
           resolve();
@@ -253,11 +340,30 @@ export const doClosePort = (context, portName, type) => {
       });
     }
 
+  }else if (type === '485') {
+    if (context.portAttributes.serialPort485 !== null) {
+      context.portAttributes.portClosed485Status = true
+      context.portAttributes.serialPort485.close((err) => {
+        if (err) {
+          console.error('Failed to close serial port:', err.message);
+          Log.error('Failed to close serial port:', err.message);
+        } else {
+          console.log('串口已暂停:' + portName, context.portAttributes.serialPort485.isPaused());
+          Log.info('串口已暂停:' + portName, context.portAttributes.serialPort485.isPaused());
+          console.log('串口已打开' + portName, context.portAttributes.serialPort485.isOpen);
+          Log.info('串口已打开' + portName, context.portAttributes.serialPort485.isOpen);
+          context.createLeftSpanMessage('串口：' + portName + '已关闭', 'grey');
+          context.portAttributes.serialPort485 = null;
+        }
+      });
+    }
+
   }
 
 };
 
 const doPortListening = (context, portName, type) => {
+  console.log("监听context对象:", context)
   if (type === 'one') {
     context.portAttributes.serialPortOne.on('error', (error) => {
       console.log('port Listening error: ' + error);
@@ -348,6 +454,48 @@ const doPortListening = (context, portName, type) => {
     } else {
       console.log('串口已经在监听中', portName);
     }
+  }else if (type==='voltmeter'){
+    if (context.portAttributes.serialPortVoltageSource.listenerCount('data') === 0) {
+      console.log('监听串口', portName);
+      context.portAttributes.serialPortVoltageSource.on('data', (data) => {
+        // console.warn('监听的串口对象',context.serialPort[portName])
+        // console.warn('监听的串口名称',portName)
+        let hexString = data.toString('hex').toUpperCase();
+        // console.warn('接收报文:', hexString);
+        context.receivedData.globalReceivedVoltageSourceData += hexString;
+      });
+
+      context.portAttributes.serialPortVoltageSource.on('error', (error) => {
+        console.log('port Listening error: ' + error);
+        Log.error('port Listening error: ' + error);
+        context.portAttributes.serialPortVoltageSource.close(); // 发生错误时关闭串口
+        context.portAttributes.serialPortVoltageSource = null;
+      });
+      console.log('监听串口成功', portName);
+    } else {
+      console.log('串口已经在监听中', portName);
+    }
+  }else if (type==='485'){
+    if (context.portAttributes.serialPort485.listenerCount('data') === 0) {
+      console.log('监听串口', portName);
+      context.portAttributes.serialPort485.on('data', (data) => {
+        // console.warn('监听的串口对象',context.serialPort[portName])
+        // console.warn('监听的串口名称',portName)
+        let hexString = data.toString('hex').toUpperCase();
+        // console.warn('接收报文:', hexString);
+        context.receivedData.globalReceived485Data += hexString;
+      });
+
+      context.portAttributes.serialPort485.on('error', (error) => {
+        console.log('port Listening error: ' + error);
+        Log.error('port Listening error: ' + error);
+        context.portAttributes.serialPort485.close(); // 发生错误时关闭串口
+        context.portAttributes.serialPort485 = null;
+      });
+      console.log('监听串口成功', portName);
+    } else {
+      console.log('串口已经在监听中', portName);
+    }
   }
 }
 
@@ -415,7 +563,50 @@ export const doCreatePort = (serialPort, portName, parity, dataBits, baudRate, s
     }
   } else if (type === 'four') {
     if (serialPort === undefined || serialPort === null) {
+      console.log('串口属性', portName, baudRate, dataBits, stopBits, parity)
       context.portAttributes.serialPortCurrentSource = new SerialPort({
+        path: portName,
+        baudRate: Number(baudRate),
+        autoOpen: false,
+        dataBits: Number(dataBits),
+        stopBits: Number(stopBits),
+        parity: parity === '无' ? 'none'
+          : parity === '奇校验' ? 'odd'
+            : parity === '偶校验' ? 'even'
+              : parity === 'Mark' ? 'mark'
+                : parity === '空格校验' ? 'space' : 'none'
+      }, (err) => {
+        if (err) {
+          console.error('create port fail : ', err.message);
+          Log.error('create port fail : ', err.message);
+        }
+      });
+    }
+  }else if (type === 'voltmeter') {
+    if (serialPort === undefined || serialPort === null) {
+      console.log('串口属性', portName, baudRate, dataBits, stopBits, parity)
+      context.portAttributes.serialPortVoltageSource = new SerialPort({
+        path: portName,
+        baudRate: Number(baudRate),
+        autoOpen: false,
+        dataBits: Number(dataBits),
+        stopBits: Number(stopBits),
+        parity: parity === '无' ? 'none'
+          : parity === '奇校验' ? 'odd'
+            : parity === '偶校验' ? 'even'
+              : parity === 'Mark' ? 'mark'
+                : parity === '空格校验' ? 'space' : 'none'
+      }, (err) => {
+        if (err) {
+          console.error('create port fail : ', err.message);
+          Log.error('create port fail : ', err.message);
+        }
+      });
+    }
+  }else if (type === '485') {
+    if (serialPort === undefined || serialPort === null) {
+      console.log('串口属性', portName, baudRate, dataBits, stopBits, parity)
+      context.portAttributes.serialPort485 = new SerialPort({
         path: portName,
         baudRate: Number(baudRate),
         autoOpen: false,
@@ -439,7 +630,7 @@ export const doCreatePort = (serialPort, portName, parity, dataBits, baudRate, s
 
 export function doWritePort(serialPort, arrayBuffer, type) {
 
-  if (type === 'one'||type==='meter') {
+  if (type === 'one'||type==='meter'||type==='cj88'||type==='voltmeter') {
     return new Promise((resolve, reject) => {
       if (serialPort) {
         serialPort.write(arrayBuffer, (err) => {
@@ -505,7 +696,30 @@ export function doWritePort(serialPort, arrayBuffer, type) {
       }
     })
 
-  } else if (type === 'four') {
+  } else if (type === 'four'||type==='currentSource') {
+    return new Promise((resolve, reject) => {
+      if (serialPort) {
+        serialPort.write(arrayBuffer, (err) => {
+          if (err) {
+            console.error('写入串口时发生错误:', err.message);
+            Log.error('写入串口时发生错误:', err.message);
+            reject(err);
+          } else {
+            console.log('数据已成功写入串口');
+            Log.info('数据已成功写入串口');
+            resolve();
+          }
+        });
+      } else {
+        const error = new Error('串口未初始化: ' + serialPort);
+        console.error(error.message);
+        Log.error(error.message);
+        reject(error);
+      }
+    })
+
+  }
+  else if (type==='485') {
     return new Promise((resolve, reject) => {
       if (serialPort) {
         serialPort.write(arrayBuffer, (err) => {
@@ -537,6 +751,7 @@ export function initializeAllSerialPorts(context, type) {
     context.portAttributes.selectedPortTwo = null
     context.portAttributes.selectedPortSignalSource = null
     context.portAttributes.selectedPortCurrentSource = null
+    context.portAttributes.serialPort485=null
     SerialPort.list().then(ports => {
       // context.ports = ports.map(port => ({path: port.path, available: true}));
       context.portAttributes.serialPortList = ports.map(port => port.path);
@@ -572,6 +787,7 @@ export function initializeAllSerialPorts(context, type) {
     context.portAttributes.portClosedTwoStatus = true;
     context.portAttributes.portClosedSignalSourceStatus = true;
     context.portAttributes.portClosedCurrentSourceStatus = true;
+    context.portAttributes.portClosed485Status = true;
   });
 }
 
@@ -632,6 +848,20 @@ export function doHandleSelectChange(context, type) {
           // 然后将串口对象置为 null
           context.portAttributes.portClosedCurrentSourceStatus = true;
           context.portAttributes.selectedPortCurrentSource = undefined
+        }
+      });
+    }
+  }else if (type === '485') {
+    if (context.portAttributes.serialPort485 && context.portAttributes.serialPort485.isOpen) {
+      // 如果串口对象存在且是打开状态，则关闭串口
+      context.portAttributes.serialPort485.close((err) => {
+        if (err) {
+          context.portAttributes.portClosed485Status = false;
+          context.portAttributes.selectedPort485 = undefined
+        } else {
+          // 然后将串口对象置为 null
+          context.portAttributes.portClosed485Status = true;
+          context.portAttributes.selectedPort485 = undefined
         }
       });
     }

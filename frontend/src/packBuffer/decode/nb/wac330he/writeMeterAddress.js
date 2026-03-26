@@ -2,7 +2,7 @@ import {addressCover, arrayBuffer2Hex, calculateCSByte, hex2arrayBuffer} from "@
 
 const Log = require('ee-core/log');
 
-export function decodeCheckMeterWriteAddressWAC330HE(context, responseMessage) {
+export function writeMeterAddress(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   let responseDataView = new DataView(messageBuffer)
   // 跳过包长度

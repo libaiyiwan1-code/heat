@@ -1,13 +1,14 @@
 // import { vac100WriteUpperAndLowerTemperatureLimits} from "@/views/device/action/deviceWireAction";
 import {badPrompt, readWireDeviceAddress,} from "@/views/device/operations/wireDeviceOperations";
 import {
+  calibrationVerification,
   deviceMainAndAuxiliaryValves,
   deviceSeparationAlarm,
   deviceTemperatureCalibration,
   deviceVersionMatch,
-  deviceWriteAddress, doScanVerification,
+  deviceWriteAddress, doScanVerification, enterCalibration,
   fullCloseCalibration,
-  fullOpenCalibration,
+  fullOpenCalibration, outputCalibration,
   panelCommunication,
   swipeCardFunction,
   writeCompleteConfiguration,
@@ -18,8 +19,8 @@ import {ipcApiRoute} from "@/api/main";
 import {addressCover, arrayBuffer2Hex} from "@/packBuffer/common/comUtil";
 
 const Log = require('ee-core/log');
-export const executeWithAddress = async (protocolId, type, context, action) => {
-  let pass = await readWireDeviceAddress(protocolId, type, context);
+export const executeWithAddress = async (protocolId, type, context, isInfraredDevice, action) => {
+  let pass = await readWireDeviceAddress(protocolId, type, context, isInfraredDevice);
   const valveAddress = type === 'one' ? context.leftReadAddress : context.rightReadAddress;
   await action(valveAddress);
 };
@@ -43,6 +44,14 @@ export const executeWithAddress = async (protocolId, type, context, action) => {
 export const executionProcess = async (type, protocolId, startOperation, context, isInitExecute = 0) => {
   let isCanceled = false;
   let openMission = false;
+  let isInfraredDevice = false;
+  if (
+    context.configForm.produceModel === 'VAC130-4/20mA' || context.configForm.produceModel === 'VAC130-0/10V' || context.configForm.produceModel === 'VAC130-1/10V'||
+    context.configForm.produceModel === 'VAC130H-4/20mA' || context.configForm.produceModel === 'VAC130H-0/10V' || context.configForm.produceModel === 'VAC130H-1/10V'
+
+  ) {
+    isInfraredDevice = true
+  }
   if (type === 'one') {
     context.autoLeftWorkExecute = false;  //结束监听写地址聚焦
   } else if (type === 'two') {
@@ -62,15 +71,17 @@ export const executionProcess = async (type, protocolId, startOperation, context
     context.$message.error('写地址前请输入8位地址')
     if (type === 'one') {
       context.createLeftSpanMessage('写地址前请输入8位地址', 'red')
+      context.leftGenerateAddress=''
     } else {
       context.createRightSpanMessage('写地址前请输入8位地址', 'red')
-    }
+      context.rightGenerateAddress=''}
     return false
   }
   //按钮禁用全部,颜色初始化(灰色)
   context.wireDeviceButtonAwait(type)
   context.wireDeviceButtonDisabled(type)
-
+  context.wireButtonDisabledStatus.printLabelOne=true
+  context.wireButtonDisabledStatus.printLabelTwo=true
   //按钮颜色
   let configureWriteColor = type === 'one' ? 'configureWriteOneColor' : 'configureWriteTwoColor'
   let versionMatchColor = type === 'one' ? 'versionMatchOneColor' : 'versionMatchTwoColor'
@@ -84,6 +95,9 @@ export const executionProcess = async (type, protocolId, startOperation, context
   let temperatureCalibrationColor = type === 'one' ? 'temperatureCalibrationOneColor' : 'temperatureCalibrationTwoColor'
   let factoryStatusWriteColor = type === 'one' ? 'factoryStatusWriteOneColor' : 'factoryStatusWriteTwoColor'
   let scanVerificationColor = type === 'one' ? 'scanVerificationOneColor' : 'scanVerificationTwoColor'
+  let enterCalibrationColor = type === 'one' ? 'enterCalibrationOneColor' : 'enterCalibrationOneColor'
+  let outputCalibrationColor = type === 'one' ? 'outputCalibrationOneColor' : 'outputCalibrationOneColor'
+  let calibrationVerificationColor = type === 'one' ? 'calibrationVerificationOneColor' : 'calibrationVerificationOneColor'
 
 
   // 操作列顺序
@@ -92,44 +106,91 @@ export const executionProcess = async (type, protocolId, startOperation, context
       fn: writeCompleteConfiguration,
       name: '配置写入',
       actionType: 'writeCompleteConfiguration',
-      buttonColor: configureWriteColor
+      buttonColor: configureWriteColor,
+      isInfraredDevice: isInfraredDevice,
     },
-    {fn: deviceVersionMatch, name: '版本匹配', actionType: 'deviceVersionMatch', buttonColor: versionMatchColor},
-    {fn: deviceWriteAddress, name: '地址写入', actionType: 'deviceWriteAddress', buttonColor: writeAddressColor},
+    {
+      fn: deviceVersionMatch, name: '版本匹配', actionType: 'deviceVersionMatch', buttonColor: versionMatchColor,
+      isInfraredDevice: isInfraredDevice,
+    },
+    {
+      fn: deviceWriteAddress, name: '地址写入', actionType: 'deviceWriteAddress', buttonColor: writeAddressColor,
+      isInfraredDevice: isInfraredDevice,
+    },
     {
       fn: fullCloseCalibration,
       name: '全关标定',
       actionType: 'fullCloseCalibration',
-      buttonColor: closeCalibrationColor
+      buttonColor: closeCalibrationColor,
+      isInfraredDevice: isInfraredDevice,
     },
-    {fn: fullOpenCalibration, name: '全开标定', actionType: 'fullOpenCalibration', buttonColor: openCalibrationColor},
-    {fn: panelCommunication, name: '面板通信', actionType: 'panelCommunication', buttonColor: panelCommunicationColor},
-    {fn: swipeCardFunction, name: '刷卡功能', actionType: 'swipeCardFunction', buttonColor: swipeCardFunctionColor},
+    {
+      fn: fullOpenCalibration, name: '全开标定', actionType: 'fullOpenCalibration', buttonColor: openCalibrationColor,
+      isInfraredDevice: isInfraredDevice,
+    },
+    {
+      fn: panelCommunication, name: '面板通信', actionType: 'panelCommunication', buttonColor: panelCommunicationColor,
+      isInfraredDevice: isInfraredDevice,
+    },
+    {
+      fn: swipeCardFunction, name: '刷卡功能', actionType: 'swipeCardFunction', buttonColor: swipeCardFunctionColor,
+      isInfraredDevice: isInfraredDevice,
+    },
     {
       fn: deviceSeparationAlarm,
       name: '分离测试',
       actionType: 'deviceSeparationAlarm',
-      buttonColor: separationAlarmColor
+      buttonColor: separationAlarmColor,
+      isInfraredDevice: isInfraredDevice,
     },
     {
       fn: deviceMainAndAuxiliaryValves,
       name: '副阀通讯',
       actionType: 'deviceMainAndAuxiliaryValves',
-      buttonColor: mainAuxiliaryValveColor
+      buttonColor: mainAuxiliaryValveColor,
+      isInfraredDevice:isInfraredDevice,
     },
     {
       fn: deviceTemperatureCalibration,
       name: '温度标定',
       actionType: 'deviceTemperatureCalibration',
-      buttonColor: temperatureCalibrationColor
+      buttonColor: temperatureCalibrationColor,
+      isInfraredDevice:isInfraredDevice,
     },
     {
       fn: writeOutFactoryOpenCondition,
       name: '出厂配置',
       actionType: 'writeOutFactoryOpenCondition',
-      buttonColor: factoryStatusWriteColor
+      buttonColor: factoryStatusWriteColor,
+      isInfraredDevice:isInfraredDevice,
     },
-    {fn: doScanVerification, name: '扫码验证', actionType: 'doScanVerification', buttonColor: scanVerificationColor},
+    {
+      fn: enterCalibration,
+      name: '输入标定',
+      actionType: 'deviceEnterCalibration',
+      buttonColor: enterCalibrationColor,
+      isInfraredDevice: isInfraredDevice,
+    },
+    {
+      fn: outputCalibration,
+      name: '输出标定',
+      actionType: 'deviceOutputCalibration',
+      buttonColor: outputCalibrationColor,
+      isInfraredDevice: isInfraredDevice,
+    },
+    {
+      fn: calibrationVerification,
+      name: '标定验证',
+      actionType: 'deviceCalibrationVerification',
+      buttonColor: calibrationVerificationColor,
+      isInfraredDevice: isInfraredDevice,
+    },
+
+
+    {
+      fn: doScanVerification, name: '扫码验证', actionType: 'doScanVerification', buttonColor: scanVerificationColor,
+      isInfraredDevice: isInfraredDevice,
+    },
   ];
 
   let startIndex = 0; //默认从配置写入开始执行
@@ -152,16 +213,16 @@ export const executionProcess = async (type, protocolId, startOperation, context
   if (isCanceled) {
     return false
   }
-  await executeWithAddress(protocolId, type, context, async (valveAddress) => {
+  await executeWithAddress(protocolId, type, context, isInfraredDevice, async (valveAddress) => {
     //TODO 不接入设备直接失败
     if (valveAddress === undefined || valveAddress === '') {
       context.createLeftSpanMessage('读取地址失败', 'red')
       //流程失败从新执行 恢复监听与重试按钮
-      if (type==='one'){
+      if (type === 'one') {
         context.autoLeftWorkExecute = true;
         context.leftScanAddressMissionStop = false
         context.listenLeftFixture()
-      }else if (type==='two'){
+      } else if (type === 'two') {
         context.autoRightWorkExecute = true;
         context.rightScanAddressMissionStop = false
         context.listenRightFixture()
@@ -178,10 +239,10 @@ export const executionProcess = async (type, protocolId, startOperation, context
     }
     try {
       // 按顺序执行操作
-      for (const {fn, name, actionType, buttonColor} of operationsToExecute) {
+      for (const {fn, name, actionType, buttonColor, isInfraredDevice} of operationsToExecute) {
         //写地址后的一个流程更新最新地址
         if (name === '全关标定') {
-          await executeWithAddress(protocolId, type, context, async (writeAfterAddress) => {
+          await executeWithAddress(protocolId, type, context, isInfraredDevice, async (writeAfterAddress) => {
             valveAddress = writeAfterAddress;
           })
         }
@@ -198,12 +259,12 @@ export const executionProcess = async (type, protocolId, startOperation, context
             context.listenRightFixture('scan', type)
           }
         }
-        const result = await fn(protocolId, type, context, buttonColor);
+        const result = await fn(protocolId, type, context, buttonColor, isInfraredDevice);
 
         if (result) {
           if (type === 'one') {
             context.createLeftSpanMessage(name + ' 流程失败', 'red')
-          }else {
+          } else {
             context.createRightSpanMessage(name + ' 流程失败', 'red')
           }
           console.log(`当前执行流程： ${name} - ${type === 'one' ? '左侧工装' : '右侧工装'} ,执行失败`);
@@ -213,7 +274,7 @@ export const executionProcess = async (type, protocolId, startOperation, context
           isCanceled = true; //取消上一次任务的标识
           //扫码验证流程失败上传最新地址
           if (name === '扫码验证') {
-            await executeWithAddress(protocolId, type, context, async (readAddress) => {
+            await executeWithAddress(protocolId, type, context, isInfraredDevice, async (readAddress) => {
               await context.uploadMes(arrayBuffer2Hex(addressCover(readAddress.slice(0, 8))), 0, name + ' 流程失败')
             })
           }
@@ -249,9 +310,12 @@ export const executionProcess = async (type, protocolId, startOperation, context
             deviceName: context.defaultDeviceName,
             address: arrayBuffer2Hex(addressCover(valveAddress.substring(0, 8))),
             message: name + '失败',
-            width: context.printLabelWidth,
-            height: context.printLabelHeight,
-            listDoubleRowLabels:context.listDoubleRowLabels,
+            isDouble: context.configDetail.whetherDoubleRowPrinting==='是',
+            width: context.configDetail.labelWith,
+            margin: context.configDetail.labelMargin,
+            marginLeft:context.configDetail.lableMarginLeft,
+            secondColumnFontSize:context.configDetail.secondColumnFontSize,
+            height: context.configDetail.labelHeight,
           };
           await ipc.send(ipcApiRoute.printErrorSingleRowInspectLabel5012, params)
 
@@ -264,23 +328,26 @@ export const executionProcess = async (type, protocolId, startOperation, context
               context.processTextOne = '开始测试'
               context.leftGoodProductQuantity++
               context.leftWorkPrompt = '贴检验标签，完成后生产下一个'
-
-              await executeWithAddress(protocolId, type, context, async (readAddress) => {
+              context.wireDeviceButtonEnabled(type);
+              await executeWithAddress(protocolId, type, context, isInfraredDevice, async (readAddress) => {
                 await context.uploadMes(arrayBuffer2Hex(addressCover(readAddress.slice(0, 8))), 1, '成功')
                 const params = {
-                  deviceName: context.defaultDeviceName,
-                  address: arrayBuffer2Hex(addressCover(readAddress.slice(0, 8))),
-                  message: '检  ' + context.routerParam.pwd,
-                  width: context.printLabelWidth,
-                  height: context.printLabelHeight,
-                  listDoubleRowLabels:context.listDoubleRowLabels,
-                };
+                   deviceName: context.defaultDeviceName,
+                   address: arrayBuffer2Hex(addressCover(valveAddress.substring(0, 8))),
+                    message: '检  ' + context.routerParam.pwd,
+                    isDouble: context.configDetail.whetherDoubleRowPrinting==='是',
+                    width: context.configDetail.labelWith,
+                    margin: context.configDetail.labelMargin,
+                    marginLeft:context.configDetail.lableMarginLeft,
+                    secondColumnFontSize:context.configDetail.secondColumnFontSize,
+                    height: context.configDetail.labelHeight,
+                  }
                 await ipc.send(ipcApiRoute.printSuccessSingleRowInspectLabel5012, params)
               })
               context.autoLeftWorkExecute = true
               context.leftScanAddressMissionStop = false
               //清空地址
-              context.leftGenerateAddress=''
+              context.leftGenerateAddress = ''
               context.listenLeftFixture()
               break
             } else {
@@ -292,23 +359,26 @@ export const executionProcess = async (type, protocolId, startOperation, context
               context.processTextTwo = '开始测试'
               context.rightGoodProductQuantity++
               context.rightWorkPrompt = '贴检验标签，完成后生产下一个'
-
-              await executeWithAddress(protocolId, type, context, async (readAddress) => {
+              context.wireDeviceButtonEnabled(type);
+              await executeWithAddress(protocolId, type, context, isInfraredDevice, async (readAddress) => {
                 await context.uploadMes(arrayBuffer2Hex(addressCover(readAddress.slice(0, 8))), 1, '成功')
                 const params = {
                   deviceName: context.defaultDeviceName,
-                  address: arrayBuffer2Hex(addressCover(readAddress.slice(0, 8))),
+                  address: arrayBuffer2Hex(addressCover(valveAddress.substring(0, 8))),
                   message: '检  ' + context.routerParam.pwd,
-                  width: context.printLabelWidth,
-                  height: context.printLabelHeight,
-                  listDoubleRowLabels:context.listDoubleRowLabels,
+                  isDouble: context.configDetail.whetherDoubleRowPrinting==='是',
+                  width: context.configDetail.labelWith,
+                  margin: context.configDetail.labelMargin,
+                  marginLeft:context.configDetail.lableMarginLeft,
+                  secondColumnFontSize:context.configDetail.secondColumnFontSize,
+                  height: context.configDetail.labelHeight,
                 };
                 await ipc.send(ipcApiRoute.printSuccessSingleRowInspectLabel5012, params)
               })
               context.autoRightWorkExecute = true
               context.rightScanAddressMissionStop = false
               //清空地址
-              context.rightGenerateAddress=''
+              context.rightGenerateAddress = ''
               context.listenRightFixture()
               break
             } else {

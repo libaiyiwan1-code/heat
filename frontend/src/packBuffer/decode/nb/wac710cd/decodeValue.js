@@ -1,5 +1,4 @@
 import {hex2arrayBuffer, hexToFloat} from "@/packBuffer/common/comUtil";
-import {decodeCheckReadTemperatureProbesWAC710CD} from "@/packBuffer/decode/nb/wac710cd/readProbesConfig";
 
 export function decodeGetDifferentialPressure(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);

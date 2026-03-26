@@ -114,7 +114,7 @@ export function decodeGetProductNameWAC330HE(responseMessage) {
 
 }
 
-export function decodeCheckReadSelfTestStatusWAC330HE(context, responseMessage) {
+export function readSelfTestStatus(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   // 跳过红外回包长度
   let skipLength = 33

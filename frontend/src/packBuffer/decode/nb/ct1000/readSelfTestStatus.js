@@ -163,7 +163,7 @@ export function decodeGetProductNameCT1000(responseMessage) {
   return productName
 
 }
-export function decodeCheckReadSelfTestStatusCT1000(context, responseMessage) {
+export function readSelfTestStatus(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   let dataView = new DataView(messageBuffer)
   let baseCheck =

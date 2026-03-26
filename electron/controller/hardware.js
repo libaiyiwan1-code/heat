@@ -1,5 +1,5 @@
 'use strict';
-
+const {SerialPort} = require('serialport');
 const {Controller} = require('ee-core');
 const path = require('path');
 const Ps = require('ee-core/ps');
@@ -12,7 +12,13 @@ const {info} = require("ee-core/log");
 const Log = require("ee-core/log");
 const targetDPI = 300;
 const baseScale = 1; // Base scale for 72 DPI
-const scale = Math.round((targetDPI / 72) * baseScale); // Approx. 4 for 300 DPI
+const {exec} = require("child_process");
+const usb = require('usb');
+const printer = require('@thiagoelg/node-printer');
+const {date} = require("yarn/lib/cli");
+const {getTemplate} = require("qr-image/lib/qr-base");
+
+
 /**
  * 硬件设备 - 功能demo
  * @class
@@ -186,9 +192,6 @@ class HardwareController extends Controller {
 
 
     /*40mm * 20mm*/
-    /**
-     * 打印
-     */
     print4020(args, event) {
         const deviceName = args.deviceName;
         let address = args.address;
@@ -324,6 +327,9 @@ class HardwareController extends Controller {
         return true;
     }
 
+    /**
+     * 打印
+     */
 
 
     /**
@@ -475,6 +481,651 @@ class HardwareController extends Controller {
 
         return true;
     }
+
+    getTemplate(config) {
+        let htmlStr = ''
+        let {
+            model,
+            configModel,
+            commonTraffic,
+            flowRange,
+            craftsmanCaliber,
+            date,
+            address,
+            listDoubleRowLabels,
+            png,
+            widthMM,
+            heightMM,
+            marginMM,
+            marginLeftMM,
+            secondColumnFontSize
+        } = config;
+        Log.info('config:',config)
+
+        if (configModel === 'WAC330HE') {
+            //50*12 单排
+            // 生成单个标签 HTML
+            const generateLabel = () => `
+        <div class="label">
+            <div class="barcode-container">
+                <img src="data:image/png;base64,${png.toString('base64')}" />
+                <div style="font-size: 2.8mm;font-weight: bold;">${address}</div>
+                <div class="text-date">${date}</div>
+            </div>
+            <div class="param-container">       
+                <div class="param-row">
+                    <span class="label-title">公称口径：</span>
+                    <span class="label-value">${craftsmanCaliber}</span> 
+                </div>
+                <div class="param-row">
+                    <span class="label-title">常用流量：</span>
+                    <span class="label-value">${commonTraffic}</span>
+                </div>
+                <div class="param-row">
+                    <span class="label-title">流量范围：</span>
+                    <span class="label-value">${flowRange}</span>
+                </div>
+            </div>
+        </div>
+    `;
+
+            // 双排标签
+            const labelsHTML = listDoubleRowLabels
+                ? generateLabel() + generateLabel()
+                : generateLabel();
+
+            // 返回完整 HTML
+            htmlStr = `
+<html>
+<head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Microsoft YaHei', sans-serif;
+        font-size: ${secondColumnFontSize}mm;
+    }
+
+    .container {
+        display: flex;
+        padding-left: ${marginLeftMM}mm;
+        gap: 3mm;
+        width: fit-content;
+        height: ${heightMM}mm;
+    }
+
+    .label {
+        width: ${widthMM}mm;
+        height: ${heightMM}mm;
+        margin-top: ${marginMM}mm;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    .barcode-container {
+        text-align: center;
+        margin-right: 2mm;
+    }
+    .barcode-container  {
+        width: 20mm;
+        height: 3mm;
+        object-fit: contain;
+    }
+  
+    .text-date {
+        font-size: 2.2mm;
+        font-weight: bold;
+        margin-top: 0.5mm;
+    }
+
+    .param-container{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .param-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1mm;
+    }
+    .label-title {
+        font-size: 2.3mm;
+        font-weight: bold;
+    }
+    .label-value {
+        font-size: 2.3mm;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        ${labelsHTML}
+    </div>
+</body>
+</html>
+`;
+
+        } else if (
+            configModel === 'LPC230' || configModel === 'LPC230E'||configModel==='VPT100'||configModel==='AEC100'||configModel==='CTW100'||configModel==='WAC230CF'
+            ||configModel==='WAC300NS'||configModel==='WAC400NS'||configModel==='VAC710S'||configModel==='VAC005C'||configModel==='RFT200-CAT1'||configModel==='RFT200'||
+            configModel==='NBT400'||configModel==='NTR300'||configModel==='CPT100'||configModel==='CPT100-10A'
+        ) {
+            //30*12 双排
+            let generateLabel = () => `
+            <div class="label-parent">
+                <div class="barcode-container">
+                    <img style="width: 20mm;height: 3.5mm;" src="data:image/jpg;base64,${png.toString('base64')}" >
+                </div>
+          
+                <div class="label">
+                     ${address}
+                </div>
+           </div> 
+        
+    `;
+
+            Log.info('listDoubleRowLabels:', listDoubleRowLabels)
+            // 双排标签
+            let labelsHTML = listDoubleRowLabels
+                ? generateLabel() + generateLabel()
+                : generateLabel();
+            Log.info(labelsHTML)
+            // 返回完整 HTML
+            htmlStr = `
+<html>
+<head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Microsoft YaHei', sans-serif;
+        font-size: ${secondColumnFontSize}mm;
+    }
+     .barcode-container {
+            width: 16mm;
+            height: 4mm;
+            margin-left: 1mm;
+                 margin-top: ${marginMM}mm;
+        }
+        .label-parent{
+          width: ${Number(widthMM)+2}mm;
+        }
+    .container {
+        display: flex;
+        padding-left: ${marginLeftMM}mm;
+        width: fit-content;
+        height: ${heightMM}mm;
+      
+    }
+
+    .label {
+        margin-top: 0.5mm;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        box-sizing: border-box;
+        text-align: center;
+        margin-left: 1.5mm;
+    }
+
+     
+</style>
+</head>
+<body>
+    <div class="container">
+        ${labelsHTML}
+    </div>
+</body>
+</html>
+`;
+
+
+        } else if (configModel === 'NTP100C' || configModel === 'WAC710CD' || configModel === 'WAC300CD'
+            || configModel === 'WAC300NH' || configModel === 'ET01' || configModel === 'WAC730C'||
+            configModel==='CAT400'||configModel==='CAT400S'||configModel==='WAC710C'||configModel==='WAC300C'
+            ||configModel==='WAC330N'
+        ) {
+            // 40*20 双排
+            // 生成单个标签 HTML
+            const generateLabel = () => `
+        <div class="label">
+         <div class="barcode-container">
+                <img style="width: 26mm;3.5mm;" src="data:image/jpg;base64,${png.toString('base64')}" >
+            </div>
+            <div >
+                 <p  style="line-height:0.15mm ; font-weight: 500;margin-top: 2mm;" >${address}</p>
+                <p style="line-height:0.15mm ;  font-weight: 500; margin-top: -0.3mm">型号: ${model}</p>
+                   <p style="line-height:0.15mm ;margin-left: -2mm;  font-weight: 500; margin-top: -0.3mm">${date}</p>
+                
+            </div>
+        </div>
+    `;
+
+            // 双排标签
+            const labelsHTML = listDoubleRowLabels
+                ? generateLabel() + generateLabel()
+                : generateLabel();
+
+            // 返回完整 HTML
+            htmlStr = `
+<html>
+<head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Microsoft YaHei', sans-serif;
+        font-size: ${secondColumnFontSize}mm;
+    }
+
+    .container {
+        display: flex;
+        margin-left: ${marginLeftMM}mm;
+        gap: 3mm;
+        width: fit-content;
+        height: ${heightMM}mm;
+    }
+
+    .label {
+        width: ${widthMM}mm;
+        height: ${heightMM}mm;
+        flex-direction: row;
+        box-sizing: border-box;
+        text-align: center;
+    }
+    .barcode-container{
+     margin-top: ${marginMM}mm;
+    
+    }
+
+ 
+  
+     
+</style>
+</head>
+<body>
+    <div class="container">
+        ${labelsHTML}
+    </div>
+</body>
+</html>
+`;
+
+
+        }else if (configModel === 'LPC210'||configModel==='LPC210E' ) {
+            // 40*20 双排
+            // 生成单个标签 HTML
+            const generateLabel = () => `
+        <div class="label">
+         <div class="barcode-container">
+                <img style="width: 34mm;height: 17px;" src="data:image/jpg;base64,${png.toString('base64')}" >
+            </div>
+            <div >
+                 <p  style="line-height:1mm ; font-weight: 500;margin-top: 2.5mm;" >${address}</p>
+                <p style="line-height:1mm ;  font-weight: 500; margin-top: -0.3mm">型号:  HDC024/7 </p>
+            </div>
+        </div>
+    `;
+
+            // 双排标签
+            const labelsHTML = listDoubleRowLabels
+                ? generateLabel() + generateLabel()
+                : generateLabel();
+
+            // 返回完整 HTML
+            htmlStr = `
+<html>
+<head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Microsoft YaHei', sans-serif;
+        font-size: ${secondColumnFontSize}mm;
+    }
+
+    .container {
+        display: flex;
+        margin-left: ${marginLeftMM}mm;
+        gap: 3mm;
+        width: fit-content;
+        height: ${heightMM}mm;
+    }
+
+    .label {
+        width: ${widthMM}mm;
+        height: ${heightMM}mm;
+        margin-top: ${marginMM}mm;
+        flex-direction: row;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+ 
+  
+     
+</style>
+</head>
+<body>
+    <div class="container">
+        ${labelsHTML}
+    </div>
+</body>
+</html>
+`;
+
+
+        }
+
+        return htmlStr;
+    }
+
+    async doPrintTest(args) {
+        const deviceName = args.defaultDeviceName;
+        let address = args.address;
+        const widthMM = args.width;   // 标签宽度
+        const heightMM = args.height;  // 标签高度
+        const marginMM = args.margin;   // 边距
+        const marginLeftMM = args.marginLeft;   // 右移动距离
+        const listDoubleRowLabels = args.isDouble; // 是否双排
+        const secondColumnFontSize = args.secondColumnFontSize; // 字号
+        Log.info('args:',args)
+        const opt = {
+            title: 'printer window',
+            x: 10,
+            y: 10,
+            width: 400,
+            height: 600,
+            show: false
+        };
+        const name = 'window-printer';
+        const printWindow = Addon.get('window').create(name, opt);
+        Log.info(address)
+
+        const png = await bwipjs.toBuffer({
+            bcid: 'code128',
+            text: address,
+            scale: 1,
+            width: 2,
+            height: 4,
+            includetext: false,
+            textxalign: 'center',
+        });
+
+
+        // 页面内容
+        let config = {
+            date: `日期：${new Date().getFullYear()}.${(new Date().getMonth() + 1).toString().padStart(2, '0')}`,
+            address: address,
+            widthMM: widthMM,
+            heightMM: heightMM,
+            marginMM: marginMM,
+            marginLeftMM: marginLeftMM,
+            listDoubleRowLabels: listDoubleRowLabels,
+            secondColumnFontSize: secondColumnFontSize,
+            model: args.model,
+            configModel: args.configModel,
+            commonTraffic: args.commonTraffic,
+            flowRange: args.flowRange,
+            craftsmanCaliber: args.craftsmanCaliber,
+            png: png
+        }
+        let content = this.getTemplate(config)
+
+        // 加载内容
+        printWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(content)}`);
+
+        // 将 mm 转换为微米（Electron pageSize 单位 µm）
+        const pageSize = {
+            width: widthMM * 990 * (listDoubleRowLabels ? 2 : 1), // 双排 + 额外边距
+            height: (heightMM) * 1000
+        };
+
+        printWindow.webContents.once('did-finish-load', () => {
+            printWindow.webContents.print({
+                silent: true, // 静默打印
+                printBackground: false,
+                deviceName: deviceName,
+                copies: 1,
+                landscape: false,
+                pageSize,
+                scaleFactor: 100, // 原始大小打印
+                margins: {
+                    marginType: 'none' // 禁用默认边距
+                }
+            }, (success, failureReason) => {
+                console.log('打印状态:', success, failureReason);
+                // printWindow.openDevTools()
+                // printWindow.close();
+            });
+        });
+
+        return true;
+    }
+
+
+    async doPrint(args) {
+        const deviceName = args.defaultDeviceName;
+        const modal = args.modal;
+        let address = '12345678';
+        const widthMM = args.width;   // 标签宽度
+        const heightMM = args.height;  // 标签高度
+        const marginMM = args.margin;   // 边距
+        const marginLeftMM = args.marginLeft;   // 右移动距离
+        const listDoubleRowLabels = args.isDouble; // 是否双排
+        const secondColumnFontSize = args.secondColumnFontSize; // 字号
+
+        const opt = {
+            title: 'printer window',
+            x: 10,
+            y: 10,
+            width: 400,
+            height: 600,
+            show: false
+        };
+        const name = 'window-printer';
+        const printWindow = Addon.get('window').create(name, opt);
+
+        // 页面内容
+        let content = `
+<html>
+<head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Microsoft YaHei', sans-serif;
+        font-size: ${secondColumnFontSize}mm;
+    }
+    .container {
+      
+        display: flex;
+        padding-left: ${marginLeftMM}mm; /* 整体右移 */
+        gap: 6mm /* 双排标签间距 */
+        width: fit-content;               /* 自适应总宽 */
+        height: ${heightMM}mm;
+       
+    }
+    .label {
+     margin-top: ${marginMM}mm;
+        width: ${widthMM}mm;
+        height: ${heightMM}mm;
+        line-height: ${heightMM}mm;
+        text-align: center;
+    }  
+    .label+.label {
+        margin-left: 3mm;
+    }
+  
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="label">${address}</div>
+        ${listDoubleRowLabels ? `<div class="label">${address}</div>` : ''}
+    </div>
+</body>
+</html>
+`;
+
+        // 加载内容
+        printWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(content)}`);
+
+        // 将 mm 转换为微米（Electron pageSize 单位 µm）
+        const pageSize = {
+            width: widthMM * 1000 * (listDoubleRowLabels ? 2 + 0.1 : 1), // 双排 + 额外边距
+            height: (heightMM) * 1000
+        };
+
+        printWindow.webContents.once('did-finish-load', () => {
+            printWindow.webContents.print({
+                silent: true, // 静默打印
+                printBackground: false,
+                deviceName: deviceName,
+                copies: 1,
+                landscape: false,
+                pageSize: pageSize,
+                margins: {marginType: 'none'},
+                scaleFactor: 100 // 原始大小打印
+            }, (success, failureReason) => {
+                console.log('打印状态:', success, failureReason);
+                // printWindow.close();
+            });
+        });
+
+        return true;
+    }
+
+    printDoubleRowLabel3012LPC230(args, event) {
+        const deviceName = args.deviceName;
+        let address = args.address
+        Log.info('address:' + address);
+        const model = args.selectPrintModel;
+        const date = args.date;
+        let width = Number(args.width)
+        let height = Number(args.height)
+        let listDoubleRowLabels = args.listDoubleRowLabels
+        Log.info('宽：' + width + '类型：', +typeof width + ' 高：' + height + '类型：' + typeof height);
+        const opt = {
+            title: 'printer window',
+            x: 10,
+            y: 10,
+            width: 400,
+            height: 600,
+            show: false
+        };
+        const name = 'window-printer';
+        const printWindow = Addon.get('window').create(name, opt);
+        const tempHtmlPath = path.join(Ps.getHomeDir(), '/public/html/view_example.html');
+
+        bwipjs.toBuffer({
+                bcid: 'code128',       // Barcode type
+                text: address,         // Text to encode
+                scale: 1, // 适配设备像素比率
+                width: 2, // 每个模块宽度
+                height: 4, // 每个模块宽度高度
+                includetext: false,    // Show human-readable text
+                textxalign: 'center',  // Text horizontal alignment
+                // textfont: 'Arial',     // 设置文本字体
+            },
+            function (err, png) {
+                if (err) {
+                    console.error('Error generating barcode:', err);
+                    return;
+                }
+
+                // address = address.replace(/(.)/g, '$1  ');
+                // Write content to tempHtmlPath
+                // address = address.split('').join(' ');
+                let content;
+                if (listDoubleRowLabels === '是') {
+                    content = `
+       <html>
+<head>
+          <style>
+        .container {
+            margin-top:0.1mm;
+            display: flex;
+            width: 80mm;
+        }
+      .label1, .label2 {
+             width: ${width}mm;
+              margin-left: 1mm;
+        }
+        .label2{
+        margin-left: 9mm;
+        }
+         .label2 {
+              padding-left: 5mm; /* 适当间距 */
+        }
+   
+        
+ 
+ 
+        
+    </style>
+
+</head>
+<body >
+    <div class="container">
+        <div class="label1">
+        <p  style="line-height:1mm ; font-size: 5mm;font-family: 'Microsoft YaHei', sans-serif;  ">${address}</p>
+        </div>
+      <div class="label2">
+         
+         <p  style="line-height:1mm ; font-size: 5mm;font-family: 'Microsoft YaHei', sans-serif;  ">${address}</p>
+            
+        </div>
+    </div>
+</body>
+</html>
+
+        `;
+
+                }
+
+                // fs.writeFileSync(tempHtmlPath, content);
+                printWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(content)}`);
+                // printWindow.loadURL(`file://${tempHtmlPath}`);
+                /*控制纸张大小*/
+                const pageSize = {
+                    width: 66 * 1000, // 转换为微米
+                    // width: 86 * 1000, // 转换为微米
+                    height: 14 * 1000
+                    // height: 22 * 1000
+                };
+                // printWindow.openDevTools();
+                // printWindow.show()
+                printWindow.webContents.once('did-finish-load', () => {
+                    printWindow.webContents.print({
+                        silent: true, //展示windows打印对话框
+                        printBackground: false,
+                        deviceName: deviceName,
+                        copies: 1,
+                        landscape: false,
+                        pageSize: 'A4',
+                        scaleFactor: 100, // 强制100%缩放
+                        margins: {
+                            marginType: 'none' // 禁用默认边距
+                        }
+                        // show:true
+                    }, (success, failureReason) => {
+                        info(success)
+                        const channel = 'controller.hardware.printStatus';
+                        event.reply(`${channel}`, {success, failureReason});
+                        // printWindow.close();
+                    });
+                });
+            });
+
+        return true;
+    }
+
 
     /**
      * VAC系列 地址标签打印 单排
@@ -762,22 +1413,18 @@ class HardwareController extends Controller {
         return true;
     }
 
-
     /**
-     *  成功检验标签打印 单排
+     * WAC330HE 定制化标签打印50*12 单排
      *
      * */
-    printSuccessSingleRowInspectLabel5012(args, event) {
-        const deviceName = args.deviceName;
+    printAddressSingleRowLabelWAC330HE(args, event) {
+        let deviceName = args.deviceName
         let address = args.address
-        Log.info('address:' + address);
-        // const model = args.selectPrintModel;
-        // const date = args.date;
-        let width = Number(args.width)
-        let height = Number(args.height)
-        let message = args.message
-        let listDoubleRowLabels = args.listDoubleRowLabels
-        Log.info('宽：' + width + '类型：', +typeof width + ' 高：' + height + '类型：' + typeof height);
+        let date = args.date
+        let craftsmanCaliber = args.craftsmanCaliber
+        let commonTraffic = args.commonTraffic
+        let flowRange = args.flowRange
+        Log.info(args)
         const opt = {
             title: 'printer window',
             x: 10,
@@ -788,7 +1435,6 @@ class HardwareController extends Controller {
         };
         const name = 'window-printer';
         const printWindow = Addon.get('window').create(name, opt);
-        const tempHtmlPath = path.join(Ps.getHomeDir(), '/public/html/view_example.html');
 
         bwipjs.toBuffer({
                 bcid: 'code128',       // Barcode type
@@ -798,46 +1444,68 @@ class HardwareController extends Controller {
                 height: 4, // 每个模块宽度高度
                 includetext: false,    // Show human-readable text
                 textxalign: 'center',  // Text horizontal alignment
-                // textfont: 'Arial',     // 设置文本字体
             },
             function (err, png) {
                 if (err) {
                     console.error('Error generating barcode:', err);
                     return;
                 }
-
-                // address = address.replace(/(.)/g, '$1  ');
-                // Write content to tempHtmlPath
-                // address=address  .split('').join(' ');
                 let content;
-                if (listDoubleRowLabels === '否') {
-                    content = `
+                content = `
      <html>
 <head>
     <style>
         .container {
-            width: 54mm;
-            height: 8mm;
-            display: flex;
+         
+          height:7mm;
+          display: flex;
         }
         .barcode-container {
             margin-top: -1mm;
-            margin-left: 1mm;
-            width: 22mm;
-            height: 10mm;
             text-align: center;
+          
+        }
+        .param-container{
+            margin-top:-1.3mm ;
+            margin-left: 2mm;
         }
         .barcode-container img {
             width: 20mm;
-            height: 5mm;
+            height: 3mm;
         }
         .barcode-number {
-            font-size: 3.5mm;
-            margin-top: 0.5mm;
+            font-size: 2.8mm;
+             font-family: "Microsoft YaHei UI", "Arial", sans-serif;
+            font-weight: bold;
         }
+        .text-date {
+            font-size: 2.1mm;
+            margin-top: 0.8mm;
+              font-family: "Microsoft YaHei UI", "Arial", sans-serif;
+            font-weight: bold;
+            width: 20mm;
+        }
+        
+        
+        .label{
+        font-size: 2.2mm;
+        font-family: "Microsoft YaHei UI", "Arial", sans-serif;
+        }.value{
+        font-size: 2.2mm;
+     font-family: "Microsoft YaHei UI", "Arial", sans-serif;
+            font-weight: bold;
+        
+        }  .param-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.2mm;
+            width: 27mm;
+        }
+
         @page {
-            size: 54mm 12mm;
+            size: 50mm 12mm;
         }
+   
     </style>
 </head>
 <body>
@@ -845,34 +1513,40 @@ class HardwareController extends Controller {
     <div class="barcode-container">
         <img src="data:image/jpg;base64,${png.toString('base64')}" />
         <div class="barcode-number">${address}</div>
+        <div class="text-date">${date}</div>
+       
     </div>
-    <span  style="font-size:4mm; margin-left: 2mm  ">${message}</span>
+    
+    <div class="param-container">       
+        <div class="param-row">
+             <span class="label">公称口径：</span>
+             <span class="value">${craftsmanCaliber}</span> 
+        </div>
+        <div class="param-row">
+             <span class="label">常用流量：</span>
+             <span class="value">${commonTraffic}</span>
+        </div>
+        <div class="param-row">
+            <span class="label">流量范围：</span>
+            <span class="value">${flowRange}</span>
+        </div>
+ 
+    </div>
+
 </div>
 </body>
 </html>
 
-        `;
+        `
 
-                }
-
-                // fs.writeFileSync(tempHtmlPath, content);
                 printWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(content)}`);
-                // printWindow.loadURL(`file://${tempHtmlPath}`);
-                /*控制纸张大小*/
-                const pageSize = {
-                    width: 54 * 1000, // 转换为微米
-                    // width: 86 * 1000, // 转换为微米
-                    height: 12 * 1000
-                    // height: 22 * 1000
-                };
-                // printWindow.openDevTools();
                 // printWindow.show()
+                // printWindow.openDevTools();
                 printWindow.webContents.once('did-finish-load', () => {
                     printWindow.webContents.print({
                         silent: true, //展示windows打印对话框
                         printBackground: false,
                         deviceName: deviceName,
-                        pageSize,
                         copies: 1,
                         landscape: false,
                         scaleFactor: 100, // 强制100%缩放
@@ -893,20 +1567,19 @@ class HardwareController extends Controller {
     }
 
     /**
-     *  失败检验标签打印 单排
+     *  成功检验标签打印 单排
      *
      * */
-    printErrorSingleRowInspectLabel5012(args, event) {
-        const deviceName = args.deviceName;
-        let address = args.address
-        Log.info('address:' + address);
-        // const model = args.selectPrintModel;
-        // const date = args.date;
-        let width = Number(args.width)
-        let height = Number(args.height)
+    async printSuccessSingleRowInspectLabel5012(args, event) {
         let message = args.message
-        let listDoubleRowLabels = args.listDoubleRowLabels
-        Log.info('宽：' + width + '类型：', +typeof width + ' 高：' + height + '类型：' + typeof height);
+        const deviceName = args.defaultDeviceName;
+        let address = args.address;
+        const widthMM = args.width;   // 标签宽度
+        const heightMM = args.height;  // 标签高度
+        const marginMM = args.margin;   // 边距
+        const marginLeftMM = args.marginLeft;   // 右移动距离
+        const listDoubleRowLabels = args.isDouble; // 是否双排
+        const secondColumnFontSize = args.secondColumnFontSize; // 字号
         const opt = {
             title: 'printer window',
             x: 10,
@@ -917,94 +1590,187 @@ class HardwareController extends Controller {
         };
         const name = 'window-printer';
         const printWindow = Addon.get('window').create(name, opt);
-        const tempHtmlPath = path.join(Ps.getHomeDir(), '/public/html/view_example.html');
 
-        bwipjs.toBuffer({
-                bcid: 'code128',       // Barcode type
-                text: address,         // Text to encode
-                scale: 1, // 适配设备像素比率
-                width: 2, // 每个模块宽度
-                height: 4, // 每个模块宽度高度
-                includetext: false,    // Show human-readable text
-                textxalign: 'center',  // Text horizontal alignment
-                // textfont: 'Arial',     // 设置文本字体
-            },
-            function (err, png) {
-                if (err) {
-                    console.error('Error generating barcode:', err);
-                    return;
-                }
+        const png = await bwipjs.toBuffer({
+            bcid: 'code128',
+            text: address,
+            scale: 1,
+            width: 2,
+            height: 4,
+            includetext: false,
+            textxalign: 'center',
+        });
 
-                // address = address.replace(/(.)/g, '$1  ');
-                // Write content to tempHtmlPath
-                // address=address  .split('').join(' ');
-                let content;
-                if (listDoubleRowLabels === '否') {
-                    content = `
+
+        let content = `
      <html>
 <head>
     <style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Microsoft YaHei', sans-serif;
+        font-size: ${secondColumnFontSize}mm;
+    }
         .container {
-            width: 54mm;
-            height: 8mm;
             display: flex;
+            padding-left: ${marginLeftMM}mm;
+            gap: 3mm;
+            width: ${widthMM}mm;
+            height: ${heightMM}mm;
+             margin-top: ${marginMM}mm;
+        }
+        .barcode-container {
+            margin-top: -1mm;
+            margin-left: 1mm;
+            width: 22mm;
+            height: 10mm;
+            text-align: center;
         }
         .barcode-number {
-            font-size: 4mm;
-            width: 25mm;
-        }
-        @page {
-            size: 54mm 12mm;
+            margin-top: -0.5mm;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="barcode-number">${address}</div>
-    <p  style="font-size: 4mm;   margin-top: auto;margin-left: -4mm">${message}</p>
+    <div class="barcode-container">
+        <img style="width: 25mm;height: 5mm;" src="data:image/jpg;base64,${png.toString('base64')}" />
+        <div class="barcode-number">${address}</div>
+    </div>
+    <span  style=" margin-left: 6mm ">${message}</span>
 </div>
 </body>
 </html>
 
         `;
 
-                }
 
-                // fs.writeFileSync(tempHtmlPath, content);
-                printWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(content)}`);
-                // printWindow.loadURL(`file://${tempHtmlPath}`);
-                /*控制纸张大小*/
-                const pageSize = {
-                    width: 54 * 1000, // 转换为微米
-                    // width: 86 * 1000, // 转换为微米
-                    height: 12 * 1000
-                    // height: 22 * 1000
-                };
-                // printWindow.openDevTools();
-                // printWindow.show()
-                printWindow.webContents.once('did-finish-load', () => {
-                    printWindow.webContents.print({
-                        silent: true, //展示windows打印对话框
-                        printBackground: false,
-                        deviceName: deviceName,
-                        pageSize,
-                        copies: 1,
-                        landscape: false,
-                        scaleFactor: 100, // 强制100%缩放
-                        margins: {marginType: 'none' // 禁用默认边距
-                        }
-                        // show:true
-                    }, (success, failureReason) => {
-                        info(success)
-                        const channel = 'controller.hardware.printStatus';
-                        event.reply(`${channel}`, {success, failureReason});
-                        // printWindow.close();
-                    });
-                });
+        printWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(content)}`);
+        /*控制纸张大小*/
+        const pageSize = {
+            width: widthMM * 990 * (listDoubleRowLabels ? 2 : 1), // 双排 + 额外边距
+            height: (heightMM) * 990
+        };
+        // printWindow.openDevTools();
+        // printWindow.show()
+        printWindow.webContents.once('did-finish-load', () => {
+            printWindow.webContents.print({
+                silent: true, //展示windows打印对话框
+                printBackground: false,
+                deviceName: deviceName,
+                pageSize,
+                copies: 1,
+                landscape: false,
+                scaleFactor: 100, // 强制100%缩放
+                margins: {
+                    marginType: 'none' // 禁用默认边距
+                }
+                // show:true
+            }, (success, failureReason) => {
+                info(success)
+                const channel = 'controller.hardware.printStatus';
+                event.reply(`${channel}`, {success, failureReason});
+                // printWindow.close();
             });
+        });
+
 
         return true;
     }
+
+    /**
+     *  失败检验标签打印 单排
+     *
+     * */
+    printErrorSingleRowInspectLabel5012(args, event) {
+        let message = args.message
+        const deviceName = args.defaultDeviceName;
+        let address = args.address;
+        const widthMM = args.width;   // 标签宽度
+        const heightMM = args.height;  // 标签高度
+        const marginMM = args.margin;   // 边距
+        const marginLeftMM = args.marginLeft;   // 右移动距离
+        const listDoubleRowLabels = args.isDouble; // 是否双排
+        const secondColumnFontSize = args.secondColumnFontSize; // 字号
+        const opt = {
+            title: 'printer window',
+            x: 10,
+            y: 10,
+            width: 400,
+            height: 600,
+            show: false
+        };
+        const name = 'window-printer';
+        const printWindow = Addon.get('window').create(name, opt);
+
+
+
+
+        let content = `
+     <html>
+<head>
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Microsoft YaHei', sans-serif;
+        font-size: ${secondColumnFontSize}mm;
+    }
+        .container {
+              padding-left: ${marginLeftMM}mm;
+            width: ${widthMM}mm;
+            height: ${heightMM}mm;
+             margin-top: ${marginMM}mm;
+            display: flex;
+        }
+        .barcode-number {
+            width: 22mm;
+        }
+ 
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="barcode-number">${address}</div>
+    <p  style="    margin-top: -0.2mm;margin-left: -2mm">${message}</p>
+</div>
+</body>
+</html>
+
+        `;
+
+
+        printWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(content)}`);
+        /*控制纸张大小*/
+        const pageSize = {
+            width: widthMM * 990 * (listDoubleRowLabels ? 2 : 1), // 双排 + 额外边距
+            height: (heightMM) * 990
+        };
+        // printWindow.openDevTools();
+        // printWindow.show()
+        printWindow.webContents.once('did-finish-load', () => {
+            printWindow.webContents.print({
+                silent: true, //展示windows打印对话框
+                printBackground: false,
+                deviceName: deviceName,
+                pageSize,
+                copies: 1,
+                landscape: false,
+                scaleFactor: 100, // 强制100%缩放
+                margins: {
+                    marginType: 'none' // 禁用默认边距
+                }
+                // show:true
+            }, (success, failureReason) => {
+                info(success)
+                // printWindow.close();
+            });
+        });
+
+        return true;
+    }
+
     /**
      *  检验标签打印 单排
      *  TODO 待调试
@@ -1050,7 +1816,7 @@ class HardwareController extends Controller {
 
                 // address = address.replace(/(.)/g, '$1  ');
                 // Write content to tempHtmlPath
-                address=address  .split('').join(' ');
+                address = address.split('').join(' ');
                 let content;
                 if (listDoubleRowLabels === '是') {
                     content = `
@@ -1547,23 +2313,6 @@ class HardwareController extends Controller {
 
         return true;
     }
-
-    // generateBarcode(address, callback) {
-    //   bwipjs.toBuffer({
-    //     bcid: 'code128',       // Barcode type
-    //     text: address,         // Text to encode
-    //     scale: 3,              // Scaling factor
-    //     height: 30,            // Bar height, in millimeters
-    //     includetext: false,    // Show human-readable text
-    //     textxalign: 'center',  // Text horizontal alignment
-    //   }, function (err, png) {
-    //     if (err) {
-    //       callback(err, null);
-    //     } else {
-    //       callback(null, png.toString('base64'));
-    //     }
-    //   });
-    // }
 
 
 }

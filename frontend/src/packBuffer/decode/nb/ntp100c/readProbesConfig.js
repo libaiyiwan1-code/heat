@@ -4,7 +4,7 @@ import {
     decodeGetTemperatureProbesNTP100CConfig,
 } from "@/packBuffer/decode/nb/ntp100c/decodeValue";
 
-export function decodeCheckReadProbesNTP100C(context, responseMessage) {
+export function readProbesConfig(context, responseMessage) {
     let messageBuffer = hex2arrayBuffer(responseMessage);
     let dataView = new DataView(messageBuffer)
     let notPass =

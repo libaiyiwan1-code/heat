@@ -1,7 +1,7 @@
 import {calculateCSByte, hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 const Log = require('ee-core/log');
 
-export function decodeCheckAwakenWAC300HE(responseMessage) {
+export function awaken(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   let responseDataView = new DataView(messageBuffer)
   // 跳过红外长度

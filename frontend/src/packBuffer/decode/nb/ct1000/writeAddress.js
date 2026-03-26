@@ -1,6 +1,6 @@
 import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 
-export function decodeCheckWriteAddressCT1000(valveAddress, responseMessage) {
+export function writeAddress(valveAddress, responseMessage) {
   let splicingAddress = '';
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)

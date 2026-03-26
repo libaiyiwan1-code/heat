@@ -5,7 +5,7 @@
 <script>
 import { message } from 'ant-design-vue';
 message.config({
-  duration: 0.3,  //message 过期时间
+  duration: 2,  //message 过期时间
 });
 export default {
   name: 'App',

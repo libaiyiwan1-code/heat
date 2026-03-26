@@ -1,5 +1,5 @@
 {
-  "productName": "生产软件_2.1.006",
+  "productName": "hlm-production-tool-setup",
   "appId": "com.electron.ee",
   "copyright": "© 20248883 生产软件 Technology to 青岛海龙马科技有限公司.",
   "directories": {
@@ -28,22 +28,20 @@
     "installerHeaderIcon": "build/icons/icon.ico",
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "生产软件_2.1.006",
+    "shortcutName": "生产软件",
     "include": "build/installer.nsh"
   },
   "mac": {
     "icon": "build/icons/icon.icns",
-    "artifactName": "${productName}-${os}-${version}-${arch}.${ext}",
+    "artifactName": "$海龙马生产软件-${os}-${version}-${arch}.${ext}",
     "darkModeSupport": true,
     "hardenedRuntime": false
   },
   "win": {
     "icon": "build/icons/icon.ico",
-    "artifactName": "${productName}-${os}-${version}-${arch}.${ext}",
+    "artifactName": "${productName}-${version}.${ext}",
     "target": [
-      {
-        "target": "nsis"
-      }
+      { "target": "nsis" }
     ]
   },
   "linux": {

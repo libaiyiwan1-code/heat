@@ -1,5 +1,4 @@
 import {hex2arrayBuffer, hexToAscii} from "@/packBuffer/common/comUtil";
-import {decodeGetProtocolId} from "@/packBuffer/decode/decode";
 const Log = require('ee-core/log');
 
 export function notHasSelfTestCompletedWAC710CD(responseMessage) {
@@ -162,7 +161,7 @@ export function decodeGetProductNameWAC710CD(responseMessage) {
   return productName
 
 }
-export function decodeCheckReadSelfTestStatusWAC710CD(context, responseMessage) {
+export function readSelfTestStatus(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   let dataView = new DataView(messageBuffer)
   let baseCheck =

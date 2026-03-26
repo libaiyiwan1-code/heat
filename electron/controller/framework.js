@@ -24,10 +24,22 @@ class FrameworkController extends Controller {
   }
 
   /**
-   * 所有方法接收两个参数
+   * 保存json
    * @param args 前端传的参数
    * @param event - ipc通信时才有值。详情见：控制器文档
    */
+  async saveProduceParam(args) {
+    const {imei, iccid, version,date,deviceId} = args
+    Log.info('保存生产参数->>>>>>>>>>>>>>',args)
+    const saveData = {
+      imei,
+      iccid,
+      version,
+      date,
+      deviceId
+    };
+    await Services.get('database.jsondb').savParam(saveData);
+  }
 
   /**
    * json数据库操作

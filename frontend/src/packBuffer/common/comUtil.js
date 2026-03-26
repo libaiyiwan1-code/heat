@@ -1,3 +1,6 @@
+const Log = require('ee-core/log');
+
+
 /**
  * 检查是否是自发送的数据
  * @param {string} responseMessage - 响应消息
@@ -12,6 +15,22 @@ export function checkSpontaneous(responseMessage, requestMessage) {
 
 }
 
+export function getDataView(responseMessage) {
+  return new DataView(hex2arrayBuffer(responseMessage))
+}
+export function isStatusNotPass(dataView, offset) {
+  const v = dataView.getUint8(offset)
+  return v !== 0x01 && v !== 0x02
+}
+export function report(context, msg,isPass=true) {
+  if (isPass){
+    context.createLeftSpanMessage(msg, 'grey')
+  }else{
+    context.createLeftSpanMessage(msg, 'red')
+  }
+  console.error(msg)
+  Log.error(msg)
+}
 /**
  * 合并 ArrayBuffer
  * @param  {...any} arrays - 要合并的 ArrayBuffer
@@ -39,7 +58,7 @@ export const mergeArrayBuffer = (...arrays) => {
 
 /**
  * ArrayBuffer 转换为十六进制字符串
- * @param {ArrayBuffer} buffer - 要转换的 ArrayBuffer
+ * @param {Array} buffer - 要转换的 ArrayBuffer
  * @returns {string} - 转换后的十六进制字符串
  */
 export const arrayBuffer2Hex = (buffer) => {
@@ -95,7 +114,7 @@ export const calculateCSByte = (buffer) => {
   for (let i = 0; i < buffer.byteLength; i++) {
     bodySum += bodyDataView.getUint8(i)
   }
-  return bodySum&0XFF;
+  return bodySum & 0XFF;
 }
 
 /**
@@ -118,12 +137,46 @@ export function hexToFloat(hexString, isLittleEndian = false) {
 }
 
 /**
+ * crc 校验算法
+ * @param buffer - 要计算的 ArrayBuffer
+ * @param isHigh - 是否返回高位
+ * @returns {number} - 返回计算得到的 CRC 校验值
+ * */
+export const calculateCRCByte = (buffer, isHigh) => {
+  const crc = calculateCRC(new Uint8Array(buffer));
+  if (isHigh) {
+    return (crc >> 8) & 0xFF; // 返回CRC高位
+  } else {
+    return crc & 0xFF; // 返回CRC低位
+  }
+}
+// Modbus 协议 计算CRC
+ const calculateCRC = (buffer) => {
+  let crc = 0xFFFF;
+  const length = buffer.byteLength;
+
+  for (let i = 0; i < length; i++) {
+    crc ^= buffer[i];
+    for (let j = 0; j < 8; j++) {
+      if ((crc & 0x0001) !== 0) {
+        crc >>= 1;
+        crc ^= 0xA001;
+      } else {
+        crc >>= 1;
+      }
+    }
+  }
+
+  return crc;
+}
+/**
  * 将 IEEE 754 float 浮点数转换为 4 字节十六进制 Buffer
  * @param {number} floatValue - 要转换的浮点数
  * @param {boolean} isLittleEndian - 是否为小端序-逆序读
  * @returns {Buffer} - 表示该浮点数的 4 字节 Buffer（大端序）
  */
 export function floatToHexBuffer(floatValue, isLittleEndian = false) {
+ console.log('转换值:',floatValue)
   const buffer = Buffer.alloc(4);
   if (isLittleEndian) {
     buffer.writeFloatLE(floatValue, 0);

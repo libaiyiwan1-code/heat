@@ -2,7 +2,7 @@ import {arrayBuffer2Hex, calculateCSByte, hex2arrayBuffer, mergeArrayBuffer} fro
 
 const Log = require('ee-core/log');
 
-export function decodeCheckInquireSelfTestWAC330HE(context,responseMessage) {
+export function inquireSelfTest(context,responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   // 跳过红外回包长度
   let skipLength = 33

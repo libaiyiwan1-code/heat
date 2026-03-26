@@ -1,7 +1,7 @@
 import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 import {decodeGetTemperatureProbesWAC300NHConfig} from "@/packBuffer/decode/nb/wac300nh/decodeValue";
 
-export function decodeCheckReadTemperatureProbesWAC300NH(context, responseMessage) {
+export function readProbesConfig(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =

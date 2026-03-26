@@ -1,7 +1,6 @@
 import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
-import {decodeReadAddress} from "@/packBuffer/decode/nb/nbt200/decodeValue";
 
-export function decodeCheckReadAddressNBT200(context, responseMessage) {
+export function readAddress(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =
@@ -11,7 +10,16 @@ export function decodeCheckReadAddressNBT200(context, responseMessage) {
     dataView.getUint8(5) !== 0X4B ||
     dataView.getUint8(10) !== 0X05
   if (!notPass) {
-    context.leftReadAddress = decodeReadAddress(responseMessage, false)
+    context.leftReadAddress = geAddress(responseMessage, false)
   }
   return notPass
+}
+
+export function geAddress(responseMessage, isCover) {
+  responseMessage = responseMessage.replace(/\s/g, '');
+  let messageBuffer = hex2arrayBuffer(responseMessage);
+  let dataView = new DataView(messageBuffer)
+  return    dataView.getUint32(21, false)
+      .toString(16)
+      .padStart(8, '0')
 }

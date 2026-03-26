@@ -1,6 +1,6 @@
 import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 
-export function decodeGenerate4mACurrent(responseMessage) {
+export function generate4mACurrent(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   return dataView.getUint8(0) !== 0x68 ||
@@ -8,7 +8,7 @@ export function decodeGenerate4mACurrent(responseMessage) {
     dataView.getUint8(4) !== 0x80
 }
 
-export function decodeGenerate10mACurrent(responseMessage) {
+export function generate10mACurrent(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   return dataView.getUint8(0) !== 0x68 ||
@@ -16,7 +16,7 @@ export function decodeGenerate10mACurrent(responseMessage) {
     dataView.getUint8(4) !== 0x80
 }
 
-export function decodeGenerate20mACurrent(responseMessage) {
+export function generate20mACurrent(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   return dataView.getUint8(0) !== 0x68 ||
@@ -25,7 +25,7 @@ export function decodeGenerate20mACurrent(responseMessage) {
 }
 
 
-export function decodeReadCurrent(responseMessage,context) {
+export function readCurrent(responseMessage,context) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let current = dataView.getUint32(3, false) * 0.001

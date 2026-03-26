@@ -1,7 +1,6 @@
 import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
-import {decodeGetVersion} from "@/packBuffer/decode/nb/nbt200/decodeValue.js";
 
-export function decodeReadVersionVerifyNBT200(context, responseMessage, type) {
+export function readVersion(context, responseMessage, type) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   let dataView = new DataView(messageBuffer)
   let result = dataView.getUint8(16)!==0x68
@@ -17,4 +16,11 @@ export function decodeReadVersionVerifyNBT200(context, responseMessage, type) {
   }
   console.log('版本：', context.readVersion)
   return result
+}
+
+
+export function decodeGetVersion(responseMessage) {
+  let messageBuffer = hex2arrayBuffer(responseMessage);
+  let dataView = new DataView(messageBuffer);
+  return dataView.getUint8(30);
 }

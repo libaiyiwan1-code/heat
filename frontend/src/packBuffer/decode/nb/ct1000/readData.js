@@ -3,7 +3,7 @@ import {
   decodeGetReadOutTemperature
 } from "@/packBuffer/decode/nb/ct1000/decodeValue";
 
-export function decodeReadDataCT1000(context, responseMessage) {
+export function readData(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =

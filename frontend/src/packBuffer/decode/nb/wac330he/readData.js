@@ -6,7 +6,7 @@ import {
 
 const Log = require('ee-core/log');
 
-export function decodeReadDataWAC330HE(context, responseMessage) {
+export function readData(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   // 跳过红外回包长度
   let skipLength = 33

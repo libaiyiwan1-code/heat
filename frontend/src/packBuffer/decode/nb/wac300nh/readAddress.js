@@ -1,6 +1,6 @@
 import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 
-export function decodeCheckReadAddressWAC300NH(context, responseMessage) {
+export function readAddress(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =

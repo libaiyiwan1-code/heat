@@ -1,5 +1,4 @@
 import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
-import {decodeCheckAwakenWAC300NH} from "@/packBuffer/decode/nb/wac300nh/awaken";
 
 
 export function decodeGetReadInTemperature(responseMessage) {

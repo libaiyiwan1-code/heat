@@ -106,7 +106,7 @@ export function decodeGetProductNameNTP100C(responseMessage) {
 
 }
 
-export function decodeCheckReadSelfTestStatusNTP100C(context, responseMessage) {
+export function readSelfTestStatus(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   let dataView = new DataView(messageBuffer)
   let baseCheck = dataView.getUint8(16) !== 0x68 ||

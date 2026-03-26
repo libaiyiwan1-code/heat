@@ -1,7 +1,6 @@
 import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
-import {decodeReadAddress} from "@/packBuffer/decode/wire/dongyuan/decodeValue";
 
-export function decodeCheckReadAddressDongYuan(context, responseMessage) {
+export function readAddress(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =
@@ -14,4 +13,14 @@ export function decodeCheckReadAddressDongYuan(context, responseMessage) {
     context.leftReadAddress = decodeReadAddress(responseMessage, true)
   }
   return notPass
+}
+
+
+export function decodeReadAddress(responseMessage, isCover ) {
+  responseMessage = responseMessage.replace(/\s/g, '');
+  let messageBuffer = hex2arrayBuffer(responseMessage);
+  let dataView = new DataView(messageBuffer)
+  return   dataView.getUint32(5, isCover)
+      .toString(16)
+      .padStart(8, '0')
 }

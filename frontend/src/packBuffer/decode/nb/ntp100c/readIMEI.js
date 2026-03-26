@@ -2,7 +2,7 @@ import {checkIMEI, hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 import {decodeGetIMEI} from "@/packBuffer/decode/decode";
 
 
-export function decodeCheckReadIMEINTP100C(context, responseMessage) {
+export function readIMEI(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =

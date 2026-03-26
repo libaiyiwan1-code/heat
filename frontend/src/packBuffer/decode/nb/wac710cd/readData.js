@@ -5,7 +5,7 @@ import {
   decodeGetReadOutTemperature
 } from "@/packBuffer/decode/nb/wac710cd/decodeValue";
 
-export function decodeReadDataWAC710CD(context, responseMessage) {
+export function readData(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =

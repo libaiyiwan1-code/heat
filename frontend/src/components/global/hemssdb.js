@@ -15,7 +15,7 @@ const pool = mysql.createPool({
   // database: 'hems',
   // port: 3336
 });
-export function checkIMEIExist(imei) {
+export function checkTerminalIMEIExist(imei) {
   return new Promise((resolve, reject) => {
     // 从连接池中获取连接
     pool.getConnection((err, connection) => {
@@ -42,6 +42,34 @@ export function checkIMEIExist(imei) {
     });
   });
 }
+export function checkCollectorIMEIExist(imei) {
+  return new Promise((resolve, reject) => {
+    // 从连接池中获取连接
+    pool.getConnection((err, connection) => {
+      if (err) {
+        console.log(err)
+        reject(err);
+        return;
+      }
+
+      // 执行查询
+      connection.query(
+        `SELECT imei FROM arc_collector WHERE  imei = ? and status>=0`,
+        [imei],
+        (error, results) => {
+          // 释放连接
+          connection.release();
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
+          }
+        }
+      );
+    });
+  });
+}
+
 export function checkRecentlyUploadedData(address, tableName) {
   return new Promise((resolve, reject) => {
     const allowedTables = ['col_terminal_data_meter_valve', 'col_terminal_data_valve','col_terminal_data_measure_point'];

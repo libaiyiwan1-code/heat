@@ -1,6 +1,6 @@
 import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 
-export function decodeLowerLimitOf4mACalibratedWAC710CD(context, responseMessage) {
+export function calibratedLowerLimit4mA(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =
@@ -19,7 +19,7 @@ export function decodeLowerLimitOf4mACalibratedWAC710CD(context, responseMessage
 }
 
 
-export function decodeUpperLimitOf20mACalibratedWAC710CD(context, responseMessage) {
+export function calibratedUpperLimit20mA(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =
@@ -36,7 +36,7 @@ export function decodeUpperLimitOf20mACalibratedWAC710CD(context, responseMessag
   }
   return notPass
 }
-export function decodeCalibratedOpenPowerWAC710CD(context, responseMessage) {
+export function openPower(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =

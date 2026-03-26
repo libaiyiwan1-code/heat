@@ -1,0 +1,2 @@
+
+export { readSelfTestStatus } from './readSelfTestStatus'

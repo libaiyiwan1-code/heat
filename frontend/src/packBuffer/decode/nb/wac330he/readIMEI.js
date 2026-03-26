@@ -1,10 +1,9 @@
 import {calculateCSByte, checkIMEI, hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 import {decodeGetIMEI} from "@/packBuffer/decode/decode";
-import {decodeCheckAwakenWAC300NH} from "@/packBuffer/decode/nb/wac300nh/awaken";
 const Log = require('ee-core/log');
 
 
-export function decodeCheckReadIMEIWAC330HE(context, responseMessage) {
+export function readIMEI(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage)
   let responseDataView = new DataView(messageBuffer)
   // 跳过红外长度

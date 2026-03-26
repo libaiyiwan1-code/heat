@@ -1,7 +1,7 @@
 import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
 import {decodeReadAddress} from "@/packBuffer/decode/nb/ntp100c/decodeValue";
 
-export function decodeCheckReadAddressNTP100C(context, responseMessage) {
+export function readAddress(context, responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   let notPass =
