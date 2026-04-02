@@ -688,7 +688,7 @@ class HardwareController extends Controller {
         } else if (configModel === 'NTP100C' || configModel === 'WAC710CD' || configModel === 'WAC300CD'
             || configModel === 'WAC300NH' || configModel === 'ET01' || configModel === 'WAC730C'||
             configModel==='CAT400'||configModel==='CAT400S'||configModel==='WAC710C'||configModel==='WAC300C'
-            ||configModel==='WAC330N'
+            ||configModel==='WAC330N'||configModel==='WAC400N'||configModel==='VAC710'
         ) {
             // 40*20 双排
             // 生成单个标签 HTML

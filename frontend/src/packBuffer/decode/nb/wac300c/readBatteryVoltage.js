@@ -13,7 +13,7 @@ export function readBatteryVoltage(context, responseMessage) {
   if (!notPass) {
     console.warn('解析电池电压:', dataView.getUint16(30, true) * 0.01)
     context.deviceBatteryVoltage = dataView.getUint16(30, true) * 0.01
-    context.createLeftSpanMessage('读取电池电压值:' + context.deviceBatteryVoltage + 'V', 'grey')
+    context.createLeftSpanMessage('读取电池电压值:' + Number(context.deviceBatteryVoltage).toFixed(4) + 'V', 'grey')
   } else {
     return notPass
   }

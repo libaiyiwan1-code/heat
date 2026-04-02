@@ -6,6 +6,8 @@ import * as DPC100420mA from "@/packBuffer/decode/nb/dpc100-4-20ma";
 import * as WAC710CD from "@/packBuffer/decode/nb/wac710cd";
 import * as WAC300CD from "@/packBuffer/decode/nb/wac300cd";
 import * as WAC710C from "@/packBuffer/decode/nb/wac710c";
+import * as VAC710 from "@/packBuffer/decode/nb/vac710";
+import * as WAC400N from "@/packBuffer/decode/nb/wac400n";
 import * as WAC300NS from "@/packBuffer/decode/nb/wac300ns";
 import * as WAC400NS from "@/packBuffer/decode/nb/wac400ns";
 import * as VAC710S from "@/packBuffer/decode/nb/vac710s";
@@ -2513,121 +2515,51 @@ export const protocolIDMap = {
       },
     },
   },
-  //TODO
-  'WAC400N': {
-    protocolCode: 'EN1434_9992',
-    protocolId: 72,
-    model: -1,
-    joinMode: 2,
-    isInfraredDevice: false,
-    isDeviceActionTransparentTransmissionProtocol: {
-      'inquireSelfTest': false,
-      'writeTemperatureProbe': false,
-      'selfTest': false,
-      'readSelfTestStatus': false,
-      'readICCID': false,
-      'readIMEI': false,
-      'writeAddress': false,
-      'readAddress': false,
-      'exitSelfTest': false,
-      'readData': false,
-    },
-    deviceActionResponseMessageLength: {
-      'inquireSelfTest': 16,
-      'writeTemperatureProbe': 16,
-      'selfTest': -1,
-      'readSelfTestStatus': 56,
-      'readICCID': 36,
-      'readIMEI': 31,
-      'readAddress': 15,
-      'writeAddress': 16,
-      'exitSelfTest': 16,
-      'readData': 16,
-    },
-    deviceActionResponseMessageLength2: {
-      'inquireSelfTest': 16,
-      'writeTemperatureProbe': 16,
-      'selfTest': -1,
-      'readSelfTestStatus': 56,
-      'readICCID': 36,
-      'readIMEI': 31,
-      'readAddress': 15,
-      'writeAddress': 16,
-      'exitSelfTest': 16,
-      'readData': 16,
-    },
-    portAttribute: {
-      parity: '偶校验',
-      dataBits: 8,
-      baudRate: 2400,
-      stopBits: 1
-    },
-    validateResponse: {
-      inquireSelfTest: (data) => {
-        return null
-      },
-      readSelfTestStatus: (context, data) => {
-        return null
-      },
-      readICCID: (context, data) => {
-        return null
-      },
-      readIMEI: (context, data) => {
-        return null
-      },
-      writeAddress: (leftGenerateAddress, data) => {
-        return null
-      },
-      readAddress: (context, data) => {
-        return null
-      },
-      exitSelfTest: (context, data) => {
-        return null
-      },
-    },
-  },
-  //TODO
+
   'VAC710': {
-    protocolCode: 'EN1434_0156',
-    protocolId: 126,
+    protocolCode: null,
+    protocolId: 96,
     model: -1,
     joinMode: 2,
     isInfraredDevice: false,
     isDeviceActionTransparentTransmissionProtocol: {
-      'inquireSelfTest': false,
-      'writeTemperatureProbe': false,
-      'selfTest': false,
-      'readSelfTestStatus': false,
-      'readICCID': false,
-      'readIMEI': false,
+      'inquireSelfTest': true,
+      'writeTemperatureProbe': true,
+      'writePressureProbe': true,
+      'selfTest': true,
+      'readVersion': false,
+      'readSelfTestStatus': true,
+      'readSelfTestStatus2': true,
       'writeAddress': false,
       'readAddress': false,
-      'exitSelfTest': false,
-      'readData': false,
+      'exitSelfTest': true,
+      'readData': true,
     },
     deviceActionResponseMessageLength: {
-      'inquireSelfTest': 16,
-      'writeTemperatureProbe': 16,
+      'inquireSelfTest': 37,
+      'writeTemperatureProbe': 37,
+      'writePressureProbe': 37,
       'selfTest': -1,
-      'readSelfTestStatus': 56,
-      'readICCID': 36,
-      'readIMEI': 31,
-      'readAddress': 15,
+      'readVersion': 17,
+      'readSelfTestStatus': 76,
+      'readSelfTestStatus2': 84,
+      'readAddress': 21,
       'writeAddress': 16,
-      'exitSelfTest': 16,
-      'readData': 16,
+      'exitSelfTest': 37,
+      'readData': 87,
     },
     deviceActionResponseMessageLength2: {
-      'inquireSelfTest': 16,
-      'writeTemperatureProbe': 16,
+      'inquireSelfTest': 37,
+      'writeTemperatureProbe': 37,
+      'writePressureProbe': 37,
       'selfTest': -1,
-      'readSelfTestStatus': 56,
-      'readICCID': 36,
-      'readIMEI': 31,
-      'readAddress': 15,
+      'readVersion': 17,
+      'readSelfTestStatus': 76,
+      'readSelfTestStatus2': 84,
+      'readAddress': 21,
       'writeAddress': 16,
-      'exitSelfTest': 16,
-      'readData': 16,
+      'exitSelfTest': 37,
+      'readData': 87,
     },
     portAttribute: {
       parity: '偶校验',
@@ -2637,25 +2569,34 @@ export const protocolIDMap = {
     },
     validateResponse: {
       inquireSelfTest: (data) => {
-        return null
+        return VAC710.inquireSelfTest(data)
+      },
+      writeTemperatureProbe: (data) => {
+        return VAC710.writeTemperatureProbe(data)
+      },
+      writePressureProbe: ( data) => {
+        return VAC710.writePressureProbe(data)
+      },
+      readVersion: (context, data) => {
+        return VAC710.readVersion(context,data)
       },
       readSelfTestStatus: (context, data) => {
-        return null
+        return VAC710.readSelfTestStatus(context,data)
       },
-      readICCID: (context, data) => {
-        return null
-      },
-      readIMEI: (context, data) => {
-        return null
+      readSelfTestStatus2: (context, data) => {
+        return VAC710.readSelfTestStatus2(context,data)
       },
       writeAddress: (leftGenerateAddress, data) => {
-        return null
+        return VAC710.writeAddress(leftGenerateAddress, data)
       },
       readAddress: (context, data) => {
-        return null
+        return VAC710.readAddress(context, data)
       },
-      exitSelfTest: (context, data) => {
-        return null
+      exitSelfTest: ( data) => {
+        return VAC710.exitSelfTest(data)
+      },
+      readData: (context, data) => {
+        return VAC710.readData(context,data)
       },
     },
   },
@@ -4473,4139 +4414,4231 @@ export const protocolIDMap = {
       },
     }
   },
-    'VPT100': {
-      protocolCode: undefined, //不注册平台
-      protocolId: 51,
-      model: 68,
-      joinMode: 2,
-      isInfraredDevice: false,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'inquireSelfTest': false,
-        'selfTest': false,
-        'readSelfTestStatus': false,
-        'writeAddress': false,
-        'readAddress': false,
-        'writeTemperaturePressureProbe': false
-      },
-      deviceActionResponseMessageLength: {
-        'inquireSelfTest': 16,
-        'selfTest': -1,
-        'readSelfTestStatus': 56,
-        'readAddress': 21,
-        'writeAddress': 16,
-        'writeTemperaturePressureProbe': 16
-      },
-      deviceActionResponseMessageLength2: {
-        'inquireSelfTest': 16,
-        'selfTest': -1,
-        'readSelfTestStatus': 56,
-        'readAddress': 21,
-        'writeAddress': 16,
-        'writeTemperaturePressureProbe': 16
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        inquireSelfTest: (data) => {
-          return VPT100.inquireSelfTest(data);
-        },
-        readSelfTestStatus: (context, data) => {
-          return VPT100.readSelfTestStatus(context, data);
-        },
-        writeAddress: (leftGenerateAddress, data) => {
-          return VPT100.writeAddress(leftGenerateAddress, data);
-        },
-        readAddress: (context, data) => {
-          return VPT100.readAddress(context, data);
-        },
-        writeTemperaturePressureProbe: (context, data) => {
-          return VPT100.writeTemperaturePressureProbe(context, data)
-        }
-      },
+  'VPT100': {
+    protocolCode: undefined, //不注册平台
+    protocolId: 51,
+    model: 68,
+    joinMode: 2,
+    isInfraredDevice: false,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': false,
+      'selfTest': false,
+      'readSelfTestStatus': false,
+      'writeAddress': false,
+      'readAddress': false,
+      'writeTemperaturePressureProbe': false
     },
-    'LPC230': {
-      protocolCode: ``,//TODO 不注册平台
-      protocolId: 128,
-      model: -1,//TODO 不注册平台
-      joinMode: 2,//TODO 不注册平台
-      isInfraredDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'inquireSelfTest': false,
-        'selfTest': false,
-        'readSelfTestStatus': false,
-        'readICCID': false,
-        'readIMEI': false,
-        'writeAddress': false,
-        'exitSelfTest': false,
-        'readAddress': false,
-      },
-      deviceActionResponseMessageLength: {
-        'inquireSelfTest': 18,
-        'selfTest': -1,
-        'readSelfTestStatus': 55,
-        'readICCID': 38,
-        'readIMEI': 33,
-        'readAddress': 33,
-        'writeAddress': 20,
-        'exitSelfTest': 18,
-      },
-      deviceActionResponseMessageLength2: {
-        'inquireSelfTest': 36,
-        'selfTest': -1,
-        'readSelfTestStatus': 73,
-        'readICCID': 56,
-        'readIMEI': 51,
-        'readAddress': 51,
-        'writeAddress': 43,
-        'exitSelfTest': 36,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        inquireSelfTest: (data) => {
-          return LPC230.inquireSelfTest(data);
-        },
-        readSelfTestStatus: (context, data) => {
-          return LPC230.readSelfTestStatus(context, data);
-        },
-        readICCID: (context, data) => {
-          return LPC230.readICCID(context, data);
-        },
-        readIMEI: (context, data) => {
-          return LPC230.readIMEI(context, data);
-        },
-        writeAddress: (leftGenerateAddress, data) => {
-          return LPC230.writeAddress(leftGenerateAddress, data);
-        },
-        exitSelfTest: (data) => {
-          return LPC230.exitSelfTest(data);
-        },
-        readAddress: (context, data) => {
-          return LPC230.readAddress(context, data);
-        },
-
-
-      },
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 16,
+      'selfTest': -1,
+      'readSelfTestStatus': 56,
+      'readAddress': 21,
+      'writeAddress': 16,
+      'writeTemperaturePressureProbe': 16
     },
-    'LPC230E': {
-      protocolCode: ``,//TODO 不注册平台
-      protocolId: 128,
-      model: -1,//TODO 不注册平台
-      joinMode: 2,//TODO 不注册平台
-      isInfraredDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'inquireSelfTest': false,
-        'selfTest': false,
-        'readSelfTestStatus': false,
-        'readICCID': false,
-        'readIMEI': false,
-        'writeAddress': false,
-        'exitSelfTest': false,
-        'readAddress': false,
-      },
-      deviceActionResponseMessageLength: {
-        'inquireSelfTest': 18,
-        'selfTest': -1,
-        'readSelfTestStatus': 55,
-        'readICCID': 38,
-        'readIMEI': 33,
-        'readAddress': 33,
-        'writeAddress': 20,
-        'exitSelfTest': 18,
-      },
-      deviceActionResponseMessageLength2: {
-        'inquireSelfTest': 36,
-        'selfTest': -1,
-        'readSelfTestStatus': 73,
-        'readICCID': 56,
-        'readIMEI': 51,
-        'readAddress': 51,
-        'writeAddress': 43,
-        'exitSelfTest': 36,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        inquireSelfTest: (data) => {
-          return LPC230E.inquireSelfTest(data);
-        },
-        readSelfTestStatus: (context, data) => {
-          return LPC230E.readSelfTestStatus(context, data);
-        },
-        readICCID: (context, data) => {
-          return LPC230E.readICCID(context, data);
-        },
-        readIMEI: (context, data) => {
-          return LPC230E.readIMEI(context, data);
-        },
-        writeAddress: (leftGenerateAddress, data) => {
-          return LPC230E.writeAddress(leftGenerateAddress, data);
-        },
-        exitSelfTest: (data) => {
-          return LPC230E.exitSelfTest(data);
-        },
-        readAddress: (context, data) => {
-          return LPC230E.readAddress(context, data);
-        },
-
-
-      },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 16,
+      'selfTest': -1,
+      'readSelfTestStatus': 56,
+      'readAddress': 21,
+      'writeAddress': 16,
+      'writeTemperaturePressureProbe': 16
     },
-    'AEC100': {
-      protocolCode: ``,//TODO 不注册平台
-      protocolId: 149,
-      model: -1,//TODO 不注册平台
-      joinMode: -1,//TODO 不注册平台
-      isInfraredDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readCurrentAmmeterInputLoop': false, //读取电流表输入回路
-        'readCurrentAmmeterOutputLoop': false,// 读取电流表输出回路
-        'writesActualInputCurrentValue4MA': false,//设备4mA输入标定
-        'writesActualInputCurrentValue20MA': false,//设备20mA输入标定
-        'output4MAActualCurrentValueCalibration': false,//设备4mA输出标定
-        'output20MAActualCurrentValueCalibration': false,//设备20mA输出标定
-        'writeFixedOutput4MA': false, //设备输出4mA
-        'writeFixedOutput20MA': false, //设备输出20mA
-        'current4To20mACalibrationSuccessful': false,//4-20mA标定成功
-        'current4To20mACalibrationError': false,//4-20mA标定失败
-        'deviceReadsCurrent': false, //读取当前电流值
-        'inquireSelfTest': false, //自检查询
-        'selfTest': false,//自检开启
-        'readSelfTestStatus': false,//读取自检状态
-        'readICCID': false, //读取ICCID
-        'readIMEI': false, // 读取IMEI
-        'writeAddress': false, //写地址
-        'readAddress': false, //读地址
-        'signalSourceOutput': false,//信号源输出
-        'readCurrentSource': false,//读取电流源
-        'exitSelfTest': false// 退出自检
-      },
-      deviceActionResponseMessageLength: {
-        'readCurrentAmmeterInputLoop': 9, //读取电流表输入回路
-        'readCurrentAmmeterOutputLoop': 9,// 读取电流表输出回路
-        'writesActualInputCurrentValue4MA': 19,//设备4mA输入标定
-        'writesActualInputCurrentValue20MA': 19,//设备20mA输入标定
-        'output4MAActualCurrentValueCalibration': 16,//设备4mA输出标定
-        'output20MAActualCurrentValueCalibration': 16,//设备20mA输出标定
-        'writeFixedOutput4MA': 16, //设备输出4mA
-        'writeFixedOutput20MA': 16, //设备输出20mA
-        'current4To20mACalibrationSuccessful': 16,//4-20mA标定成功
-        'current4To20mACalibrationError': 16,//4-20mA标定失败
-        'deviceReadsCurrent': 20, //读取当前电流值
-        'inquireSelfTest': 18, //自检查询
-        'selfTest': -1,//自检开启
-        'readSelfTestStatus': 53,//读取自检状态
-        'readICCID': 38, //读取ICCID
-        'readIMEI': 33, // 读取IMEI
-        'writeAddress': 18, //写地址
-        'readAddress': 19, //读地址
-        'signalSourceOutput': 8,//信号源输出
-        'readCurrentSource': 7,//读取电流源
-        'exitSelfTest': 18
-      },
-      deviceActionResponseMessageLength2: {
-        'readCurrentAmmeterInputLoop': 9, //读取电流表输入回路
-        'readCurrentAmmeterOutputLoop': 9,// 读取电流表输出回路
-        'writesActualInputCurrentValue4MA': 39,//设备4mA输入标定
-        'writesActualInputCurrentValue20MA': 39,//设备20mA输入标定
-        'output4MAActualCurrentValueCalibration': 36,//设备4mA输出标定
-        'output20MAActualCurrentValueCalibration': 36,//设备20mA输出标定
-        'writeFixedOutput4MA': 33, //设备输出4mA
-        'writeFixedOutput20MA': 33, //设备输出20mA
-        'current4To20mACalibrationSuccessful': 33,//4-20mA标定成功
-        'current4To20mACalibrationError': 33,//4-20mA标定失败
-        'deviceReadsCurrent': 36, //读取当前电流值
-        'inquireSelfTest': 36, //自检查询
-        'selfTest': -1,//自检开启
-        'readSelfTestStatus': 71,//读取自检状态
-        'readICCID': 56, //读取ICCID
-        'readIMEI': 51, // 读取IMEI
-        'writeAddress': 43, //写地址
-        'readAddress': 37, //读地址
-        'signalSourceOutput': 8,//信号源输出
-        'readCurrentSource': 7,
-        'exitSelfTest': 36
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        inquireSelfTest: (data) => {
-          return AEC100.inquireSelfTest(data);
-        },
-        readSelfTestStatus: (context, data) => {
-          return AEC100.readSelfTestStatus(context, data);
-        },
-        readICCID: (context, data) => {
-          return AEC100.readICCID(context, data);
-        },
-        readIMEI: (context, data) => {
-          return AEC100.readIMEI(context, data);
-        },
-        writeAddress: (leftGenerateAddress, data) => {
-          return AEC100.writeAddress(leftGenerateAddress, data);
-        },
-
-        readAddress: (context, data) => {
-          return AEC100.readAddress(context, data);
-        },
-        readCurrentAmmeterInputLoop: (data, context) => {
-          return AEC100.readCurrentAmmeter(data, context);
-        },
-        readCurrentAmmeterOutputLoop: (data, context) => {
-          return AEC100.readCurrentAmmeter(data, context);
-        },
-        readCurrentSource: (data, context) => {
-          return AEC100.readCurrentSource(data, context);
-        },
-        writesActualInputCurrentValue4MA: (data) => {
-          return AEC100.writesActualInputCurrentValue4mA(data);
-        },
-        writesActualInputCurrentValue20MA: (data) => {
-          return AEC100.writesActualInputCurrentValue20mA(data);
-        },
-        writeFixedOutput4MA: (data) => {
-          return AEC100.writeFixedOutput4mA(data);
-        },
-        writeFixedOutput20MA: (data) => {
-          return AEC100.writeFixedOutput20mA(data);
-        },
-        output4MAActualCurrentValueCalibration: (data) => {
-          return AEC100.writesActualInputCurrentValue4mA(data);
-        },
-        output20MAActualCurrentValueCalibration: (data) => {
-          return AEC100.writesActualInputCurrentValue20mA(data);
-        },
-        deviceReadsCurrent: (data, context) => {
-          return AEC100.readDeviceCurrent(data, context);
-        },
-        signal4MASourceOutput: (data) => {
-          return AEC100.signal4MASourceOutput(data)
-        },
-        signal12MASourceOutput: (data) => {
-          return AEC100.signal12MASourceOutput(data)
-        },
-        signal20MASourceOutput: (data) => {
-          return AEC100.signal20MASourceOutput(data)
-        },
-        current4To20mACalibrationSuccessful: (data) => {
-          return AEC100.calibrationCurrent4To20mASuccessful(data)
-        },
-        current4To20mACalibrationError: (data) => {
-          return AEC100.calibrationCurrent4To20mAError(data)
-        }
-
-      },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
     },
-    'WAC300N': {
-      protocolCode: `EN1434_9993`,
-      model: 1,  /*1移动|6电信*/
-      joinMode: 2,/*2移动|8电信*/
-      isInfraredDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'inquireSelfTest': true,
-        'writeTemperatureProbesConfig': true,
-        'selfTest': true,
-        'readSelfTestStatus': true,
-        'readICCID': false,
-        'readIMEI': false,
-        'readAddress': false,
-        'writeAddress': false,
-        'exitSelfTest': true,
-        'awaken': false,
-        'readData': true,
-        'readTemperatureProbes': true
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return VPT100.inquireSelfTest(data);
       },
-      protocolId: 71,
-      deviceActionResponseMessageLength: {
-        'inquireSelfTest': 67,
-        'writeTemperatureProbesConfig': 69,
-        'selfTest': 99,
-        'readSelfTestStatus': 106,
-        'readICCID': 52,
-        'readIMEI': 47,
-        'readAddress': 47,
-        'writeAddress': 37,
-        'exitSelfTest': 67,
-        'awaken': 32,
-        'readData': 105,
-        'readTemperatureProbes': 69
+      readSelfTestStatus: (context, data) => {
+        return VPT100.readSelfTestStatus(context, data);
       },
-      deviceActionResponseMessageLength2: {
-        'inquireSelfTest': 33,
-        'writeTemperatureProbesConfig': 35,
-        'selfTest': 99,
-        'readSelfTestStatus': 33,
-        'readICCID': 16,
-        'readIMEI': 16,
-        'readAddress': 16,
-        'writeAddress': 21,
-        'exitSelfTest': 33,
-        'awaken': 16,
-        'readData': 33,
-        'readTemperatureProbes': 33
+      writeAddress: (leftGenerateAddress, data) => {
+        return VPT100.writeAddress(leftGenerateAddress, data);
       },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
+      readAddress: (context, data) => {
+        return VPT100.readAddress(context, data);
       },
-      validateResponse: {
-        inquireSelfTest: (data) => {
-          return WAC300N.inquireSelfTest(data);
-        },
-        writeTemperatureProbesConfig: (data) => {
-          return WAC300N.writeTemperatureProbesConfig(data);
-        },
-        readSelfTestStatus: (context, data) => {
-          return WAC300N.readSelfTestStatus(context, data);
-        },
-        readICCID: (context, data) => {
-          return WAC300N.readICCID(context, data);
-        },
-        readIMEI: (context, data) => {
-          return WAC300N.readIMEI(context, data);
-        },
-        readAddress: (context, data) => {
-          return WAC300N.readAddress(context, data);
-        },
-        writeAddress: (leftGenerateAddress, data) => {
-          return WAC300N.writeAddress(leftGenerateAddress, data);
-        },
-        awaken: (data) => {
-          return WAC300N.awaken(data);
-        },
-        readData: (context, data) => {
-          return WAC300N.readData(context, data);
-        },
-        readTemperatureProbes: (context, data) => {
-          return WAC300N.readProbesConfig(context, data);
-        },
-
-      },
+      writeTemperaturePressureProbe: (context, data) => {
+        return VPT100.writeTemperaturePressureProbe(context, data)
+      }
     },
-
-    'WAC300NH': {
-      protocolCode: `EN1434_9993`,
-      model: 1,  /*1移动|6电信*/
-      joinMode: 2,/*2移动|8电信*/
-      isInfraredDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'inquireSelfTest': true,
-        'writeTemperatureProbesConfig': true,
-        'selfTest': true,
-        'readSelfTestStatus': true,
-        'readICCID': false,
-        'readIMEI': false,
-        'readAddress': false,
-        'writeAddress': false,
-        'exitSelfTest': true,
-        'awaken': false,
-        'readData': true,
-        'readTemperatureProbes': true
-      },
-      protocolId: 71,
-      deviceActionResponseMessageLength: {
-        'inquireSelfTest': 67,
-        'writeTemperatureProbesConfig': 69,
-        'selfTest': 99,
-        'readSelfTestStatus': 106,
-        'readICCID': 52,
-        'readIMEI': 47,
-        'readAddress': 47,
-        'writeAddress': 37,
-        'exitSelfTest': 67,
-        'awaken': 32,
-        'readData': 105,
-        'readTemperatureProbes': 69
-      },
-      deviceActionResponseMessageLength2: {
-        'inquireSelfTest': 33,
-        'writeTemperatureProbesConfig': 35,
-        'selfTest': 99,
-        'readSelfTestStatus': 33,
-        'readICCID': 16,
-        'readIMEI': 16,
-        'readAddress': 16,
-        'writeAddress': 21,
-        'exitSelfTest': 33,
-        'awaken': 16,
-        'readData': 33,
-        'readTemperatureProbes': 33
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        inquireSelfTest: (data) => {
-          return WAC300NH.inquireSelfTest(data);
-        },
-        writeTemperatureProbesConfig: (data) => {
-          return WAC300NH.writeTemperatureProbesConfig(data);
-        },
-        readSelfTestStatus: (context, data) => {
-          return WAC300NH.readSelfTestStatus(context, data);
-        },
-        readICCID: (context, data) => {
-          return WAC300NH.readICCID(context, data);
-        },
-        readIMEI: (context, data) => {
-          return WAC300NH.readIMEI(context, data);
-        },
-        readAddress: (context, data) => {
-          return WAC300NH.readAddress(context, data);
-        },
-        writeAddress: (leftGenerateAddress, data) => {
-          return WAC300NH.writeAddress(leftGenerateAddress, data);
-        },
-        awaken: (data) => {
-          return WAC300NH.awaken(data);
-        },
-        readData: (context, data) => {
-          return WAC300NH.readData(context, data);
-        },
-        readTemperatureProbes: (context, data) => {
-          return WAC300NH.readProbesConfig(context, data);
-        },
-
-      },
+  },
+  'LPC230': {
+    protocolCode: ``,//TODO 不注册平台
+    protocolId: 128,
+    model: -1,//TODO 不注册平台
+    joinMode: 2,//TODO 不注册平台
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': false,
+      'selfTest': false,
+      'readSelfTestStatus': false,
+      'readICCID': false,
+      'readIMEI': false,
+      'writeAddress': false,
+      'exitSelfTest': false,
+      'readAddress': false,
     },
-    'WAC300NY': {
-      protocolCode: `EN1434_9993`,
-      model: 1,  /*1移动|6电信*/
-      joinMode: 2,/*2移动|8电信*/
-      isInfraredDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'inquireSelfTest': true,
-        'writeTemperatureProbesConfig': true,
-        'selfTest': true,
-        'readSelfTestStatus': true,
-        'readICCID': false,
-        'readIMEI': false,
-        'readAddress': false,
-        'writeAddress': false,
-        'exitSelfTest': true,
-        'awaken': false,
-        'readData': true,
-        'readTemperatureProbes': true
-      },
-      protocolId: 71,
-      deviceActionResponseMessageLength: {
-        'inquireSelfTest': 67,
-        'writeTemperatureProbesConfig': 69,
-        'selfTest': 99,
-        'readSelfTestStatus': 106,
-        'readICCID': 52,
-        'readIMEI': 47,
-        'readAddress': 47,
-        'writeAddress': 37,
-        'exitSelfTest': 67,
-        'awaken': 32,
-        'readData': 105,
-        'readTemperatureProbes': 69
-      },
-      deviceActionResponseMessageLength2: {
-        'inquireSelfTest': 33,
-        'writeTemperatureProbesConfig': 35,
-        'selfTest': 99,
-        'readSelfTestStatus': 33,
-        'readICCID': 16,
-        'readIMEI': 16,
-        'readAddress': 16,
-        'writeAddress': 21,
-        'exitSelfTest': 33,
-        'awaken': 16,
-        'readData': 33,
-        'readTemperatureProbes': 33
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        inquireSelfTest: (data) => {
-          return WAC300NY.inquireSelfTest(data);
-        },
-        writeTemperatureProbesConfig: (data) => {
-          return WAC300NY.writeTemperatureProbesConfig(data);
-        },
-        readSelfTestStatus: (context, data) => {
-          return WAC300NY.readSelfTestStatus(context, data);
-        },
-        readICCID: (context, data) => {
-          return WAC300NY.readICCID(context, data);
-        },
-        readIMEI: (context, data) => {
-          return WAC300NY.readIMEI(context, data);
-        },
-        readAddress: (context, data) => {
-          return WAC300NY.readAddress(context, data);
-        },
-        writeAddress: (leftGenerateAddress, data) => {
-          return WAC300NY.writeAddress(leftGenerateAddress, data);
-        },
-        awaken: (data) => {
-          return WAC300NY.awaken(data);
-        },
-        readData: (context, data) => {
-          return WAC300NY.readData(context, data);
-        },
-        readTemperatureProbes: (context, data) => {
-          return WAC300NY.readProbesConfig(context, data);
-        },
-
-      },
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 18,
+      'selfTest': -1,
+      'readSelfTestStatus': 55,
+      'readICCID': 38,
+      'readIMEI': 33,
+      'readAddress': 33,
+      'writeAddress': 20,
+      'exitSelfTest': 18,
     },
-    'WAC330HE': {
-      protocolCode: `EN1434_0100`,
-      model: 38,  /*84移动|38电信*/
-      joinMode: 8,/*2移动|8电信*/
-      isInfraredDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'inquireSelfTest': true,
-        'writeTemperatureProbesConfig': true,
-        'readData': true,
-        'selfTest': true,
-        'readAddress': false,
-        'writeValveAddress': false,
-        'readSelfTestStatus': true,
-        'readICCID': false,
-        'readIMEI': false,
-        'exitSelfTest': true,
-        'awaken': false,
-        'meterSettingDate': false,
-        'meterReadAddress': false,
-        'meterWriteAddress': false,
-        'meterEnterVerificationStatus': false,
-        'meterReturnVerificationStatus': false,
-        'meterTemperatureCalibration': false,
-      },
-      protocolId: 102,
-      deviceActionResponseMessageLength: {
-        'inquireSelfTest': 37,
-        'writeTemperatureProbesConfig': 37,
-        'readData': 132,
-        'selfTest': -1,
-        'readAddress': 21,
-        'writeValveAddress': 16,
-        'readSelfTestStatus': 76,
-        'readICCID': 36,
-        'readIMEI': 31,
-        'exitSelfTest': 33,
-        'awaken': 16,
-        'meterSettingDate': 19,
-        'meterReadAddress': 20,
-        'meterWriteAddress': 19,
-        'meterEnterVerificationStatus': 21,
-        'meterReturnVerificationStatus': 21,
-        'meterTemperatureCalibration': -1,
-      },
-      deviceActionResponseMessageLength2: {
-        'inquireSelfTest': 70,
-        'writeTemperatureProbesConfig': 72,
-        'readData': 165,
-        'selfTest': -1,
-        'readAddress': 37,
-        'writeValveAddress': 37,
-        'readSelfTestStatus': 109,
-        'readICCID': 52,
-        'readIMEI': 47,
-        'exitSelfTest': 70,
-        'awaken': 32,
-        'meterSettingDate': 42,
-        'meterReadAddress': 37,
-        'meterWriteAddress': 42,
-        'meterEnterVerificationStatus': 39,
-        'meterReturnVerificationStatus': 39,
-        'meterTemperatureCalibration': -1,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        inquireSelfTest: (context, data) => {
-          return WAC330HE.inquireSelfTest(context, data);
-        },
-        writeTemperatureProbesConfig: (context, data) => {
-          return WAC330HE.writeTemperatureProbesConfig(context, data);
-        },
-        meterEnterVerificationStatus: (data) => {
-          return WAC330HE.meterVerificationStatusEnter(data);
-        },
-        meterReturnVerificationStatus: (data) => {
-          return WAC330HE.meterVerificationStatusExit(data);
-        },
-        meterSettingDate: (data) => {
-          return WAC330HE.meterSetTime(data);
-        },
-        // meterReadAddress: (context, data) => {
-        // return decodeCheckMeterReadAddressWAC330HE(context, data);
-        // },
-        meterWriteAddress: (context, data) => {
-          return WAC330HE.writeMeterAddress(context, data);
-        },
-        readData: (context, data) => {
-          return WAC330HE.readData(context, data);
-        },
-        readSelfTestStatus: (context, data) => {
-          return WAC330HE.readSelfTestStatus(context, data);
-        },
-        readICCID: (context, data) => {
-          return WAC330HE.readICCID(context, data);
-        },
-        readIMEI: (context, data) => {
-          return WAC330HE.readIMEI(context, data);
-        },
-        readAddress: (context, data) => {
-          return WAC330HE.readValveAddress(context, data);
-        },
-        writeValveAddress: (leftGenerateAddress, data) => {
-          return WAC330HE.writeValveAddress(leftGenerateAddress, data);
-        },
-        awaken: (data) => {
-          return WAC330HE.awaken(data);
-        },
-      },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 36,
+      'selfTest': -1,
+      'readSelfTestStatus': 73,
+      'readICCID': 56,
+      'readIMEI': 51,
+      'readAddress': 51,
+      'writeAddress': 43,
+      'exitSelfTest': 36,
     },
-    'WAC730C': {
-      protocolCode: `EN1434_0187`,
-      model: 85,
-      joinMode: 2,
-      isInfraredDevice: false,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'inquireSelfTest': true,
-        'selfTest': true,
-        'writeAddress': false,
-        'readICCID': false,
-        'readIMEI': false,
-        'readSelfTestStatus': true,
-        'exitSelfTest': true,
-        'readAddress': false,
-        'writePressureProbesConfig': true,
-        'writeTemperatureProbesConfig': true,
-      },
-      protocolId: 148,
-      deviceActionResponseMessageLength: {
-        'inquireSelfTest': 34,
-        'writeAddress': 16,
-        'readICCID': 36,
-        'readIMEI': 31,
-        'readSelfTestStatus': 73,
-        'exitSelfTest': 34,
-        'readAddress': 21,
-        'selfTest': -1,
-        'writeTemperatureProbesConfig': 34,
-        'writePressureProbesConfig': 34,
-      },
-      deviceActionResponseMessageLength2: {
-        'inquireSelfTest': 34,
-        'writeAddress': 16,
-        'readICCID': 36,
-        'readIMEI': 31,
-        'readSelfTestStatus': 73,
-        'exitSelfTest': 34,
-        'readAddress': 21,
-        'selfTest': -1,
-        'writeTemperatureProbesConfig': 34,
-        'writePressureProbesConfig': 34,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        inquireSelfTest: (data) => {
-          return WAC730C.inquireSelfTest(data);
-        },
-        readSelfTestStatus: (context, data) => {
-          return WAC730C.readSelfTestStatus(context, data);
-        },
-        readIMEI: (context, data) => {
-          return WAC730C.readIMEI(context, data);
-        },
-        readICCID: (context, data) => {
-          return WAC730C.readICCID(context, data);
-        },
-        writeAddress: (leftGenerateAddress, data) => {
-          return WAC730C.writeAddress(leftGenerateAddress, data);
-        },
-        readAddress: (context, data) => {
-          return WAC730C.readAddress(context, data);
-        },
-        exitSelfTest: (data) => {
-          return WAC730C.exitSelfTest(data);
-        },
-        writeTemperatureProbesConfig: (data) => {
-          return WAC730C.writeTemperatureProbesConfig(data);
-        },
-        writePressureProbesConfig: (data) => {
-          return WAC730C.writePressureProbesConfig(data);
-        },
-
-      },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
     },
-    'PTC100-4-20MA': {
-      protocolCode: null,
-      model: null,  /*1移动|6电信*/
-      joinMode: null,/*2移动|8电信*/
-      isInfraredDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'inquireSelfTest': true,
-        'selfTest': true,
-        'readSelfTestStatus': false,
-        'zeroMpaDemarcate': false,
-        'readPressureGaugePressure': false,
-        'onePointSixMpaDemarcate': false,
-        'readDevicePressure': false,
-        'deviceOutputs4mA': false,
-        'readTemperatureCurrent': false,
-        'temperatureChannelCalibrated4mA': false,
-        'deviceOutputs20mA': false,
-        'temperatureChannelCalibrated20mA': false,
-        'deviceOutputs12mA': false,
-        'readPressureCurrent': false,
-        'pressureChannelCalibrated4mA': false,
-        'pressureChannelCalibrated20mA': false,
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return LPC230.inquireSelfTest(data);
       },
-      protocolId: 122,
-      deviceActionResponseMessageLength: {
-        'inquireSelfTest': 16,
-        'selfTest': -1,
-        'readSelfTestStatus': 56,
-        'zeroMpaDemarcate': 9,
-        'readPressureGaugePressure': 9,
-        'onePointSixMpaDemarcate': 9,
-        'readDevicePressure': 9,
-        'deviceOutputs4mA': 9,
-        'readTemperatureCurrent': 9,
-        'temperatureChannelCalibrated4mA': 9,
-        'deviceOutputs20mA': 9,
-        'temperatureChannelCalibrated20mA': 9,
-        'deviceOutputs12mA': 9,
-        'readPressureCurrent': 9,
-        'pressureChannelCalibrated4mA': 9,
-        'pressureChannelCalibrated20mA': 9,
+      readSelfTestStatus: (context, data) => {
+        return LPC230.readSelfTestStatus(context, data);
       },
-      deviceActionResponseMessageLength2: {
-        'inquireSelfTest': 32,
-        'selfTest': -1,
-        'readSelfTestStatus': 72,
-        'zeroMpaDemarcate': 23,
-        'readPressureGaugePressure': 9,
-        'onePointSixMpaDemarcate': 23,
-        'readDevicePressure': 17,
-        'deviceOutputs4mA': 17,
-        'readTemperatureCurrent': 9,
-        'temperatureChannelCalibrated4mA': 19,
-        'deviceOutputs20mA': 17,
-        'temperatureChannelCalibrated20mA': 19,
-        'deviceOutputs12mA': 17,
-        'readPressureCurrent': 9,
-        'pressureChannelCalibrated4mA': 19,
-        'pressureChannelCalibrated20mA': 19,
+      readICCID: (context, data) => {
+        return LPC230.readICCID(context, data);
       },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
+      readIMEI: (context, data) => {
+        return LPC230.readIMEI(context, data);
       },
-      validateResponse: {
-        inquireSelfTest: (data) => {
-          return PTC100420MA.inquireSelfTest(data);
-        },
-        readSelfTestStatus: (context, data) => {
-          return PTC100420MA.readSelfTestStatus(context, data);
-        },
-        exitSelfTest: (data) => {
-          return PTC100420MA.exitSelfTest(data);
-        },
+      writeAddress: (leftGenerateAddress, data) => {
+        return LPC230.writeAddress(leftGenerateAddress, data);
+      },
+      exitSelfTest: (data) => {
+        return LPC230.exitSelfTest(data);
+      },
+      readAddress: (context, data) => {
+        return LPC230.readAddress(context, data);
+      },
 
-        zeroMpaDemarcate: (context, data) => {
-          return PTC100420MA.zeroMpaDemarcate(context, data);
-        },
-        readPressureGaugePressure: (context, data) => {
-          return PTC100420MA.readVoltmeter(data, context);
-        },
-        onePointSixMpaDemarcate: (context, data) => {
-          return PTC100420MA.onePointSixMpaDemarcate(data, context);
-        },
-        readDevicePressure: (context, data) => {
-          return PTC100420MA.readDevicePressure(data, context);
-        },
-        deviceOutputs4mA: (context, data) => {
-          return PTC100420MA.deviceOutputs4mA(data);
-        },
-        readTemperatureCurrent: (context, data) => {
-          return PTC100420MA.readTemperatureGaugeCurrent(data, context);
-        },
-        temperatureChannelCalibrated4mA: (context, data) => {
-          return PTC100420MA.calibrateTemperatureChannel4mA(data, context);
-        },
-        deviceOutputs20mA: (context, data) => {
-          return PTC100420MA.deviceOutputs20mA(data);
-        },
-        temperatureChannelCalibrated20mA: (context, data) => {
-          return PTC100420MA.calibrateTemperatureChannel20mA(data, context);
-        },
-        deviceOutputs12mA: (context, data) => {
-          return PTC100420MA.deviceOutputs12mA(data, context);
-        },
-        readPressureCurrent: (context, data) => {
-          return PTC100420MA.readPressureGaugeCurrent(data, context);
-        },
-        pressureChannelCalibrated4mA: (context, data) => {
-          return PTC100420MA.calibratePressureChannel4mA(data, context);
-        },
-        pressureChannelCalibrated20mA: (context, data) => {
-          return PTC100420MA.calibratePressureChannel20mA(data, context);
-        }
 
-      },
     },
-    'PTC100-RS485': {
-      protocolCode: null,
-      model: null,  /*1移动|6电信*/
-      joinMode: null,/*2移动|8电信*/
-      isInfraredDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'inquireSelfTest': false,
-        'selfTest': false,
-        'readSelfTestStatus': false,
-        'zeroMpaDemarcate': false,
-        'readPressureGaugePressure': false,
-        'onePointSixMpaDemarcate': false,
-        'readDevicePressure': false,
-        'readTemperature': false,
+  },
+  'LPC230E': {
+    protocolCode: ``,//TODO 不注册平台
+    protocolId: 128,
+    model: -1,//TODO 不注册平台
+    joinMode: 2,//TODO 不注册平台
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': false,
+      'selfTest': false,
+      'readSelfTestStatus': false,
+      'readICCID': false,
+      'readIMEI': false,
+      'writeAddress': false,
+      'exitSelfTest': false,
+      'readAddress': false,
+    },
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 18,
+      'selfTest': -1,
+      'readSelfTestStatus': 55,
+      'readICCID': 38,
+      'readIMEI': 33,
+      'readAddress': 33,
+      'writeAddress': 20,
+      'exitSelfTest': 18,
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 36,
+      'selfTest': -1,
+      'readSelfTestStatus': 73,
+      'readICCID': 56,
+      'readIMEI': 51,
+      'readAddress': 51,
+      'writeAddress': 43,
+      'exitSelfTest': 36,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return LPC230E.inquireSelfTest(data);
       },
-      protocolId: 122,
-      deviceActionResponseMessageLength: {
-        'inquireSelfTest': 20,
-        'selfTest': -1,
-        'readSelfTestStatus': 59,
-        'zeroMpaDemarcate': 13,
-        'readPressureGaugePressure': 13,
-        'onePointSixMpaDemarcate': 13,
-        'readDevicePressure': 13,
-        'readTemperature': 13,
+      readSelfTestStatus: (context, data) => {
+        return LPC230E.readSelfTestStatus(context, data);
       },
-      deviceActionResponseMessageLength2: {
-        'inquireSelfTest': 20,
-        'selfTest': -1,
-        'readSelfTestStatus': 59,
-        'zeroMpaDemarcate': 13,
-        'readPressureGaugePressure': 13,
-        'onePointSixMpaDemarcate': 13,
-        'readDevicePressure': 13,
-        'readTemperature': 13,
+      readICCID: (context, data) => {
+        return LPC230E.readICCID(context, data);
       },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
+      readIMEI: (context, data) => {
+        return LPC230E.readIMEI(context, data);
       },
-      validateResponse: {
-        inquireSelfTest: (data) => {
-          return PTC100RS485.inquireSelfTest(data);
-        },
-        readSelfTestStatus: (context, data) => {
-          return PTC100RS485.readSelfTestStatus(context, data);
-        },
-        exitSelfTest: (data) => {
-          return PTC100RS485.exitSelfTest(data);
-        },
-        zeroMpaDemarcate: (context, data) => {
-          return PTC100RS485.zeroMpaDemarcate(context, data);
-        },
-        readPressureGaugePressure: (context, data) => {
-          return PTC100RS485.readVoltmeter(data, context);
-        },
-        onePointSixMpaDemarcate: (context, data) => {
-          return PTC100RS485.onePointSixMpaDemarcate(data, context);
-        },
-        readDevicePressure: (context, data) => {
-          return PTC100RS485.readDevicePressure(data, context);
-        },
-        // readTemperature:(context,data) => {
-        //   return decodeReadTemperature(data,context);
-        // },
+      writeAddress: (leftGenerateAddress, data) => {
+        return LPC230E.writeAddress(leftGenerateAddress, data);
+      },
+      exitSelfTest: (data) => {
+        return LPC230E.exitSelfTest(data);
+      },
+      readAddress: (context, data) => {
+        return LPC230E.readAddress(context, data);
+      },
 
 
+    },
+  },
+  'AEC100': {
+    protocolCode: ``,//TODO 不注册平台
+    protocolId: 149,
+    model: -1,//TODO 不注册平台
+    joinMode: -1,//TODO 不注册平台
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readCurrentAmmeterInputLoop': false, //读取电流表输入回路
+      'readCurrentAmmeterOutputLoop': false,// 读取电流表输出回路
+      'writesActualInputCurrentValue4MA': false,//设备4mA输入标定
+      'writesActualInputCurrentValue20MA': false,//设备20mA输入标定
+      'output4MAActualCurrentValueCalibration': false,//设备4mA输出标定
+      'output20MAActualCurrentValueCalibration': false,//设备20mA输出标定
+      'writeFixedOutput4MA': false, //设备输出4mA
+      'writeFixedOutput20MA': false, //设备输出20mA
+      'current4To20mACalibrationSuccessful': false,//4-20mA标定成功
+      'current4To20mACalibrationError': false,//4-20mA标定失败
+      'deviceReadsCurrent': false, //读取当前电流值
+      'inquireSelfTest': false, //自检查询
+      'selfTest': false,//自检开启
+      'readSelfTestStatus': false,//读取自检状态
+      'readICCID': false, //读取ICCID
+      'readIMEI': false, // 读取IMEI
+      'writeAddress': false, //写地址
+      'readAddress': false, //读地址
+      'signalSourceOutput': false,//信号源输出
+      'readCurrentSource': false,//读取电流源
+      'exitSelfTest': false// 退出自检
+    },
+    deviceActionResponseMessageLength: {
+      'readCurrentAmmeterInputLoop': 9, //读取电流表输入回路
+      'readCurrentAmmeterOutputLoop': 9,// 读取电流表输出回路
+      'writesActualInputCurrentValue4MA': 19,//设备4mA输入标定
+      'writesActualInputCurrentValue20MA': 19,//设备20mA输入标定
+      'output4MAActualCurrentValueCalibration': 16,//设备4mA输出标定
+      'output20MAActualCurrentValueCalibration': 16,//设备20mA输出标定
+      'writeFixedOutput4MA': 16, //设备输出4mA
+      'writeFixedOutput20MA': 16, //设备输出20mA
+      'current4To20mACalibrationSuccessful': 16,//4-20mA标定成功
+      'current4To20mACalibrationError': 16,//4-20mA标定失败
+      'deviceReadsCurrent': 20, //读取当前电流值
+      'inquireSelfTest': 18, //自检查询
+      'selfTest': -1,//自检开启
+      'readSelfTestStatus': 53,//读取自检状态
+      'readICCID': 38, //读取ICCID
+      'readIMEI': 33, // 读取IMEI
+      'writeAddress': 18, //写地址
+      'readAddress': 19, //读地址
+      'signalSourceOutput': 8,//信号源输出
+      'readCurrentSource': 7,//读取电流源
+      'exitSelfTest': 18
+    },
+    deviceActionResponseMessageLength2: {
+      'readCurrentAmmeterInputLoop': 9, //读取电流表输入回路
+      'readCurrentAmmeterOutputLoop': 9,// 读取电流表输出回路
+      'writesActualInputCurrentValue4MA': 39,//设备4mA输入标定
+      'writesActualInputCurrentValue20MA': 39,//设备20mA输入标定
+      'output4MAActualCurrentValueCalibration': 36,//设备4mA输出标定
+      'output20MAActualCurrentValueCalibration': 36,//设备20mA输出标定
+      'writeFixedOutput4MA': 33, //设备输出4mA
+      'writeFixedOutput20MA': 33, //设备输出20mA
+      'current4To20mACalibrationSuccessful': 33,//4-20mA标定成功
+      'current4To20mACalibrationError': 33,//4-20mA标定失败
+      'deviceReadsCurrent': 36, //读取当前电流值
+      'inquireSelfTest': 36, //自检查询
+      'selfTest': -1,//自检开启
+      'readSelfTestStatus': 71,//读取自检状态
+      'readICCID': 56, //读取ICCID
+      'readIMEI': 51, // 读取IMEI
+      'writeAddress': 43, //写地址
+      'readAddress': 37, //读地址
+      'signalSourceOutput': 8,//信号源输出
+      'readCurrentSource': 7,
+      'exitSelfTest': 36
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return AEC100.inquireSelfTest(data);
+      },
+      readSelfTestStatus: (context, data) => {
+        return AEC100.readSelfTestStatus(context, data);
+      },
+      readICCID: (context, data) => {
+        return AEC100.readICCID(context, data);
+      },
+      readIMEI: (context, data) => {
+        return AEC100.readIMEI(context, data);
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return AEC100.writeAddress(leftGenerateAddress, data);
+      },
+
+      readAddress: (context, data) => {
+        return AEC100.readAddress(context, data);
+      },
+      readCurrentAmmeterInputLoop: (data, context) => {
+        return AEC100.readCurrentAmmeter(data, context);
+      },
+      readCurrentAmmeterOutputLoop: (data, context) => {
+        return AEC100.readCurrentAmmeter(data, context);
+      },
+      readCurrentSource: (data, context) => {
+        return AEC100.readCurrentSource(data, context);
+      },
+      writesActualInputCurrentValue4MA: (data) => {
+        return AEC100.writesActualInputCurrentValue4mA(data);
+      },
+      writesActualInputCurrentValue20MA: (data) => {
+        return AEC100.writesActualInputCurrentValue20mA(data);
+      },
+      writeFixedOutput4MA: (data) => {
+        return AEC100.writeFixedOutput4mA(data);
+      },
+      writeFixedOutput20MA: (data) => {
+        return AEC100.writeFixedOutput20mA(data);
+      },
+      output4MAActualCurrentValueCalibration: (data) => {
+        return AEC100.writesActualInputCurrentValue4mA(data);
+      },
+      output20MAActualCurrentValueCalibration: (data) => {
+        return AEC100.writesActualInputCurrentValue20mA(data);
+      },
+      deviceReadsCurrent: (data, context) => {
+        return AEC100.readDeviceCurrent(data, context);
+      },
+      signal4MASourceOutput: (data) => {
+        return AEC100.signal4MASourceOutput(data)
+      },
+      signal12MASourceOutput: (data) => {
+        return AEC100.signal12MASourceOutput(data)
+      },
+      signal20MASourceOutput: (data) => {
+        return AEC100.signal20MASourceOutput(data)
+      },
+      current4To20mACalibrationSuccessful: (data) => {
+        return AEC100.calibrationCurrent4To20mASuccessful(data)
+      },
+      current4To20mACalibrationError: (data) => {
+        return AEC100.calibrationCurrent4To20mAError(data)
       }
 
     },
-    'VAC200': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: false,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writeUpperAndLowerTemperatureLimits': false,
-        'writePowerOffAndWirelessError': false,
-        'writeHeatingDate': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
+  },
+  'WAC300N': {
+    protocolCode: `EN1434_9993`,
+    model: 1,  /*1移动|6电信*/
+    joinMode: 2,/*2移动|8电信*/
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': true,
+      'writeTemperatureProbesConfig': true,
+      'selfTest': true,
+      'readSelfTestStatus': true,
+      'readICCID': false,
+      'readIMEI': false,
+      'readAddress': false,
+      'writeAddress': false,
+      'exitSelfTest': true,
+      'awaken': false,
+      'readData': true,
+      'readTemperatureProbes': true
+    },
+    protocolId: 71,
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 67,
+      'writeTemperatureProbesConfig': 69,
+      'selfTest': 99,
+      'readSelfTestStatus': 106,
+      'readICCID': 52,
+      'readIMEI': 47,
+      'readAddress': 47,
+      'writeAddress': 37,
+      'exitSelfTest': 67,
+      'awaken': 32,
+      'readData': 105,
+      'readTemperatureProbes': 69
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 33,
+      'writeTemperatureProbesConfig': 35,
+      'selfTest': 99,
+      'readSelfTestStatus': 33,
+      'readICCID': 16,
+      'readIMEI': 16,
+      'readAddress': 16,
+      'writeAddress': 21,
+      'exitSelfTest': 33,
+      'awaken': 16,
+      'readData': 33,
+      'readTemperatureProbes': 33
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return WAC300N.inquireSelfTest(data);
       },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
+      writeTemperatureProbesConfig: (data) => {
+        return WAC300N.writeTemperatureProbesConfig(data);
       },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
+      readSelfTestStatus: (context, data) => {
+        return WAC300N.readSelfTestStatus(context, data);
       },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
+      readICCID: (context, data) => {
+        return WAC300N.readICCID(context, data);
       },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writeUpperAndLowerTemperatureLimits: (data) => {
-          return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeHeatingDate: (data) => {
-          return wireDeviceCommon.writeHeatingPeriod(data);
-        },
-        writeProbesConfig: (data) => {
-          return wireDeviceCommon.writeProbeConfiguration(data);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-        factoryConditionFullyClose: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyClose(data);
-        },
-        factoryConditionFullyOpen: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
-        },
-        outTemperatureCalibration: (data) => {
-          return wireDeviceCommon.outTemperatureCalibration(data);
-        },
-        inTemperatureCalibration: (data) => {
-          return wireDeviceCommon.inTemperatureCalibration(data);
-        },
-        readInAndBackTemperatureVerify: (data, type, context) => {
-          return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
-        },
+      readIMEI: (context, data) => {
+        return WAC300N.readIMEI(context, data);
+      },
+      readAddress: (context, data) => {
+        return WAC300N.readAddress(context, data);
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return WAC300N.writeAddress(leftGenerateAddress, data);
+      },
+      awaken: (data) => {
+        return WAC300N.awaken(data);
+      },
+      readData: (context, data) => {
+        return WAC300N.readData(context, data);
+      },
+      readTemperatureProbes: (context, data) => {
+        return WAC300N.readProbesConfig(context, data);
+      },
 
-        faceplateCommunication: (data) => {
-          return wireDeviceCommon.faceplateCommunication(data);
-        },
-        creditCard: (data) => {
-          return wireDeviceCommon.creditCardVerify(data);
-        },
-        separationAlarm: (data) => {
-          return wireDeviceCommon.separationAlarmVerify(data);
-        },
-        mainAndAuxiliaryValvesVerify: (data) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
-        },
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        }
+    },
+  },
 
+  'WAC300NH': {
+    protocolCode: `EN1434_9993`,
+    model: 1,  /*1移动|6电信*/
+    joinMode: 2,/*2移动|8电信*/
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': true,
+      'writeTemperatureProbesConfig': true,
+      'selfTest': true,
+      'readSelfTestStatus': true,
+      'readICCID': false,
+      'readIMEI': false,
+      'readAddress': false,
+      'writeAddress': false,
+      'exitSelfTest': true,
+      'awaken': false,
+      'readData': true,
+      'readTemperatureProbes': true
+    },
+    protocolId: 71,
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 67,
+      'writeTemperatureProbesConfig': 69,
+      'selfTest': 99,
+      'readSelfTestStatus': 106,
+      'readICCID': 52,
+      'readIMEI': 47,
+      'readAddress': 47,
+      'writeAddress': 37,
+      'exitSelfTest': 67,
+      'awaken': 32,
+      'readData': 105,
+      'readTemperatureProbes': 69
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 33,
+      'writeTemperatureProbesConfig': 35,
+      'selfTest': 99,
+      'readSelfTestStatus': 33,
+      'readICCID': 16,
+      'readIMEI': 16,
+      'readAddress': 16,
+      'writeAddress': 21,
+      'exitSelfTest': 33,
+      'awaken': 16,
+      'readData': 33,
+      'readTemperatureProbes': 33
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return WAC300NH.inquireSelfTest(data);
       },
-      preprocess: {
-        readValveState: (data, type, context) => {
-          return wireDeviceCommon.readValveState(data, type, context)
-        },
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-        panelDetectionLostNormalState: (context, data, type) => {
-          return wireDeviceCommon.detectPanelState(context, data, type)
-        },
-        creditCardState: (context, data, type) => {
-          return wireDeviceCommon.creditCardState(context, data, type)
-        },
-        separationAlarmState: (data, close, context, type) => {
-          return wireDeviceCommon.separationAlarmState(data, close, context, type)
-        },
-        mainAndAuxiliaryValvesState: (data, context, type) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
-        },
+      writeTemperatureProbesConfig: (data) => {
+        return WAC300NH.writeTemperatureProbesConfig(data);
+      },
+      readSelfTestStatus: (context, data) => {
+        return WAC300NH.readSelfTestStatus(context, data);
+      },
+      readICCID: (context, data) => {
+        return WAC300NH.readICCID(context, data);
+      },
+      readIMEI: (context, data) => {
+        return WAC300NH.readIMEI(context, data);
+      },
+      readAddress: (context, data) => {
+        return WAC300NH.readAddress(context, data);
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return WAC300NH.writeAddress(leftGenerateAddress, data);
+      },
+      awaken: (data) => {
+        return WAC300NH.awaken(data);
+      },
+      readData: (context, data) => {
+        return WAC300NH.readData(context, data);
+      },
+      readTemperatureProbes: (context, data) => {
+        return WAC300NH.readProbesConfig(context, data);
+      },
+
+    },
+  },
+
+  'WAC400N': {
+    protocolCode: `EN1434_9992`,
+    model: 1,  /*2移动|7电信*/
+    joinMode: 2,/*2移动|8电信*/
+    isInfraredDevice: true,
+    protocolId: 72,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': true,
+      'writeTemperatureProbesConfig': true,
+      'selfTest': true,
+      'readData': true,
+      'readSelfTestStatus': true,
+      'readIMEI': false,
+      'readICCID': false,
+      'readTemperatureProbes': true,
+      'writeAddress': false,
+      'awaken': false,
+      'exitSelfTest': true,
+      'readAddress': false
+    },
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 34,
+      'writeTemperatureProbesConfig': 34,
+      'selfTest': -1,
+      'readData': 59,
+      'readSelfTestStatus': 73,
+      'readIMEI': 31,
+      'readICCID': 36,
+      'readTemperatureProbes': 36,
+      'writeAddress': 37,
+      'awaken': 16,
+      'exitSelfTest': 34,
+      'readAddress': 21,
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 67,
+      'writeTemperatureProbesConfig': 69,
+      'selfTest': -1,
+      'readData': 92,
+      'readSelfTestStatus': 106,
+      'readIMEI': 47,
+      'readICCID': 52,
+      'readTemperatureProbes': 69,
+      'writeAddress': 58,
+      'awaken': 32,
+      'exitSelfTest': 67,
+      'readAddress': 37,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return WAC400N.inquireSelfTest(data);
+      },
+      writeTemperatureProbesConfig: (data) => {
+        return WAC400N.writeTemperatureProbesConfig(data);
+      },
+      readSelfTestStatus: (context, data) => {
+        return WAC400N.readSelfTestStatus(context, data);
+      },
+      readICCID: (context, data) => {
+        return WAC400N.readICCID(context, data);
+      },
+      readIMEI: (context, data) => {
+        return WAC400N.readIMEI(context, data);
+      },
+      readAddress: (context, data) => {
+        return WAC400N.readAddress(context, data);
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return WAC400N.writeAddress(leftGenerateAddress, data);
+      },
+      awaken: (data) => {
+        return WAC400N.awaken(data);
+      },
+      readData: (context, data) => {
+        return WAC400N.readData(context, data);
+      },
+      readTemperatureProbes: (context, data) => {
+        return WAC400N.readProbesConfig(context, data);
+      },
+      exitSelfTest: (data) => {
+        return WAC400N.exitSelfTest(data);
+      },
+
+    },
+  },
+  'WAC300NY': {
+    protocolCode: `EN1434_9993`,
+    model: 1,  /*1移动|6电信*/
+    joinMode: 2,/*2移动|8电信*/
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': true,
+      'writeTemperatureProbesConfig': true,
+      'selfTest': true,
+      'readSelfTestStatus': true,
+      'readICCID': false,
+      'readIMEI': false,
+      'readAddress': false,
+      'writeAddress': false,
+      'exitSelfTest': true,
+      'awaken': false,
+      'readData': true,
+      'readTemperatureProbes': true
+    },
+    protocolId: 71,
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 67,
+      'writeTemperatureProbesConfig': 69,
+      'selfTest': 99,
+      'readSelfTestStatus': 106,
+      'readICCID': 52,
+      'readIMEI': 47,
+      'readAddress': 47,
+      'writeAddress': 37,
+      'exitSelfTest': 67,
+      'awaken': 32,
+      'readData': 105,
+      'readTemperatureProbes': 69
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 33,
+      'writeTemperatureProbesConfig': 35,
+      'selfTest': 99,
+      'readSelfTestStatus': 33,
+      'readICCID': 16,
+      'readIMEI': 16,
+      'readAddress': 16,
+      'writeAddress': 21,
+      'exitSelfTest': 33,
+      'awaken': 16,
+      'readData': 33,
+      'readTemperatureProbes': 33
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return WAC300NY.inquireSelfTest(data);
+      },
+      writeTemperatureProbesConfig: (data) => {
+        return WAC300NY.writeTemperatureProbesConfig(data);
+      },
+      readSelfTestStatus: (context, data) => {
+        return WAC300NY.readSelfTestStatus(context, data);
+      },
+      readICCID: (context, data) => {
+        return WAC300NY.readICCID(context, data);
+      },
+      readIMEI: (context, data) => {
+        return WAC300NY.readIMEI(context, data);
+      },
+      readAddress: (context, data) => {
+        return WAC300NY.readAddress(context, data);
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return WAC300NY.writeAddress(leftGenerateAddress, data);
+      },
+      awaken: (data) => {
+        return WAC300NY.awaken(data);
+      },
+      readData: (context, data) => {
+        return WAC300NY.readData(context, data);
+      },
+      readTemperatureProbes: (context, data) => {
+        return WAC300NY.readProbesConfig(context, data);
+      },
+
+    },
+  },
+  'WAC330HE': {
+    protocolCode: `EN1434_0100`,
+    model: 38,  /*84移动|38电信*/
+    joinMode: 8,/*2移动|8电信*/
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': true,
+      'writeTemperatureProbesConfig': true,
+      'readData': true,
+      'selfTest': true,
+      'readAddress': false,
+      'writeValveAddress': false,
+      'readSelfTestStatus': true,
+      'readICCID': false,
+      'readIMEI': false,
+      'exitSelfTest': true,
+      'awaken': false,
+      'meterSettingDate': false,
+      'meterReadAddress': false,
+      'meterWriteAddress': false,
+      'meterEnterVerificationStatus': false,
+      'meterReturnVerificationStatus': false,
+      'meterTemperatureCalibration': false,
+    },
+    protocolId: 102,
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 37,
+      'writeTemperatureProbesConfig': 37,
+      'readData': 132,
+      'selfTest': -1,
+      'readAddress': 21,
+      'writeValveAddress': 16,
+      'readSelfTestStatus': 76,
+      'readICCID': 36,
+      'readIMEI': 31,
+      'exitSelfTest': 33,
+      'awaken': 16,
+      'meterSettingDate': 19,
+      'meterReadAddress': 20,
+      'meterWriteAddress': 19,
+      'meterEnterVerificationStatus': 21,
+      'meterReturnVerificationStatus': 21,
+      'meterTemperatureCalibration': -1,
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 70,
+      'writeTemperatureProbesConfig': 72,
+      'readData': 165,
+      'selfTest': -1,
+      'readAddress': 37,
+      'writeValveAddress': 37,
+      'readSelfTestStatus': 109,
+      'readICCID': 52,
+      'readIMEI': 47,
+      'exitSelfTest': 70,
+      'awaken': 32,
+      'meterSettingDate': 42,
+      'meterReadAddress': 37,
+      'meterWriteAddress': 42,
+      'meterEnterVerificationStatus': 39,
+      'meterReturnVerificationStatus': 39,
+      'meterTemperatureCalibration': -1,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (context, data) => {
+        return WAC330HE.inquireSelfTest(context, data);
+      },
+      writeTemperatureProbesConfig: (context, data) => {
+        return WAC330HE.writeTemperatureProbesConfig(context, data);
+      },
+      meterEnterVerificationStatus: (data) => {
+        return WAC330HE.meterVerificationStatusEnter(data);
+      },
+      meterReturnVerificationStatus: (data) => {
+        return WAC330HE.meterVerificationStatusExit(data);
+      },
+      meterSettingDate: (data) => {
+        return WAC330HE.meterSetTime(data);
+      },
+      // meterReadAddress: (context, data) => {
+      // return decodeCheckMeterReadAddressWAC330HE(context, data);
+      // },
+      meterWriteAddress: (context, data) => {
+        return WAC330HE.writeMeterAddress(context, data);
+      },
+      readData: (context, data) => {
+        return WAC330HE.readData(context, data);
+      },
+      readSelfTestStatus: (context, data) => {
+        return WAC330HE.readSelfTestStatus(context, data);
+      },
+      readICCID: (context, data) => {
+        return WAC330HE.readICCID(context, data);
+      },
+      readIMEI: (context, data) => {
+        return WAC330HE.readIMEI(context, data);
+      },
+      readAddress: (context, data) => {
+        return WAC330HE.readValveAddress(context, data);
+      },
+      writeValveAddress: (leftGenerateAddress, data) => {
+        return WAC330HE.writeValveAddress(leftGenerateAddress, data);
+      },
+      awaken: (data) => {
+        return WAC330HE.awaken(data);
       },
     },
-    'VAC200P': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: false,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writeUpperAndLowerTemperatureLimits': false,
-        'writePowerOffAndWirelessError': false,
-        'writeHeatingDate': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writeUpperAndLowerTemperatureLimits: (data) => {
-          return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeHeatingDate: (data) => {
-          return wireDeviceCommon.writeHeatingPeriod(data);
-        },
-        writeProbesConfig: (data) => {
-          return wireDeviceCommon.writeProbeConfiguration(data);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-        factoryConditionFullyClose: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyClose(data);
-        },
-        factoryConditionFullyOpen: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
-        },
-        outTemperatureCalibration: (data) => {
-          return wireDeviceCommon.outTemperatureCalibration(data);
-        },
-        inTemperatureCalibration: (data) => {
-          return wireDeviceCommon.inTemperatureCalibration(data);
-        },
-        readInAndBackTemperatureVerify: (data, type, context) => {
-          return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
-        },
-
-        faceplateCommunication: (data) => {
-          return wireDeviceCommon.faceplateCommunication(data);
-        },
-        creditCard: (data) => {
-          return wireDeviceCommon.creditCardVerify(data);
-        },
-        separationAlarm: (data) => {
-          return wireDeviceCommon.separationAlarmVerify(data);
-        },
-        mainAndAuxiliaryValvesVerify: (data) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
-        },
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        }
-
-      },
-      preprocess: {
-        readValveState: (data, type, context) => {
-          return wireDeviceCommon.readValveState(data, type, context)
-        },
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-        panelDetectionLostNormalState: (context, data, type) => {
-          return wireDeviceCommon.detectPanelState(context, data, type)
-        },
-        creditCardState: (context, data, type) => {
-          return wireDeviceCommon.creditCardState(context, data, type)
-        },
-        separationAlarmState: (data, close, context, type) => {
-          return wireDeviceCommon.separationAlarmState(data, close, context, type)
-        },
-        mainAndAuxiliaryValvesState: (data, context, type) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
-        },
-      },
+  },
+  'WAC730C': {
+    protocolCode: `EN1434_0187`,
+    model: 85,
+    joinMode: 2,
+    isInfraredDevice: false,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': true,
+      'selfTest': true,
+      'writeAddress': false,
+      'readICCID': false,
+      'readIMEI': false,
+      'readSelfTestStatus': true,
+      'exitSelfTest': true,
+      'readAddress': false,
+      'writePressureProbesConfig': true,
+      'writeTemperatureProbesConfig': true,
     },
-    'VAC130-4/20mA': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: true,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writePowerOffAndWirelessError': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-        'readCurrentAmmeterInputLoop': false,
-        'readCurrentAmmeterOutputLoop': false,
-        'writesActualInputCurrentValue4MA': false,
-        'writesActualInputCurrentValue20MA': false,
-        'writeFixedOutput4MA': false,
-        'writeFixedOutput20MA': false,
-        'output4MAActualCurrentValueCalibration': false,
-        'output20MAActualCurrentValueCalibration': false,
-        'deviceReadsCurrent': false,
-        'writeWorkChannel0-10V': false,
-        'writeWorkChannel1-10V': false,
-        'writeWorkChannel4-20mA': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'writeForcedTemperatureSetting': 19,
-        'writesActualInputCurrentValue4MA': 23,
-        'writesActualInputCurrentValue20MA': 23,
-        'writeFixedOutput4MA': 20,
-        'writeFixedOutput20MA': 20,
-        'output4MAActualCurrentValueCalibration': 23,
-        'output20MAActualCurrentValueCalibration': 23,
-        'deviceReadsCurrent': 19,
-        'signalSourceOutput': 8,
-        'readCurrentAmmeterInputLoop': 9,
-        'readCurrentAmmeterOutputLoop': 9,
-        'writeWorkChannel0-10V': 19,
-        'writeWorkChannel1-10V': 19,
-        'writeWorkChannel4-20mA': 19,
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 38,
-        'writePowerOffAndWirelessError': 39,
-        'writeAllConfig': 66,
-        'writeForcedTemperatureSetting': 44,
-        'readVersion': 39,
-        'fullOpenCalibration': 41,
-        'fullOffCalibration': 41,
-        'writeAddress': 45,
-        'writesActualInputCurrentValue4MA': 45,
-        'writesActualInputCurrentValue20MA': 45,
-        'writeFixedOutput4MA': 39,
-        'writeFixedOutput20MA': 39,
-        'output4MAActualCurrentValueCalibration': 42,
-        'output20MAActualCurrentValueCalibration': 42,
-        'deviceReadsCurrent': 42,
-        'signalSourceOutput': 8,
-        'readCurrentAmmeterInputLoop': 9,
-        'readCurrentAmmeterOutputLoop': 9,
-        'writeWorkChannel0-10V': 39,
-        'writeWorkChannel1-10V': 39,
-        'writeWorkChannel4-20mA': 39,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-        readCurrentAmmeterInputLoop: (data, context) => {
-          return VAC130.readCurrentAmmeterInputLoop(data, context);
-        },
-        readCurrentAmmeterOutputLoop: (data, context) => {
-          return VAC130.readCurrentAmmeterInputLoop(data, context);
-        },
-        writesActualInputCurrentValue4MA: (data) => {
-          return VAC130.writesActualInputCurrentValue4MA(data);
-        },
-        writesActualInputCurrentValue20MA: (data) => {
-          return VAC130.writesActualInputCurrentValue20MA(data);
-        },
-        writeFixedOutput4MA: (data) => {
-          return VAC130.writeFixedOutput4MA(data);
-        },
-        writeFixedOutput20MA: (data) => {
-          return VAC130.writeFixedOutput20MA(data);
-        },
-        output4MAActualCurrentValueCalibration: (data) => {
-          return VAC130.output4MAActualCurrentValueCalibration(data);
-        },
-        output20MAActualCurrentValueCalibration: (data) => {
-          return VAC130.output20MAActualCurrentValueCalibration(data);
-        },
-        deviceReadsCurrent: (data, context) => {
-          return VAC130.deviceReadsCurrent(data, context);
-        },
-        signal4MASourceOutput: (data) => {
-          return VAC130.signal4MASourceOutput(data)
-        },
-        signal12MASourceOutput: (data) => {
-          return VAC130.signal12MASourceOutput(data)
-        },
-        signal20MASourceOutput: (data) => {
-          return VAC130.signal20MASourceOutput(data)
-        },
-        writeWorkChannel010V: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-        writeWorkChannel110V: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-        writeWorkChannel420mA: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-      },
-      preprocess: {
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-
-      },
+    protocolId: 148,
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 34,
+      'writeAddress': 16,
+      'readICCID': 36,
+      'readIMEI': 31,
+      'readSelfTestStatus': 73,
+      'exitSelfTest': 34,
+      'readAddress': 21,
+      'selfTest': -1,
+      'writeTemperatureProbesConfig': 34,
+      'writePressureProbesConfig': 34,
     },
-    'VAC130H-4/20mA': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: true,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writePowerOffAndWirelessError': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-        'readCurrentAmmeterInputLoop': false,
-        'readCurrentAmmeterOutputLoop': false,
-        'writesActualInputCurrentValue4MA': false,
-        'writesActualInputCurrentValue20MA': false,
-        'writeFixedOutput4MA': false,
-        'writeFixedOutput20MA': false,
-        'output4MAActualCurrentValueCalibration': false,
-        'output20MAActualCurrentValueCalibration': false,
-        'deviceReadsCurrent': false,
-        'writeWorkChannel0-10V': false,
-        'writeWorkChannel1-10V': false,
-        'writeWorkChannel4-20mA': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'writeForcedTemperatureSetting': 19,
-        'writesActualInputCurrentValue4MA': 23,
-        'writesActualInputCurrentValue20MA': 23,
-        'writeFixedOutput4MA': 20,
-        'writeFixedOutput20MA': 20,
-        'output4MAActualCurrentValueCalibration': 23,
-        'output20MAActualCurrentValueCalibration': 23,
-        'deviceReadsCurrent': 19,
-        'signalSourceOutput': 8,
-        'readCurrentAmmeterInputLoop': 9,
-        'readCurrentAmmeterOutputLoop': 9,
-        'writeWorkChannel0-10V': 19,
-        'writeWorkChannel1-10V': 19,
-        'writeWorkChannel4-20mA': 19,
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 38,
-        'writePowerOffAndWirelessError': 39,
-        'writeAllConfig': 66,
-        'writeForcedTemperatureSetting': 44,
-        'readVersion': 39,
-        'fullOpenCalibration': 41,
-        'fullOffCalibration': 41,
-        'writeAddress': 45,
-        'writesActualInputCurrentValue4MA': 45,
-        'writesActualInputCurrentValue20MA': 45,
-        'writeFixedOutput4MA': 39,
-        'writeFixedOutput20MA': 39,
-        'output4MAActualCurrentValueCalibration': 42,
-        'output20MAActualCurrentValueCalibration': 42,
-        'deviceReadsCurrent': 42,
-        'signalSourceOutput': 8,
-        'readCurrentAmmeterInputLoop': 9,
-        'readCurrentAmmeterOutputLoop': 9,
-        'writeWorkChannel0-10V': 39,
-        'writeWorkChannel1-10V': 39,
-        'writeWorkChannel4-20mA': 39,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-        readCurrentAmmeterInputLoop: (data, context) => {
-          return VAC130.readCurrentAmmeterInputLoop(data, context);
-        },
-        readCurrentAmmeterOutputLoop: (data, context) => {
-          return VAC130.readCurrentAmmeterInputLoop(data, context);
-        },
-        writesActualInputCurrentValue4MA: (data) => {
-          return VAC130.writesActualInputCurrentValue4MA(data);
-        },
-        writesActualInputCurrentValue20MA: (data) => {
-          return VAC130.writesActualInputCurrentValue20MA(data);
-        },
-        writeFixedOutput4MA: (data) => {
-          return VAC130.writeFixedOutput4MA(data);
-        },
-        writeFixedOutput20MA: (data) => {
-          return VAC130.writeFixedOutput20MA(data);
-        },
-        output4MAActualCurrentValueCalibration: (data) => {
-          return VAC130.output4MAActualCurrentValueCalibration(data);
-        },
-        output20MAActualCurrentValueCalibration: (data) => {
-          return VAC130.output20MAActualCurrentValueCalibration(data);
-        },
-        deviceReadsCurrent: (data, context) => {
-          return VAC130.deviceReadsCurrent(data, context);
-        },
-        signal4MASourceOutput: (data) => {
-          return VAC130.signal4MASourceOutput(data)
-        },
-        signal12MASourceOutput: (data) => {
-          return VAC130.signal12MASourceOutput(data)
-        },
-        signal20MASourceOutput: (data) => {
-          return VAC130.signal20MASourceOutput(data)
-        },
-        writeWorkChannel010V: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-        writeWorkChannel110V: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-        writeWorkChannel420mA: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-      },
-      preprocess: {
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-
-      },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 34,
+      'writeAddress': 16,
+      'readICCID': 36,
+      'readIMEI': 31,
+      'readSelfTestStatus': 73,
+      'exitSelfTest': 34,
+      'readAddress': 21,
+      'selfTest': -1,
+      'writeTemperatureProbesConfig': 34,
+      'writePressureProbesConfig': 34,
     },
-    'VAC130-0/10V': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: true,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writePowerOffAndWirelessError': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-        'readVoltageAmmeterInputLoop': false,
-        'readVoltageAmmeterOutputLoop': false,
-        'writesActualInputVoltageValue1V': false,
-        'writesActualInputVoltageValue10V': false,
-        'writeFixedOutput1V': false,
-        'writeFixedOutput10V': false,
-        'output1VActualVoltageValueCalibration': false,
-        'output10VActualVoltageValueCalibration': false,
-        'deviceReadsVoltage': false,
-        'writeWorkChannel0-10V': false,
-        'writeWorkChannel1-10V': false,
-        'writeWorkChannel4-20mA': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'writeForcedTemperatureSetting': 19,
-        'writesActualInputVoltageValue1V': 23,
-        'writesActualInputVoltageValue10V': 23,
-        'writeFixedOutput1V': 19,
-        'writeFixedOutput10V': 19,
-        'output1VActualVoltageValueCalibration': 23,
-        'output10VActualVoltageValueCalibration': 23,
-        'deviceReadsVoltage': 19,
-        'signalSourceOutput': 8,
-        'readVoltageAmmeterInputLoop': 9,
-        'readVoltageAmmeterOutputLoop': 9,
-        'writeWorkChannel0-10V': 19,
-        'writeWorkChannel1-10V': 19,
-        'writeWorkChannel4-20mA': 19,
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 38,
-        'writePowerOffAndWirelessError': 39,
-        'writeAllConfig': 66,
-        'writeForcedTemperatureSetting': 44,
-        'readVersion': 39,
-        'fullOpenCalibration': 41,
-        'fullOffCalibration': 41,
-        'writeAddress': 45,
-        'writesActualInputVoltageValue1V': 45,
-        'writesActualInputVoltageValue10V': 45,
-        'writeFixedOutput1V': 39,
-        'writeFixedOutput10V': 39,
-        'output1VActualVoltageValueCalibration': 42,
-        'output10VActualVoltageValueCalibration': 42,
-        'deviceReadsVoltage': 42,
-        'signalSourceOutput': 8,
-        'readVoltageAmmeterInputLoop': 9,
-        'readVoltageAmmeterOutputLoop': 9,
-        'writeWorkChannel0-10V': 39,
-        'writeWorkChannel1-10V': 39,
-        'writeWorkChannel4-20mA': 39,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-        readVoltageAmmeterInputLoop: (data, context) => {
-          return VAC130.readVoltageAmmeterInputLoop(data, context);
-        },
-        readVoltageAmmeterOutputLoop: (data, context) => {
-          return VAC130.readVoltageAmmeterInputLoop(data, context);
-        },
-        writesActualInputVoltageValue1V: (data, context) => {
-          return VAC130.writesActualInputVoltageValue1V(data, context);
-        },
-        writesActualInputVoltageValue10V: (data, context) => {
-          return VAC130.writesActualInputVoltageValue10V(data, context);
-        },
-        writeFixedOutput1V: (data) => {
-          return VAC130.writeFixedOutput1V(data);
-        },
-        writeFixedOutput10V: (data) => {
-          return VAC130.writeFixedOutput10V(data);
-        },
-        output1VActualVoltageValueCalibration: (data) => {
-          return VAC130.output1VActualVoltageValueCalibration(data);
-        },
-        output10VActualVoltageValueCalibration: (data) => {
-          return VAC130.output10VActualVoltageValueCalibration(data);
-        },
-        deviceReadsVoltage: (data, context) => {
-          return VAC130.deviceReadsVoltage(data, context);
-        },
-        signal1VSourceOutput: (data) => {
-          return VAC130.signal1VSourceOutput(data)
-        },
-        signal5VSourceOutput: (data) => {
-          return VAC130.signal5VSourceOutput(data)
-        },
-        signal10VSourceOutput: (data) => {
-          return VAC130.signal10VSourceOutput(data)
-        },
-        writeWorkChannel010V: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-        writeWorkChannel110V: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-        writeWorkChannel420mA: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-      },
-      preprocess: {
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-
-      },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
     },
-    'VAC130H-0/10V': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: true,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writePowerOffAndWirelessError': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-        'readVoltageAmmeterInputLoop': false,
-        'readVoltageAmmeterOutputLoop': false,
-        'writesActualInputVoltageValue1V': false,
-        'writesActualInputVoltageValue10V': false,
-        'writeFixedOutput1V': false,
-        'writeFixedOutput10V': false,
-        'output1VActualVoltageValueCalibration': false,
-        'output10VActualVoltageValueCalibration': false,
-        'deviceReadsVoltage': false,
-        'writeWorkChannel0-10V': false,
-        'writeWorkChannel1-10V': false,
-        'writeWorkChannel4-20mA': false,
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return WAC730C.inquireSelfTest(data);
       },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'writeForcedTemperatureSetting': 19,
-        'writesActualInputVoltageValue1V': 23,
-        'writesActualInputVoltageValue10V': 23,
-        'writeFixedOutput1V': 19,
-        'writeFixedOutput10V': 19,
-        'output1VActualVoltageValueCalibration': 23,
-        'output10VActualVoltageValueCalibration': 23,
-        'deviceReadsVoltage': 19,
-        'signalSourceOutput': 8,
-        'readVoltageAmmeterInputLoop': 9,
-        'readVoltageAmmeterOutputLoop': 9,
-        'writeWorkChannel0-10V': 19,
-        'writeWorkChannel1-10V': 19,
-        'writeWorkChannel4-20mA': 19,
+      readSelfTestStatus: (context, data) => {
+        return WAC730C.readSelfTestStatus(context, data);
       },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 38,
-        'writePowerOffAndWirelessError': 39,
-        'writeAllConfig': 66,
-        'writeForcedTemperatureSetting': 44,
-        'readVersion': 39,
-        'fullOpenCalibration': 41,
-        'fullOffCalibration': 41,
-        'writeAddress': 45,
-        'writesActualInputVoltageValue1V': 45,
-        'writesActualInputVoltageValue10V': 45,
-        'writeFixedOutput1V': 39,
-        'writeFixedOutput10V': 39,
-        'output1VActualVoltageValueCalibration': 42,
-        'output10VActualVoltageValueCalibration': 42,
-        'deviceReadsVoltage': 42,
-        'signalSourceOutput': 8,
-        'readVoltageAmmeterInputLoop': 9,
-        'readVoltageAmmeterOutputLoop': 9,
-        'writeWorkChannel0-10V': 39,
-        'writeWorkChannel1-10V': 39,
-        'writeWorkChannel4-20mA': 39,
+      readIMEI: (context, data) => {
+        return WAC730C.readIMEI(context, data);
       },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
+      readICCID: (context, data) => {
+        return WAC730C.readICCID(context, data);
       },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
+      writeAddress: (leftGenerateAddress, data) => {
+        return WAC730C.writeAddress(leftGenerateAddress, data);
+      },
+      readAddress: (context, data) => {
+        return WAC730C.readAddress(context, data);
+      },
+      exitSelfTest: (data) => {
+        return WAC730C.exitSelfTest(data);
+      },
+      writeTemperatureProbesConfig: (data) => {
+        return WAC730C.writeTemperatureProbesConfig(data);
+      },
+      writePressureProbesConfig: (data) => {
+        return WAC730C.writePressureProbesConfig(data);
+      },
 
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-        readVoltageAmmeterInputLoop: (data, context) => {
-          return VAC130.readVoltageAmmeterInputLoop(data, context);
-        },
-        readVoltageAmmeterOutputLoop: (data, context) => {
-          return VAC130.readVoltageAmmeterInputLoop(data, context);
-        },
-        writesActualInputVoltageValue1V: (data, context) => {
-          return VAC130.writesActualInputVoltageValue1V(data, context);
-        },
-        writesActualInputVoltageValue10V: (data, context) => {
-          return VAC130.writesActualInputVoltageValue10V(data, context);
-        },
-        writeFixedOutput1V: (data) => {
-          return VAC130.writeFixedOutput1V(data);
-        },
-        writeFixedOutput10V: (data) => {
-          return VAC130.writeFixedOutput10V(data);
-        },
-        output1VActualVoltageValueCalibration: (data) => {
-          return VAC130.output1VActualVoltageValueCalibration(data);
-        },
-        output10VActualVoltageValueCalibration: (data) => {
-          return VAC130.output10VActualVoltageValueCalibration(data);
-        },
-        deviceReadsVoltage: (data, context) => {
-          return VAC130.deviceReadsVoltage(data, context);
-        },
-        signal1VSourceOutput: (data) => {
-          return VAC130.signal1VSourceOutput(data)
-        },
-        signal5VSourceOutput: (data) => {
-          return VAC130.signal5VSourceOutput(data)
-        },
-        signal10VSourceOutput: (data) => {
-          return VAC130.signal10VSourceOutput(data)
-        },
-        writeWorkChannel010V: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-        writeWorkChannel110V: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-        writeWorkChannel420mA: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-      },
-      preprocess: {
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-
-      },
     },
-    'VAC130-1/10V': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: true,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writePowerOffAndWirelessError': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-        'readVoltageAmmeterInputLoop': false,
-        'readVoltageAmmeterOutputLoop': false,
-        'writesActualInputVoltageValue1V': false,
-        'writesActualInputVoltageValue10V': false,
-        'writeFixedOutput1V': false,
-        'writeFixedOutput10V': false,
-        'output1VActualVoltageValueCalibration': false,
-        'output10VActualVoltageValueCalibration': false,
-        'deviceReadsVoltage': false,
-        'writeWorkChannel0-10V': false,
-        'writeWorkChannel1-10V': false,
-        'writeWorkChannel4-20mA': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'writeForcedTemperatureSetting': 19,
-        'writesActualInputVoltageValue1V': 23,
-        'writesActualInputVoltageValue10V': 23,
-        'writeFixedOutput1V': 19,
-        'writeFixedOutput10V': 19,
-        'output1VActualVoltageValueCalibration': 23,
-        'output10VActualVoltageValueCalibration': 23,
-        'deviceReadsVoltage': 19,
-        'signalSourceOutput': 8,
-        'readVoltageAmmeterInputLoop': 9,
-        'readVoltageAmmeterOutputLoop': 9,
-        'writeWorkChannel0-10V': 19,
-        'writeWorkChannel1-10V': 19,
-        'writeWorkChannel4-20mA': 19,
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 38,
-        'writePowerOffAndWirelessError': 39,
-        'writeAllConfig': 66,
-        'writeForcedTemperatureSetting': 44,
-        'readVersion': 39,
-        'fullOpenCalibration': 41,
-        'fullOffCalibration': 41,
-        'writeAddress': 45,
-        'writesActualInputVoltageValue1V': 45,
-        'writesActualInputVoltageValue10V': 45,
-        'writeFixedOutput1V': 39,
-        'writeFixedOutput10V': 39,
-        'output1VActualVoltageValueCalibration': 42,
-        'output10VActualVoltageValueCalibration': 42,
-        'deviceReadsVoltage': 42,
-        'signalSourceOutput': 8,
-        'readVoltageAmmeterInputLoop': 9,
-        'readVoltageAmmeterOutputLoop': 9,
-        'writeWorkChannel0-10V': 39,
-        'writeWorkChannel1-10V': 39,
-        'writeWorkChannel4-20mA': 39,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-        readVoltageAmmeterInputLoop: (data, context) => {
-          return VAC130.readVoltageAmmeterInputLoop(data, context);
-        },
-        readVoltageAmmeterOutputLoop: (data, context) => {
-          return VAC130.readVoltageAmmeterInputLoop(data, context);
-        },
-        writesActualInputVoltageValue1V: (data, context) => {
-          return VAC130.writesActualInputVoltageValue1V(data, context);
-        },
-        writesActualInputVoltageValue10V: (data, context) => {
-          return VAC130.writesActualInputVoltageValue10V(data, context);
-        },
-        writeFixedOutput1V: (data) => {
-          return VAC130.writeFixedOutput1V(data);
-        },
-        writeFixedOutput10V: (data) => {
-          return VAC130.writeFixedOutput10V(data);
-        },
-        output1VActualVoltageValueCalibration: (data) => {
-          return VAC130.output1VActualVoltageValueCalibration(data);
-        },
-        output10VActualVoltageValueCalibration: (data) => {
-          return VAC130.output10VActualVoltageValueCalibration(data);
-        },
-        deviceReadsVoltage: (data, context) => {
-          return VAC130.deviceReadsVoltage(data, context);
-        },
-        signal1VSourceOutput: (data) => {
-          return VAC130.signal1VSourceOutput(data)
-        },
-        signal5VSourceOutput: (data) => {
-          return VAC130.signal5VSourceOutput(data)
-        },
-        signal10VSourceOutput: (data) => {
-          return VAC130.signal10VSourceOutput(data)
-        },
-        writeWorkChannel010V: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-        writeWorkChannel110V: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-        writeWorkChannel420mA: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-      },
-      preprocess: {
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-
-      },
+  },
+  'PTC100-4-20MA': {
+    protocolCode: null,
+    model: null,  /*1移动|6电信*/
+    joinMode: null,/*2移动|8电信*/
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': true,
+      'selfTest': true,
+      'readSelfTestStatus': false,
+      'zeroMpaDemarcate': false,
+      'readPressureGaugePressure': false,
+      'onePointSixMpaDemarcate': false,
+      'readDevicePressure': false,
+      'deviceOutputs4mA': false,
+      'readTemperatureCurrent': false,
+      'temperatureChannelCalibrated4mA': false,
+      'deviceOutputs20mA': false,
+      'temperatureChannelCalibrated20mA': false,
+      'deviceOutputs12mA': false,
+      'readPressureCurrent': false,
+      'pressureChannelCalibrated4mA': false,
+      'pressureChannelCalibrated20mA': false,
     },
-    'VAC130H-1/10V': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: true,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writePowerOffAndWirelessError': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-        'readVoltageAmmeterInputLoop': false,
-        'readVoltageAmmeterOutputLoop': false,
-        'writesActualInputVoltageValue1V': false,
-        'writesActualInputVoltageValue10V': false,
-        'writeFixedOutput1V': false,
-        'writeFixedOutput10V': false,
-        'output1VActualVoltageValueCalibration': false,
-        'output10VActualVoltageValueCalibration': false,
-        'deviceReadsVoltage': false,
-        'writeWorkChannel0-10V': false,
-        'writeWorkChannel1-10V': false,
-        'writeWorkChannel4-20mA': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'writeForcedTemperatureSetting': 19,
-        'writesActualInputVoltageValue1V': 23,
-        'writesActualInputVoltageValue10V': 23,
-        'writeFixedOutput1V': 19,
-        'writeFixedOutput10V': 19,
-        'output1VActualVoltageValueCalibration': 23,
-        'output10VActualVoltageValueCalibration': 23,
-        'deviceReadsVoltage': 19,
-        'signalSourceOutput': 8,
-        'readVoltageAmmeterInputLoop': 9,
-        'readVoltageAmmeterOutputLoop': 9,
-        'writeWorkChannel0-10V': 19,
-        'writeWorkChannel1-10V': 19,
-        'writeWorkChannel4-20mA': 19,
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 38,
-        'writePowerOffAndWirelessError': 39,
-        'writeAllConfig': 66,
-        'writeForcedTemperatureSetting': 44,
-        'readVersion': 39,
-        'fullOpenCalibration': 41,
-        'fullOffCalibration': 41,
-        'writeAddress': 45,
-        'writesActualInputVoltageValue1V': 45,
-        'writesActualInputVoltageValue10V': 45,
-        'writeFixedOutput1V': 39,
-        'writeFixedOutput10V': 39,
-        'output1VActualVoltageValueCalibration': 42,
-        'output10VActualVoltageValueCalibration': 42,
-        'deviceReadsVoltage': 42,
-        'signalSourceOutput': 8,
-        'readVoltageAmmeterInputLoop': 9,
-        'readVoltageAmmeterOutputLoop': 9,
-        'writeWorkChannel0-10V': 39,
-        'writeWorkChannel1-10V': 39,
-        'writeWorkChannel4-20mA': 39,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-        readVoltageAmmeterInputLoop: (data, context) => {
-          return VAC130.readVoltageAmmeterInputLoop(data, context);
-        },
-        readVoltageAmmeterOutputLoop: (data, context) => {
-          return VAC130.readVoltageAmmeterInputLoop(data, context);
-        },
-        writesActualInputVoltageValue1V: (data, context) => {
-          return VAC130.writesActualInputVoltageValue1V(data, context);
-        },
-        writesActualInputVoltageValue10V: (data, context) => {
-          return VAC130.writesActualInputVoltageValue10V(data, context);
-        },
-        writeFixedOutput1V: (data) => {
-          return VAC130.writeFixedOutput1V(data);
-        },
-        writeFixedOutput10V: (data) => {
-          return VAC130.writeFixedOutput10V(data);
-        },
-        output1VActualVoltageValueCalibration: (data) => {
-          return VAC130.output1VActualVoltageValueCalibration(data);
-        },
-        output10VActualVoltageValueCalibration: (data) => {
-          return VAC130.output10VActualVoltageValueCalibration(data);
-        },
-        deviceReadsVoltage: (data, context) => {
-          return VAC130.deviceReadsVoltage(data, context);
-        },
-        signal1VSourceOutput: (data) => {
-          return VAC130.signal1VSourceOutput(data)
-        },
-        signal5VSourceOutput: (data) => {
-          return VAC130.signal5VSourceOutput(data)
-        },
-        signal10VSourceOutput: (data) => {
-          return VAC130.signal10VSourceOutput(data)
-        },
-        writeWorkChannel010V: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-        writeWorkChannel110V: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-        writeWorkChannel420mA: (data) => {
-          return VAC130.writeWorkChannel(data)
-        },
-      },
-      preprocess: {
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-
-      },
+    protocolId: 122,
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 16,
+      'selfTest': -1,
+      'readSelfTestStatus': 56,
+      'zeroMpaDemarcate': 9,
+      'readPressureGaugePressure': 9,
+      'onePointSixMpaDemarcate': 9,
+      'readDevicePressure': 9,
+      'deviceOutputs4mA': 9,
+      'readTemperatureCurrent': 9,
+      'temperatureChannelCalibrated4mA': 9,
+      'deviceOutputs20mA': 9,
+      'temperatureChannelCalibrated20mA': 9,
+      'deviceOutputs12mA': 9,
+      'readPressureCurrent': 9,
+      'pressureChannelCalibrated4mA': 9,
+      'pressureChannelCalibrated20mA': 9,
     },
-    'VAC200Y': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: false,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writeUpperAndLowerTemperatureLimits': false,
-        'writePowerOffAndWirelessError': false,
-        'writeHeatingDate': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writeUpperAndLowerTemperatureLimits: (data) => {
-          return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeHeatingDate: (data) => {
-          return wireDeviceCommon.writeHeatingPeriod(data);
-        },
-        writeProbesConfig: (data) => {
-          return wireDeviceCommon.writeProbeConfiguration(data);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-        factoryConditionFullyClose: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyClose(data);
-        },
-        factoryConditionFullyOpen: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
-        },
-        outTemperatureCalibration: (data) => {
-          return wireDeviceCommon.outTemperatureCalibration(data);
-        },
-        inTemperatureCalibration: (data) => {
-          return wireDeviceCommon.inTemperatureCalibration(data);
-        },
-        readInAndBackTemperatureVerify: (data, type, context) => {
-          return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
-        },
-
-        faceplateCommunication: (data) => {
-          return wireDeviceCommon.faceplateCommunication(data);
-        },
-        creditCard: (data) => {
-          return wireDeviceCommon.creditCardVerify(data);
-        },
-        separationAlarm: (data) => {
-          return wireDeviceCommon.separationAlarmVerify(data);
-        },
-        mainAndAuxiliaryValvesVerify: (data) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
-        },
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-
-      },
-      preprocess: {
-        readValveState: (data, type, context) => {
-          return wireDeviceCommon.readValveState(data, type, context)
-        },
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-        panelDetectionLostNormalState: (context, data, type) => {
-          return wireDeviceCommon.detectPanelState(context, data, type)
-        },
-        creditCardState: (context, data, type) => {
-          return wireDeviceCommon.creditCardState(context, data, type)
-        },
-        separationAlarmState: (data, close, context, type) => {
-          return wireDeviceCommon.separationAlarmState(data, close, context, type)
-        },
-        mainAndAuxiliaryValvesState: (data, context, type) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
-        },
-      },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 32,
+      'selfTest': -1,
+      'readSelfTestStatus': 72,
+      'zeroMpaDemarcate': 23,
+      'readPressureGaugePressure': 9,
+      'onePointSixMpaDemarcate': 23,
+      'readDevicePressure': 17,
+      'deviceOutputs4mA': 17,
+      'readTemperatureCurrent': 9,
+      'temperatureChannelCalibrated4mA': 19,
+      'deviceOutputs20mA': 17,
+      'temperatureChannelCalibrated20mA': 19,
+      'deviceOutputs12mA': 17,
+      'readPressureCurrent': 9,
+      'pressureChannelCalibrated4mA': 19,
+      'pressureChannelCalibrated20mA': 19,
     },
-    'VAC201': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: false,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writeUpperAndLowerTemperatureLimits': false,
-        'writePowerOffAndWirelessError': false,
-        'writeHeatingDate': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writeUpperAndLowerTemperatureLimits: (data) => {
-          return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeHeatingDate: (data) => {
-          return wireDeviceCommon.writeHeatingPeriod(data);
-        },
-        writeProbesConfig: (data) => {
-          return wireDeviceCommon.writeProbeConfiguration(data);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-        factoryConditionFullyClose: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyClose(data);
-        },
-        factoryConditionFullyOpen: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
-        },
-        outTemperatureCalibration: (data) => {
-          return wireDeviceCommon.outTemperatureCalibration(data);
-        },
-        inTemperatureCalibration: (data) => {
-          return wireDeviceCommon.inTemperatureCalibration(data);
-        },
-        readInAndBackTemperatureVerify: (data, type, context) => {
-          return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
-        },
-
-        faceplateCommunication: (data) => {
-          return wireDeviceCommon.faceplateCommunication(data);
-        },
-        creditCard: (data) => {
-          return wireDeviceCommon.creditCardVerify(data);
-        },
-        separationAlarm: (data) => {
-          return wireDeviceCommon.separationAlarmVerify(data);
-        },
-        mainAndAuxiliaryValvesVerify: (data) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
-        },
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-
-      },
-      preprocess: {
-        readValveState: (data, type, context) => {
-          return wireDeviceCommon.readValveState(data, type, context)
-        },
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-        panelDetectionLostNormalState: (context, data, type) => {
-          return wireDeviceCommon.detectPanelState(context, data, type)
-        },
-        creditCardState: (context, data, type) => {
-          return wireDeviceCommon.creditCardState(context, data, type)
-        },
-        separationAlarmState: (data, close, context, type) => {
-          return wireDeviceCommon.separationAlarmState(data, close, context, type)
-        },
-        mainAndAuxiliaryValvesState: (data, context, type) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
-        },
-      },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
     },
-    'VAC300': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: false,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writeUpperAndLowerTemperatureLimits': false,
-        'writePowerOffAndWirelessError': false,
-        'writeHeatingDate': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return PTC100420MA.inquireSelfTest(data);
       },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
+      readSelfTestStatus: (context, data) => {
+        return PTC100420MA.readSelfTestStatus(context, data);
       },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
+      exitSelfTest: (data) => {
+        return PTC100420MA.exitSelfTest(data);
       },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writeUpperAndLowerTemperatureLimits: (data) => {
-          return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeHeatingDate: (data) => {
-          return wireDeviceCommon.writeHeatingPeriod(data);
-        },
-        writeProbesConfig: (data) => {
-          return wireDeviceCommon.writeProbeConfiguration(data);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-        factoryConditionFullyClose: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyClose(data);
-        },
-        factoryConditionFullyOpen: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
-        },
-        outTemperatureCalibration: (data) => {
-          return wireDeviceCommon.outTemperatureCalibration(data);
-        },
-        inTemperatureCalibration: (data) => {
-          return wireDeviceCommon.inTemperatureCalibration(data);
-        },
-        readInAndBackTemperatureVerify: (data, type, context) => {
-          return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
-        },
 
-        faceplateCommunication: (data) => {
-          return wireDeviceCommon.faceplateCommunication(data);
-        },
-        creditCard: (data) => {
-          return wireDeviceCommon.creditCardVerify(data);
-        },
-        separationAlarm: (data) => {
-          return wireDeviceCommon.separationAlarmVerify(data);
-        },
-        mainAndAuxiliaryValvesVerify: (data) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
-        },
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
+      zeroMpaDemarcate: (context, data) => {
+        return PTC100420MA.zeroMpaDemarcate(context, data);
+      },
+      readPressureGaugePressure: (context, data) => {
+        return PTC100420MA.readVoltmeter(data, context);
+      },
+      onePointSixMpaDemarcate: (context, data) => {
+        return PTC100420MA.onePointSixMpaDemarcate(data, context);
+      },
+      readDevicePressure: (context, data) => {
+        return PTC100420MA.readDevicePressure(data, context);
+      },
+      deviceOutputs4mA: (context, data) => {
+        return PTC100420MA.deviceOutputs4mA(data);
+      },
+      readTemperatureCurrent: (context, data) => {
+        return PTC100420MA.readTemperatureGaugeCurrent(data, context);
+      },
+      temperatureChannelCalibrated4mA: (context, data) => {
+        return PTC100420MA.calibrateTemperatureChannel4mA(data, context);
+      },
+      deviceOutputs20mA: (context, data) => {
+        return PTC100420MA.deviceOutputs20mA(data);
+      },
+      temperatureChannelCalibrated20mA: (context, data) => {
+        return PTC100420MA.calibrateTemperatureChannel20mA(data, context);
+      },
+      deviceOutputs12mA: (context, data) => {
+        return PTC100420MA.deviceOutputs12mA(data, context);
+      },
+      readPressureCurrent: (context, data) => {
+        return PTC100420MA.readPressureGaugeCurrent(data, context);
+      },
+      pressureChannelCalibrated4mA: (context, data) => {
+        return PTC100420MA.calibratePressureChannel4mA(data, context);
+      },
+      pressureChannelCalibrated20mA: (context, data) => {
+        return PTC100420MA.calibratePressureChannel20mA(data, context);
+      }
 
-      },
-      preprocess: {
-        readValveState: (data, type, context) => {
-          return wireDeviceCommon.readValveState(data, type, context)
-        },
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-        panelDetectionLostNormalState: (context, data, type) => {
-          return wireDeviceCommon.detectPanelState(context, data, type)
-        },
-        creditCardState: (context, data, type) => {
-          return wireDeviceCommon.creditCardState(context, data, type)
-        },
-        separationAlarmState: (data, close, context, type) => {
-          return wireDeviceCommon.separationAlarmState(data, close, context, type)
-        },
-        mainAndAuxiliaryValvesState: (data, context, type) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
-        },
-      },
     },
-    'VAC300Z': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: false,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writeUpperAndLowerTemperatureLimits': false,
-        'writePowerOffAndWirelessError': false,
-        'writeHeatingDate': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writeUpperAndLowerTemperatureLimits: (data) => {
-          return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeHeatingDate: (data) => {
-          return wireDeviceCommon.writeHeatingPeriod(data);
-        },
-        writeProbesConfig: (data) => {
-          return wireDeviceCommon.writeProbeConfiguration(data);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-        factoryConditionFullyClose: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyClose(data);
-        },
-        factoryConditionFullyOpen: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
-        },
-        outTemperatureCalibration: (data) => {
-          return wireDeviceCommon.outTemperatureCalibration(data);
-        },
-        inTemperatureCalibration: (data) => {
-          return wireDeviceCommon.inTemperatureCalibration(data);
-        },
-        readInAndBackTemperatureVerify: (data, type, context) => {
-          return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
-        },
-
-        faceplateCommunication: (data) => {
-          return wireDeviceCommon.faceplateCommunication(data);
-        },
-        creditCard: (data) => {
-          return wireDeviceCommon.creditCardVerify(data);
-        },
-        separationAlarm: (data) => {
-          return wireDeviceCommon.separationAlarmVerify(data);
-        },
-        mainAndAuxiliaryValvesVerify: (data) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
-        },
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-
-      },
-      preprocess: {
-        readValveState: (data, type, context) => {
-          return wireDeviceCommon.readValveState(data, type, context)
-        },
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-        panelDetectionLostNormalState: (context, data, type) => {
-          return wireDeviceCommon.detectPanelState(context, data, type)
-        },
-        creditCardState: (context, data, type) => {
-          return wireDeviceCommon.creditCardState(context, data, type)
-        },
-        separationAlarmState: (data, close, context, type) => {
-          return wireDeviceCommon.separationAlarmState(data, close, context, type)
-        },
-        mainAndAuxiliaryValvesState: (data, context, type) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
-        },
-      },
+  },
+  'PTC100-RS485': {
+    protocolCode: null,
+    model: null,  /*1移动|6电信*/
+    joinMode: null,/*2移动|8电信*/
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': false,
+      'selfTest': false,
+      'readSelfTestStatus': false,
+      'zeroMpaDemarcate': false,
+      'readPressureGaugePressure': false,
+      'onePointSixMpaDemarcate': false,
+      'readDevicePressure': false,
+      'readTemperature': false,
     },
-    'VAC300H': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: false,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writeUpperAndLowerTemperatureLimits': false,
-        'writePowerOffAndWirelessError': false,
-        'writeHeatingDate': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writeUpperAndLowerTemperatureLimits: (data) => {
-          return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeHeatingDate: (data) => {
-          return wireDeviceCommon.writeHeatingPeriod(data);
-        },
-        writeProbesConfig: (data) => {
-          return wireDeviceCommon.writeProbeConfiguration(data);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-        factoryConditionFullyClose: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyClose(data);
-        },
-        factoryConditionFullyOpen: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
-        },
-        outTemperatureCalibration: (data) => {
-          return wireDeviceCommon.outTemperatureCalibration(data);
-        },
-        inTemperatureCalibration: (data) => {
-          return wireDeviceCommon.inTemperatureCalibration(data);
-        },
-        readInAndBackTemperatureVerify: (data, type, context) => {
-          return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
-        },
-
-        faceplateCommunication: (data) => {
-          return wireDeviceCommon.faceplateCommunication(data);
-        },
-        creditCard: (data) => {
-          return wireDeviceCommon.creditCardVerify(data);
-        },
-        separationAlarm: (data) => {
-          return wireDeviceCommon.separationAlarmVerify(data);
-        },
-        mainAndAuxiliaryValvesVerify: (data) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
-        },
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-
-      },
-      preprocess: {
-        readValveState: (data, type, context) => {
-          return wireDeviceCommon.readValveState(data, type, context)
-        },
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-        panelDetectionLostNormalState: (context, data, type) => {
-          return wireDeviceCommon.detectPanelState(context, data, type)
-        },
-        creditCardState: (context, data, type) => {
-          return wireDeviceCommon.creditCardState(context, data, type)
-        },
-        separationAlarmState: (data, close, context, type) => {
-          return wireDeviceCommon.separationAlarmState(data, close, context, type)
-        },
-        mainAndAuxiliaryValvesState: (data, context, type) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
-        },
-      },
+    protocolId: 122,
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 20,
+      'selfTest': -1,
+      'readSelfTestStatus': 59,
+      'zeroMpaDemarcate': 13,
+      'readPressureGaugePressure': 13,
+      'onePointSixMpaDemarcate': 13,
+      'readDevicePressure': 13,
+      'readTemperature': 13,
     },
-    'VAC300HC': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: false,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writeUpperAndLowerTemperatureLimits': false,
-        'writePowerOffAndWirelessError': false,
-        'writeHeatingDate': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writeUpperAndLowerTemperatureLimits: (data) => {
-          return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeHeatingDate: (data) => {
-          return wireDeviceCommon.writeHeatingPeriod(data);
-        },
-        writeProbesConfig: (data) => {
-          return wireDeviceCommon.writeProbeConfiguration(data);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-        factoryConditionFullyClose: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyClose(data);
-        },
-        factoryConditionFullyOpen: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
-        },
-        outTemperatureCalibration: (data) => {
-          return wireDeviceCommon.outTemperatureCalibration(data);
-        },
-        inTemperatureCalibration: (data) => {
-          return wireDeviceCommon.inTemperatureCalibration(data);
-        },
-        readInAndBackTemperatureVerify: (data, type, context) => {
-          return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
-        },
-
-        faceplateCommunication: (data) => {
-          return wireDeviceCommon.faceplateCommunication(data);
-        },
-        creditCard: (data) => {
-          return wireDeviceCommon.creditCardVerify(data);
-        },
-        separationAlarm: (data) => {
-          return wireDeviceCommon.separationAlarmVerify(data);
-        },
-        mainAndAuxiliaryValvesVerify: (data) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
-        },
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-
-      },
-      preprocess: {
-        readValveState: (data, type, context) => {
-          return wireDeviceCommon.readValveState(data, type, context)
-        },
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-        panelDetectionLostNormalState: (context, data, type) => {
-          return wireDeviceCommon.detectPanelState(context, data, type)
-        },
-        creditCardState: (context, data, type) => {
-          return wireDeviceCommon.creditCardState(context, data, type)
-        },
-        separationAlarmState: (data, close, context, type) => {
-          return wireDeviceCommon.separationAlarmState(data, close, context, type)
-        },
-        mainAndAuxiliaryValvesState: (data, context, type) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
-        },
-      },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 20,
+      'selfTest': -1,
+      'readSelfTestStatus': 59,
+      'zeroMpaDemarcate': 13,
+      'readPressureGaugePressure': 13,
+      'onePointSixMpaDemarcate': 13,
+      'readDevicePressure': 13,
+      'readTemperature': 13,
     },
-    'VAC400': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: false,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writeUpperAndLowerTemperatureLimits': false,
-        'writePowerOffAndWirelessError': false,
-        'writeHeatingDate': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writeUpperAndLowerTemperatureLimits: (data) => {
-          return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeHeatingDate: (data) => {
-          return wireDeviceCommon.writeHeatingPeriod(data);
-        },
-        writeProbesConfig: (data) => {
-          return wireDeviceCommon.writeProbeConfiguration(data);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-        factoryConditionFullyClose: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyClose(data);
-        },
-        factoryConditionFullyOpen: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
-        },
-        outTemperatureCalibration: (data) => {
-          return wireDeviceCommon.outTemperatureCalibration(data);
-        },
-        inTemperatureCalibration: (data) => {
-          return wireDeviceCommon.inTemperatureCalibration(data);
-        },
-        readInAndBackTemperatureVerify: (data, type, context) => {
-          return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
-        },
-
-        faceplateCommunication: (data) => {
-          return wireDeviceCommon.faceplateCommunication(data);
-        },
-        creditCard: (data) => {
-          return wireDeviceCommon.creditCardVerify(data);
-        },
-        separationAlarm: (data) => {
-          return wireDeviceCommon.separationAlarmVerify(data);
-        },
-        mainAndAuxiliaryValvesVerify: (data) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
-        },
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-
-      },
-      preprocess: {
-        readValveState: (data, type, context) => {
-          return wireDeviceCommon.readValveState(data, type, context)
-        },
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-        panelDetectionLostNormalState: (context, data, type) => {
-          return wireDeviceCommon.detectPanelState(context, data, type)
-        },
-        creditCardState: (context, data, type) => {
-          return wireDeviceCommon.creditCardState(context, data, type)
-        },
-        separationAlarmState: (data, close, context, type) => {
-          return wireDeviceCommon.separationAlarmState(data, close, context, type)
-        },
-        mainAndAuxiliaryValvesState: (data, context, type) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
-        },
-      },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
     },
-    'VAC100': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: false,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writeUpperAndLowerTemperatureLimits': false,
-        'writePowerOffAndWirelessError': false,
-        'writeHeatingDate': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-        'writeTargetAdjustmentValue': false,
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return PTC100RS485.inquireSelfTest(data);
       },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeTargetAdjustmentValue': 19,
-        'writeForcedTemperatureSetting': 19,
-        'writeCleaningValveCycle': 19
+      readSelfTestStatus: (context, data) => {
+        return PTC100RS485.readSelfTestStatus(context, data);
       },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-        'writeTargetAdjustmentValue': 19,
-        'writeCleaningValveCycle': 19
+      exitSelfTest: (data) => {
+        return PTC100RS485.exitSelfTest(data);
       },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
+      zeroMpaDemarcate: (context, data) => {
+        return PTC100RS485.zeroMpaDemarcate(context, data);
       },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writeUpperAndLowerTemperatureLimits: (data) => {
-          return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeHeatingDate: (data) => {
-          return wireDeviceCommon.writeHeatingPeriod(data);
-        },
-        writeProbesConfig: (data) => {
-          return wireDeviceCommon.writeProbeConfiguration(data);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-        factoryConditionFullyClose: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyClose(data);
-        },
-        factoryConditionFullyOpen: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
-        },
-        outTemperatureCalibration: (data) => {
-          return wireDeviceCommon.outTemperatureCalibration(data);
-        },
-        inTemperatureCalibration: (data) => {
-          return wireDeviceCommon.inTemperatureCalibration(data);
-        },
-        readInAndBackTemperatureVerify: (data, type, context) => {
-          return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
-        },
+      readPressureGaugePressure: (context, data) => {
+        return PTC100RS485.readVoltmeter(data, context);
+      },
+      onePointSixMpaDemarcate: (context, data) => {
+        return PTC100RS485.onePointSixMpaDemarcate(data, context);
+      },
+      readDevicePressure: (context, data) => {
+        return PTC100RS485.readDevicePressure(data, context);
+      },
+      // readTemperature:(context,data) => {
+      //   return decodeReadTemperature(data,context);
+      // },
 
-        faceplateCommunication: (data) => {
-          return wireDeviceCommon.faceplateCommunication(data);
-        },
-        creditCard: (data) => {
-          return wireDeviceCommon.creditCardVerify(data);
-        },
-        separationAlarm: (data) => {
-          return wireDeviceCommon.separationAlarmVerify(data);
-        },
-        mainAndAuxiliaryValvesVerify: (data) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
-        },
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-        writeTargetAdjustmentValue: (data) => {
-          return wireDeviceCommon.writeTargetAdjustmentValue(data);
-        },
-        writeCleaningValveCycle: (data) => {
-          return wireDeviceCommon.writeCleaningValveCycle(data);
-        }
 
-      },
-      preprocess: {
-        readValveState: (data, type, context) => {
-          return wireDeviceCommon.readValveState(data, type, context)
-        },
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-        panelDetectionLostNormalState: (context, data, type) => {
-          return wireDeviceCommon.detectPanelState(context, data, type)
-        },
-        creditCardState: (context, data, type) => {
-          return wireDeviceCommon.creditCardState(context, data, type)
-        },
-        separationAlarmState: (data, close, context, type) => {
-          return wireDeviceCommon.separationAlarmState(data, close, context, type)
-        },
-        mainAndAuxiliaryValvesState: (data, context, type) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
-        },
-      },
-    },
-    'VAC100R': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: false,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writeUpperAndLowerTemperatureLimits': false,
-        'writePowerOffAndWirelessError': false,
-        'writeHeatingDate': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-        'writeTargetAdjustmentValue': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeTargetAdjustmentValue': 19,
-        'writeForcedTemperatureSetting': 19,
-        'writeCleaningValveCycle': 19
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-        'writeTargetAdjustmentValue': 19,
-        'writeCleaningValveCycle': 19
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writeUpperAndLowerTemperatureLimits: (data) => {
-          return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeHeatingDate: (data) => {
-          return wireDeviceCommon.writeHeatingPeriod(data);
-        },
-        writeProbesConfig: (data) => {
-          return wireDeviceCommon.writeProbeConfiguration(data);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-        factoryConditionFullyClose: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyClose(data);
-        },
-        factoryConditionFullyOpen: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
-        },
-        outTemperatureCalibration: (data) => {
-          return wireDeviceCommon.outTemperatureCalibration(data);
-        },
-        inTemperatureCalibration: (data) => {
-          return wireDeviceCommon.inTemperatureCalibration(data);
-        },
-        readInAndBackTemperatureVerify: (data, type, context) => {
-          return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
-        },
-
-        faceplateCommunication: (data) => {
-          return wireDeviceCommon.faceplateCommunication(data);
-        },
-        creditCard: (data) => {
-          return wireDeviceCommon.creditCardVerify(data);
-        },
-        separationAlarm: (data) => {
-          return wireDeviceCommon.separationAlarmVerify(data);
-        },
-        mainAndAuxiliaryValvesVerify: (data) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
-        },
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-        writeTargetAdjustmentValue: (data) => {
-          return wireDeviceCommon.writeTargetAdjustmentValue(data);
-        },
-        writeCleaningValveCycle: (data) => {
-          return wireDeviceCommon.writeCleaningValveCycle(data);
-        }
-
-      },
-      preprocess: {
-        readValveState: (data, type, context) => {
-          return wireDeviceCommon.readValveState(data, type, context)
-        },
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-        panelDetectionLostNormalState: (context, data, type) => {
-          return wireDeviceCommon.detectPanelState(context, data, type)
-        },
-        creditCardState: (context, data, type) => {
-          return wireDeviceCommon.creditCardState(context, data, type)
-        },
-        separationAlarmState: (data, close, context, type) => {
-          return wireDeviceCommon.separationAlarmState(data, close, context, type)
-        },
-        mainAndAuxiliaryValvesState: (data, context, type) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
-        },
-      },
-    },
-    'VAC101': {
-      protocolCode: undefined,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: false,
-      isWireDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readWireDeviceAddress': false,
-        'writeUpperAndLowerTemperatureLimits': false,
-        'writePowerOffAndWirelessError': false,
-        'writeHeatingDate': false,
-        'writeProbesConfig': false,
-        'writeAllConfig': false,
-        'readVersion': false,
-        'factoryConditionFullyClose': false,
-        'factoryConditionFullyOpen': false,
-        'outTemperatureCalibration': false,
-        'inTemperatureCalibration': false,
-        'mainAndAuxiliaryValvesVerify': false,
-        'faceplateCommunication': false,
-        'creditCard': false,
-        'fullOpenCalibration': false,
-        'fullOffCalibration': false,
-        'writeAddress': false,
-        'badPrompt': false,
-        'writeTargetAdjustmentValue': false,
-      },
-      protocolId: 70, //hex:46
-      deviceActionResponseMessageLength: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeTargetAdjustmentValue': 19,
-        'writeForcedTemperatureSetting': 19,
-        'writeCleaningValveCycle': 19
-      },
-      deviceActionResponseMessageLength2: {
-        'readWireDeviceAddress': 19,
-        'writeUpperAndLowerTemperatureLimits': 19,
-        'writePowerOffAndWirelessError': 19,
-        'writeHeatingDate': 19,
-        'writeProbesConfig': 19,
-        'writeAllConfig': 19,
-        'readVersion': 20,
-        'factoryConditionFullyClose': 21,
-        'factoryConditionFullyOpen': 21,
-        'outTemperatureCalibration': 19,
-        'inTemperatureCalibration': 19,
-        'faceplateCommunication': 55,
-        'separationAlarmVerify': 55,
-        'readValveState': 55,
-        'creditCard': 84,
-        'separationAlarm': 55,
-        'mainAndAuxiliaryValvesVerify': 58,
-        'fullOpenCalibration': 22,
-        'fullOffCalibration': 22,
-        'writeAddress': 19,
-        'badPrompt': 0,
-        'writeForcedTemperatureSetting': 19,
-        'writeTargetAdjustmentValue': 19,
-        'writeCleaningValveCycle': 19
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
-        },
-        writeUpperAndLowerTemperatureLimits: (data) => {
-          return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
-        },
-        writePowerOffAndWirelessError: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
-        },
-        writeHeatingDate: (data) => {
-          return wireDeviceCommon.writeHeatingPeriod(data);
-        },
-        writeProbesConfig: (data) => {
-          return wireDeviceCommon.writeProbeConfiguration(data);
-        },
-        writeAllConfig: (data, isInfraredDevice) => {
-          return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
-        },
-        readVersion: (context, data, type, isInfraredDevice) => {
-          return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
-        },
-        factoryConditionFullyClose: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyClose(data);
-        },
-        factoryConditionFullyOpen: (data) => {
-          return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
-        },
-        outTemperatureCalibration: (data) => {
-          return wireDeviceCommon.outTemperatureCalibration(data);
-        },
-        inTemperatureCalibration: (data) => {
-          return wireDeviceCommon.inTemperatureCalibration(data);
-        },
-        readInAndBackTemperatureVerify: (data, type, context) => {
-          return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
-        },
-
-        faceplateCommunication: (data) => {
-          return wireDeviceCommon.faceplateCommunication(data);
-        },
-        creditCard: (data) => {
-          return wireDeviceCommon.creditCardVerify(data);
-        },
-        separationAlarm: (data) => {
-          return wireDeviceCommon.separationAlarmVerify(data);
-        },
-        mainAndAuxiliaryValvesVerify: (data) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
-        },
-        fullOpenCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
-        },
-        fullOffCalibration: (data, context, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
-        },
-        writeAddress: (type, data, context, isInfraredDevice) => {
-          return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
-        },
-        writeForcedTemperatureSetting: (data, isInfraredDevice) => {
-          return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
-        },
-        writeTargetAdjustmentValue: (data) => {
-          return wireDeviceCommon.writeTargetAdjustmentValue(data);
-        },
-        writeCleaningValveCycle: (data) => {
-          return wireDeviceCommon.writeCleaningValveCycle(data);
-        }
-
-      },
-      preprocess: {
-        readValveState: (data, type, context) => {
-          return wireDeviceCommon.readValveState(data, type, context)
-        },
-        fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
-        },
-        fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
-          return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
-        },
-        panelDetectionLostNormalState: (context, data, type) => {
-          return wireDeviceCommon.detectPanelState(context, data, type)
-        },
-        creditCardState: (context, data, type) => {
-          return wireDeviceCommon.creditCardState(context, data, type)
-        },
-        separationAlarmState: (data, close, context, type) => {
-          return wireDeviceCommon.separationAlarmState(data, close, context, type)
-        },
-        mainAndAuxiliaryValvesState: (data, context, type) => {
-          return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
-        },
-      },
-    },
-    '东元热表': {
-      protocolCode: undefined,
-      protocolId: 85,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: false,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readAddress': false,
-      },
-      deviceActionResponseMessageLength: {
-        'readAddress': 20,
-      },
-      deviceActionResponseMessageLength2: {
-        'readAddress': 20,
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readAddress: (context, data) => {
-          return DongYuan.readAddress(context, data);
-        },
-      },
-    },
-    'NBT200': {
-      protocolCode: undefined,
-      protocolId: 75,
-      model: undefined,
-      joinMode: undefined,
-      isInfraredDevice: true,
-      isDeviceActionTransparentTransmissionProtocol: {
-        'readAddress': false,
-        'readVersion': false
-      },
-      deviceActionResponseMessageLength: {
-        'readAddress': 37,
-        'readVersion': 33
-      },
-      deviceActionResponseMessageLength2: {
-        'readAddress': 16,
-        'readVersion': 16
-      },
-      portAttribute: {
-        parity: '偶校验',
-        dataBits: 8,
-        baudRate: 2400,
-        stopBits: 1
-      },
-      validateResponse: {
-        readAddress: (context, data) => {
-          return NBT200.readAddress(context, data);
-        },
-        readVersion: (context, data, type) => {
-          return NBT200.readVersion(context, data, type);
-        },
-      },
     }
 
+  },
+  'VAC200': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeHeatingDate: (data) => {
+        return wireDeviceCommon.writeHeatingPeriod(data);
+      },
+      writeProbesConfig: (data) => {
+        return wireDeviceCommon.writeProbeConfiguration(data);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      factoryConditionFullyClose: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyClose(data);
+      },
+      factoryConditionFullyOpen: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
+      },
+      outTemperatureCalibration: (data) => {
+        return wireDeviceCommon.outTemperatureCalibration(data);
+      },
+      inTemperatureCalibration: (data) => {
+        return wireDeviceCommon.inTemperatureCalibration(data);
+      },
+      readInAndBackTemperatureVerify: (data, type, context) => {
+        return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
+      },
+
+      faceplateCommunication: (data) => {
+        return wireDeviceCommon.faceplateCommunication(data);
+      },
+      creditCard: (data) => {
+        return wireDeviceCommon.creditCardVerify(data);
+      },
+      separationAlarm: (data) => {
+        return wireDeviceCommon.separationAlarmVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify: (data) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      }
+
+    },
+    preprocess: {
+      readValveState: (data, type, context) => {
+        return wireDeviceCommon.readValveState(data, type, context)
+      },
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+      panelDetectionLostNormalState: (context, data, type) => {
+        return wireDeviceCommon.detectPanelState(context, data, type)
+      },
+      creditCardState: (context, data, type) => {
+        return wireDeviceCommon.creditCardState(context, data, type)
+      },
+      separationAlarmState: (data, close, context, type) => {
+        return wireDeviceCommon.separationAlarmState(data, close, context, type)
+      },
+      mainAndAuxiliaryValvesState: (data, context, type) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
+      },
+    },
+  },
+  'VAC200P': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeHeatingDate: (data) => {
+        return wireDeviceCommon.writeHeatingPeriod(data);
+      },
+      writeProbesConfig: (data) => {
+        return wireDeviceCommon.writeProbeConfiguration(data);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      factoryConditionFullyClose: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyClose(data);
+      },
+      factoryConditionFullyOpen: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
+      },
+      outTemperatureCalibration: (data) => {
+        return wireDeviceCommon.outTemperatureCalibration(data);
+      },
+      inTemperatureCalibration: (data) => {
+        return wireDeviceCommon.inTemperatureCalibration(data);
+      },
+      readInAndBackTemperatureVerify: (data, type, context) => {
+        return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
+      },
+
+      faceplateCommunication: (data) => {
+        return wireDeviceCommon.faceplateCommunication(data);
+      },
+      creditCard: (data) => {
+        return wireDeviceCommon.creditCardVerify(data);
+      },
+      separationAlarm: (data) => {
+        return wireDeviceCommon.separationAlarmVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify: (data) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      }
+
+    },
+    preprocess: {
+      readValveState: (data, type, context) => {
+        return wireDeviceCommon.readValveState(data, type, context)
+      },
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+      panelDetectionLostNormalState: (context, data, type) => {
+        return wireDeviceCommon.detectPanelState(context, data, type)
+      },
+      creditCardState: (context, data, type) => {
+        return wireDeviceCommon.creditCardState(context, data, type)
+      },
+      separationAlarmState: (data, close, context, type) => {
+        return wireDeviceCommon.separationAlarmState(data, close, context, type)
+      },
+      mainAndAuxiliaryValvesState: (data, context, type) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
+      },
+    },
+  },
+  'VAC130-4/20mA': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: true,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writePowerOffAndWirelessError': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+      'readCurrentAmmeterInputLoop': false,
+      'readCurrentAmmeterOutputLoop': false,
+      'writesActualInputCurrentValue4MA': false,
+      'writesActualInputCurrentValue20MA': false,
+      'writeFixedOutput4MA': false,
+      'writeFixedOutput20MA': false,
+      'output4MAActualCurrentValueCalibration': false,
+      'output20MAActualCurrentValueCalibration': false,
+      'deviceReadsCurrent': false,
+      'writeWorkChannel0-10V': false,
+      'writeWorkChannel1-10V': false,
+      'writeWorkChannel4-20mA': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'writeForcedTemperatureSetting': 19,
+      'writesActualInputCurrentValue4MA': 23,
+      'writesActualInputCurrentValue20MA': 23,
+      'writeFixedOutput4MA': 20,
+      'writeFixedOutput20MA': 20,
+      'output4MAActualCurrentValueCalibration': 23,
+      'output20MAActualCurrentValueCalibration': 23,
+      'deviceReadsCurrent': 19,
+      'signalSourceOutput': 8,
+      'readCurrentAmmeterInputLoop': 9,
+      'readCurrentAmmeterOutputLoop': 9,
+      'writeWorkChannel0-10V': 19,
+      'writeWorkChannel1-10V': 19,
+      'writeWorkChannel4-20mA': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 38,
+      'writePowerOffAndWirelessError': 39,
+      'writeAllConfig': 66,
+      'writeForcedTemperatureSetting': 44,
+      'readVersion': 39,
+      'fullOpenCalibration': 41,
+      'fullOffCalibration': 41,
+      'writeAddress': 45,
+      'writesActualInputCurrentValue4MA': 45,
+      'writesActualInputCurrentValue20MA': 45,
+      'writeFixedOutput4MA': 39,
+      'writeFixedOutput20MA': 39,
+      'output4MAActualCurrentValueCalibration': 42,
+      'output20MAActualCurrentValueCalibration': 42,
+      'deviceReadsCurrent': 42,
+      'signalSourceOutput': 8,
+      'readCurrentAmmeterInputLoop': 9,
+      'readCurrentAmmeterOutputLoop': 9,
+      'writeWorkChannel0-10V': 39,
+      'writeWorkChannel1-10V': 39,
+      'writeWorkChannel4-20mA': 39,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+      readCurrentAmmeterInputLoop: (data, context) => {
+        return VAC130.readCurrentAmmeterInputLoop(data, context);
+      },
+      readCurrentAmmeterOutputLoop: (data, context) => {
+        return VAC130.readCurrentAmmeterInputLoop(data, context);
+      },
+      writesActualInputCurrentValue4MA: (data) => {
+        return VAC130.writesActualInputCurrentValue4MA(data);
+      },
+      writesActualInputCurrentValue20MA: (data) => {
+        return VAC130.writesActualInputCurrentValue20MA(data);
+      },
+      writeFixedOutput4MA: (data) => {
+        return VAC130.writeFixedOutput4MA(data);
+      },
+      writeFixedOutput20MA: (data) => {
+        return VAC130.writeFixedOutput20MA(data);
+      },
+      output4MAActualCurrentValueCalibration: (data) => {
+        return VAC130.output4MAActualCurrentValueCalibration(data);
+      },
+      output20MAActualCurrentValueCalibration: (data) => {
+        return VAC130.output20MAActualCurrentValueCalibration(data);
+      },
+      deviceReadsCurrent: (data, context) => {
+        return VAC130.deviceReadsCurrent(data, context);
+      },
+      signal4MASourceOutput: (data) => {
+        return VAC130.signal4MASourceOutput(data)
+      },
+      signal12MASourceOutput: (data) => {
+        return VAC130.signal12MASourceOutput(data)
+      },
+      signal20MASourceOutput: (data) => {
+        return VAC130.signal20MASourceOutput(data)
+      },
+      writeWorkChannel010V: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+      writeWorkChannel110V: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+      writeWorkChannel420mA: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+    },
+    preprocess: {
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+
+    },
+  },
+  'VAC130H-4/20mA': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: true,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writePowerOffAndWirelessError': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+      'readCurrentAmmeterInputLoop': false,
+      'readCurrentAmmeterOutputLoop': false,
+      'writesActualInputCurrentValue4MA': false,
+      'writesActualInputCurrentValue20MA': false,
+      'writeFixedOutput4MA': false,
+      'writeFixedOutput20MA': false,
+      'output4MAActualCurrentValueCalibration': false,
+      'output20MAActualCurrentValueCalibration': false,
+      'deviceReadsCurrent': false,
+      'writeWorkChannel0-10V': false,
+      'writeWorkChannel1-10V': false,
+      'writeWorkChannel4-20mA': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'writeForcedTemperatureSetting': 19,
+      'writesActualInputCurrentValue4MA': 23,
+      'writesActualInputCurrentValue20MA': 23,
+      'writeFixedOutput4MA': 20,
+      'writeFixedOutput20MA': 20,
+      'output4MAActualCurrentValueCalibration': 23,
+      'output20MAActualCurrentValueCalibration': 23,
+      'deviceReadsCurrent': 19,
+      'signalSourceOutput': 8,
+      'readCurrentAmmeterInputLoop': 9,
+      'readCurrentAmmeterOutputLoop': 9,
+      'writeWorkChannel0-10V': 19,
+      'writeWorkChannel1-10V': 19,
+      'writeWorkChannel4-20mA': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 38,
+      'writePowerOffAndWirelessError': 39,
+      'writeAllConfig': 66,
+      'writeForcedTemperatureSetting': 44,
+      'readVersion': 39,
+      'fullOpenCalibration': 41,
+      'fullOffCalibration': 41,
+      'writeAddress': 45,
+      'writesActualInputCurrentValue4MA': 45,
+      'writesActualInputCurrentValue20MA': 45,
+      'writeFixedOutput4MA': 39,
+      'writeFixedOutput20MA': 39,
+      'output4MAActualCurrentValueCalibration': 42,
+      'output20MAActualCurrentValueCalibration': 42,
+      'deviceReadsCurrent': 42,
+      'signalSourceOutput': 8,
+      'readCurrentAmmeterInputLoop': 9,
+      'readCurrentAmmeterOutputLoop': 9,
+      'writeWorkChannel0-10V': 39,
+      'writeWorkChannel1-10V': 39,
+      'writeWorkChannel4-20mA': 39,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+      readCurrentAmmeterInputLoop: (data, context) => {
+        return VAC130.readCurrentAmmeterInputLoop(data, context);
+      },
+      readCurrentAmmeterOutputLoop: (data, context) => {
+        return VAC130.readCurrentAmmeterInputLoop(data, context);
+      },
+      writesActualInputCurrentValue4MA: (data) => {
+        return VAC130.writesActualInputCurrentValue4MA(data);
+      },
+      writesActualInputCurrentValue20MA: (data) => {
+        return VAC130.writesActualInputCurrentValue20MA(data);
+      },
+      writeFixedOutput4MA: (data) => {
+        return VAC130.writeFixedOutput4MA(data);
+      },
+      writeFixedOutput20MA: (data) => {
+        return VAC130.writeFixedOutput20MA(data);
+      },
+      output4MAActualCurrentValueCalibration: (data) => {
+        return VAC130.output4MAActualCurrentValueCalibration(data);
+      },
+      output20MAActualCurrentValueCalibration: (data) => {
+        return VAC130.output20MAActualCurrentValueCalibration(data);
+      },
+      deviceReadsCurrent: (data, context) => {
+        return VAC130.deviceReadsCurrent(data, context);
+      },
+      signal4MASourceOutput: (data) => {
+        return VAC130.signal4MASourceOutput(data)
+      },
+      signal12MASourceOutput: (data) => {
+        return VAC130.signal12MASourceOutput(data)
+      },
+      signal20MASourceOutput: (data) => {
+        return VAC130.signal20MASourceOutput(data)
+      },
+      writeWorkChannel010V: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+      writeWorkChannel110V: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+      writeWorkChannel420mA: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+    },
+    preprocess: {
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+
+    },
+  },
+  'VAC130-0/10V': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: true,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writePowerOffAndWirelessError': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+      'readVoltageAmmeterInputLoop': false,
+      'readVoltageAmmeterOutputLoop': false,
+      'writesActualInputVoltageValue1V': false,
+      'writesActualInputVoltageValue10V': false,
+      'writeFixedOutput1V': false,
+      'writeFixedOutput10V': false,
+      'output1VActualVoltageValueCalibration': false,
+      'output10VActualVoltageValueCalibration': false,
+      'deviceReadsVoltage': false,
+      'writeWorkChannel0-10V': false,
+      'writeWorkChannel1-10V': false,
+      'writeWorkChannel4-20mA': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'writeForcedTemperatureSetting': 19,
+      'writesActualInputVoltageValue1V': 23,
+      'writesActualInputVoltageValue10V': 23,
+      'writeFixedOutput1V': 19,
+      'writeFixedOutput10V': 19,
+      'output1VActualVoltageValueCalibration': 23,
+      'output10VActualVoltageValueCalibration': 23,
+      'deviceReadsVoltage': 19,
+      'signalSourceOutput': 8,
+      'readVoltageAmmeterInputLoop': 9,
+      'readVoltageAmmeterOutputLoop': 9,
+      'writeWorkChannel0-10V': 19,
+      'writeWorkChannel1-10V': 19,
+      'writeWorkChannel4-20mA': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 38,
+      'writePowerOffAndWirelessError': 39,
+      'writeAllConfig': 66,
+      'writeForcedTemperatureSetting': 44,
+      'readVersion': 39,
+      'fullOpenCalibration': 41,
+      'fullOffCalibration': 41,
+      'writeAddress': 45,
+      'writesActualInputVoltageValue1V': 45,
+      'writesActualInputVoltageValue10V': 45,
+      'writeFixedOutput1V': 39,
+      'writeFixedOutput10V': 39,
+      'output1VActualVoltageValueCalibration': 42,
+      'output10VActualVoltageValueCalibration': 42,
+      'deviceReadsVoltage': 42,
+      'signalSourceOutput': 8,
+      'readVoltageAmmeterInputLoop': 9,
+      'readVoltageAmmeterOutputLoop': 9,
+      'writeWorkChannel0-10V': 39,
+      'writeWorkChannel1-10V': 39,
+      'writeWorkChannel4-20mA': 39,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+      readVoltageAmmeterInputLoop: (data, context) => {
+        return VAC130.readVoltageAmmeterInputLoop(data, context);
+      },
+      readVoltageAmmeterOutputLoop: (data, context) => {
+        return VAC130.readVoltageAmmeterInputLoop(data, context);
+      },
+      writesActualInputVoltageValue1V: (data, context) => {
+        return VAC130.writesActualInputVoltageValue1V(data, context);
+      },
+      writesActualInputVoltageValue10V: (data, context) => {
+        return VAC130.writesActualInputVoltageValue10V(data, context);
+      },
+      writeFixedOutput1V: (data) => {
+        return VAC130.writeFixedOutput1V(data);
+      },
+      writeFixedOutput10V: (data) => {
+        return VAC130.writeFixedOutput10V(data);
+      },
+      output1VActualVoltageValueCalibration: (data) => {
+        return VAC130.output1VActualVoltageValueCalibration(data);
+      },
+      output10VActualVoltageValueCalibration: (data) => {
+        return VAC130.output10VActualVoltageValueCalibration(data);
+      },
+      deviceReadsVoltage: (data, context) => {
+        return VAC130.deviceReadsVoltage(data, context);
+      },
+      signal1VSourceOutput: (data) => {
+        return VAC130.signal1VSourceOutput(data)
+      },
+      signal5VSourceOutput: (data) => {
+        return VAC130.signal5VSourceOutput(data)
+      },
+      signal10VSourceOutput: (data) => {
+        return VAC130.signal10VSourceOutput(data)
+      },
+      writeWorkChannel010V: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+      writeWorkChannel110V: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+      writeWorkChannel420mA: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+    },
+    preprocess: {
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+
+    },
+  },
+  'VAC130H-0/10V': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: true,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writePowerOffAndWirelessError': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+      'readVoltageAmmeterInputLoop': false,
+      'readVoltageAmmeterOutputLoop': false,
+      'writesActualInputVoltageValue1V': false,
+      'writesActualInputVoltageValue10V': false,
+      'writeFixedOutput1V': false,
+      'writeFixedOutput10V': false,
+      'output1VActualVoltageValueCalibration': false,
+      'output10VActualVoltageValueCalibration': false,
+      'deviceReadsVoltage': false,
+      'writeWorkChannel0-10V': false,
+      'writeWorkChannel1-10V': false,
+      'writeWorkChannel4-20mA': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'writeForcedTemperatureSetting': 19,
+      'writesActualInputVoltageValue1V': 23,
+      'writesActualInputVoltageValue10V': 23,
+      'writeFixedOutput1V': 19,
+      'writeFixedOutput10V': 19,
+      'output1VActualVoltageValueCalibration': 23,
+      'output10VActualVoltageValueCalibration': 23,
+      'deviceReadsVoltage': 19,
+      'signalSourceOutput': 8,
+      'readVoltageAmmeterInputLoop': 9,
+      'readVoltageAmmeterOutputLoop': 9,
+      'writeWorkChannel0-10V': 19,
+      'writeWorkChannel1-10V': 19,
+      'writeWorkChannel4-20mA': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 38,
+      'writePowerOffAndWirelessError': 39,
+      'writeAllConfig': 66,
+      'writeForcedTemperatureSetting': 44,
+      'readVersion': 39,
+      'fullOpenCalibration': 41,
+      'fullOffCalibration': 41,
+      'writeAddress': 45,
+      'writesActualInputVoltageValue1V': 45,
+      'writesActualInputVoltageValue10V': 45,
+      'writeFixedOutput1V': 39,
+      'writeFixedOutput10V': 39,
+      'output1VActualVoltageValueCalibration': 42,
+      'output10VActualVoltageValueCalibration': 42,
+      'deviceReadsVoltage': 42,
+      'signalSourceOutput': 8,
+      'readVoltageAmmeterInputLoop': 9,
+      'readVoltageAmmeterOutputLoop': 9,
+      'writeWorkChannel0-10V': 39,
+      'writeWorkChannel1-10V': 39,
+      'writeWorkChannel4-20mA': 39,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+      readVoltageAmmeterInputLoop: (data, context) => {
+        return VAC130.readVoltageAmmeterInputLoop(data, context);
+      },
+      readVoltageAmmeterOutputLoop: (data, context) => {
+        return VAC130.readVoltageAmmeterInputLoop(data, context);
+      },
+      writesActualInputVoltageValue1V: (data, context) => {
+        return VAC130.writesActualInputVoltageValue1V(data, context);
+      },
+      writesActualInputVoltageValue10V: (data, context) => {
+        return VAC130.writesActualInputVoltageValue10V(data, context);
+      },
+      writeFixedOutput1V: (data) => {
+        return VAC130.writeFixedOutput1V(data);
+      },
+      writeFixedOutput10V: (data) => {
+        return VAC130.writeFixedOutput10V(data);
+      },
+      output1VActualVoltageValueCalibration: (data) => {
+        return VAC130.output1VActualVoltageValueCalibration(data);
+      },
+      output10VActualVoltageValueCalibration: (data) => {
+        return VAC130.output10VActualVoltageValueCalibration(data);
+      },
+      deviceReadsVoltage: (data, context) => {
+        return VAC130.deviceReadsVoltage(data, context);
+      },
+      signal1VSourceOutput: (data) => {
+        return VAC130.signal1VSourceOutput(data)
+      },
+      signal5VSourceOutput: (data) => {
+        return VAC130.signal5VSourceOutput(data)
+      },
+      signal10VSourceOutput: (data) => {
+        return VAC130.signal10VSourceOutput(data)
+      },
+      writeWorkChannel010V: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+      writeWorkChannel110V: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+      writeWorkChannel420mA: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+    },
+    preprocess: {
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+
+    },
+  },
+  'VAC130-1/10V': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: true,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writePowerOffAndWirelessError': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+      'readVoltageAmmeterInputLoop': false,
+      'readVoltageAmmeterOutputLoop': false,
+      'writesActualInputVoltageValue1V': false,
+      'writesActualInputVoltageValue10V': false,
+      'writeFixedOutput1V': false,
+      'writeFixedOutput10V': false,
+      'output1VActualVoltageValueCalibration': false,
+      'output10VActualVoltageValueCalibration': false,
+      'deviceReadsVoltage': false,
+      'writeWorkChannel0-10V': false,
+      'writeWorkChannel1-10V': false,
+      'writeWorkChannel4-20mA': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'writeForcedTemperatureSetting': 19,
+      'writesActualInputVoltageValue1V': 23,
+      'writesActualInputVoltageValue10V': 23,
+      'writeFixedOutput1V': 19,
+      'writeFixedOutput10V': 19,
+      'output1VActualVoltageValueCalibration': 23,
+      'output10VActualVoltageValueCalibration': 23,
+      'deviceReadsVoltage': 19,
+      'signalSourceOutput': 8,
+      'readVoltageAmmeterInputLoop': 9,
+      'readVoltageAmmeterOutputLoop': 9,
+      'writeWorkChannel0-10V': 19,
+      'writeWorkChannel1-10V': 19,
+      'writeWorkChannel4-20mA': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 38,
+      'writePowerOffAndWirelessError': 39,
+      'writeAllConfig': 66,
+      'writeForcedTemperatureSetting': 44,
+      'readVersion': 39,
+      'fullOpenCalibration': 41,
+      'fullOffCalibration': 41,
+      'writeAddress': 45,
+      'writesActualInputVoltageValue1V': 45,
+      'writesActualInputVoltageValue10V': 45,
+      'writeFixedOutput1V': 39,
+      'writeFixedOutput10V': 39,
+      'output1VActualVoltageValueCalibration': 42,
+      'output10VActualVoltageValueCalibration': 42,
+      'deviceReadsVoltage': 42,
+      'signalSourceOutput': 8,
+      'readVoltageAmmeterInputLoop': 9,
+      'readVoltageAmmeterOutputLoop': 9,
+      'writeWorkChannel0-10V': 39,
+      'writeWorkChannel1-10V': 39,
+      'writeWorkChannel4-20mA': 39,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+      readVoltageAmmeterInputLoop: (data, context) => {
+        return VAC130.readVoltageAmmeterInputLoop(data, context);
+      },
+      readVoltageAmmeterOutputLoop: (data, context) => {
+        return VAC130.readVoltageAmmeterInputLoop(data, context);
+      },
+      writesActualInputVoltageValue1V: (data, context) => {
+        return VAC130.writesActualInputVoltageValue1V(data, context);
+      },
+      writesActualInputVoltageValue10V: (data, context) => {
+        return VAC130.writesActualInputVoltageValue10V(data, context);
+      },
+      writeFixedOutput1V: (data) => {
+        return VAC130.writeFixedOutput1V(data);
+      },
+      writeFixedOutput10V: (data) => {
+        return VAC130.writeFixedOutput10V(data);
+      },
+      output1VActualVoltageValueCalibration: (data) => {
+        return VAC130.output1VActualVoltageValueCalibration(data);
+      },
+      output10VActualVoltageValueCalibration: (data) => {
+        return VAC130.output10VActualVoltageValueCalibration(data);
+      },
+      deviceReadsVoltage: (data, context) => {
+        return VAC130.deviceReadsVoltage(data, context);
+      },
+      signal1VSourceOutput: (data) => {
+        return VAC130.signal1VSourceOutput(data)
+      },
+      signal5VSourceOutput: (data) => {
+        return VAC130.signal5VSourceOutput(data)
+      },
+      signal10VSourceOutput: (data) => {
+        return VAC130.signal10VSourceOutput(data)
+      },
+      writeWorkChannel010V: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+      writeWorkChannel110V: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+      writeWorkChannel420mA: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+    },
+    preprocess: {
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+
+    },
+  },
+  'VAC130H-1/10V': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: true,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writePowerOffAndWirelessError': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+      'readVoltageAmmeterInputLoop': false,
+      'readVoltageAmmeterOutputLoop': false,
+      'writesActualInputVoltageValue1V': false,
+      'writesActualInputVoltageValue10V': false,
+      'writeFixedOutput1V': false,
+      'writeFixedOutput10V': false,
+      'output1VActualVoltageValueCalibration': false,
+      'output10VActualVoltageValueCalibration': false,
+      'deviceReadsVoltage': false,
+      'writeWorkChannel0-10V': false,
+      'writeWorkChannel1-10V': false,
+      'writeWorkChannel4-20mA': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'writeForcedTemperatureSetting': 19,
+      'writesActualInputVoltageValue1V': 23,
+      'writesActualInputVoltageValue10V': 23,
+      'writeFixedOutput1V': 19,
+      'writeFixedOutput10V': 19,
+      'output1VActualVoltageValueCalibration': 23,
+      'output10VActualVoltageValueCalibration': 23,
+      'deviceReadsVoltage': 19,
+      'signalSourceOutput': 8,
+      'readVoltageAmmeterInputLoop': 9,
+      'readVoltageAmmeterOutputLoop': 9,
+      'writeWorkChannel0-10V': 19,
+      'writeWorkChannel1-10V': 19,
+      'writeWorkChannel4-20mA': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 38,
+      'writePowerOffAndWirelessError': 39,
+      'writeAllConfig': 66,
+      'writeForcedTemperatureSetting': 44,
+      'readVersion': 39,
+      'fullOpenCalibration': 41,
+      'fullOffCalibration': 41,
+      'writeAddress': 45,
+      'writesActualInputVoltageValue1V': 45,
+      'writesActualInputVoltageValue10V': 45,
+      'writeFixedOutput1V': 39,
+      'writeFixedOutput10V': 39,
+      'output1VActualVoltageValueCalibration': 42,
+      'output10VActualVoltageValueCalibration': 42,
+      'deviceReadsVoltage': 42,
+      'signalSourceOutput': 8,
+      'readVoltageAmmeterInputLoop': 9,
+      'readVoltageAmmeterOutputLoop': 9,
+      'writeWorkChannel0-10V': 39,
+      'writeWorkChannel1-10V': 39,
+      'writeWorkChannel4-20mA': 39,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+      readVoltageAmmeterInputLoop: (data, context) => {
+        return VAC130.readVoltageAmmeterInputLoop(data, context);
+      },
+      readVoltageAmmeterOutputLoop: (data, context) => {
+        return VAC130.readVoltageAmmeterInputLoop(data, context);
+      },
+      writesActualInputVoltageValue1V: (data, context) => {
+        return VAC130.writesActualInputVoltageValue1V(data, context);
+      },
+      writesActualInputVoltageValue10V: (data, context) => {
+        return VAC130.writesActualInputVoltageValue10V(data, context);
+      },
+      writeFixedOutput1V: (data) => {
+        return VAC130.writeFixedOutput1V(data);
+      },
+      writeFixedOutput10V: (data) => {
+        return VAC130.writeFixedOutput10V(data);
+      },
+      output1VActualVoltageValueCalibration: (data) => {
+        return VAC130.output1VActualVoltageValueCalibration(data);
+      },
+      output10VActualVoltageValueCalibration: (data) => {
+        return VAC130.output10VActualVoltageValueCalibration(data);
+      },
+      deviceReadsVoltage: (data, context) => {
+        return VAC130.deviceReadsVoltage(data, context);
+      },
+      signal1VSourceOutput: (data) => {
+        return VAC130.signal1VSourceOutput(data)
+      },
+      signal5VSourceOutput: (data) => {
+        return VAC130.signal5VSourceOutput(data)
+      },
+      signal10VSourceOutput: (data) => {
+        return VAC130.signal10VSourceOutput(data)
+      },
+      writeWorkChannel010V: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+      writeWorkChannel110V: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+      writeWorkChannel420mA: (data) => {
+        return VAC130.writeWorkChannel(data)
+      },
+    },
+    preprocess: {
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+
+    },
+  },
+  'VAC200Y': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeHeatingDate: (data) => {
+        return wireDeviceCommon.writeHeatingPeriod(data);
+      },
+      writeProbesConfig: (data) => {
+        return wireDeviceCommon.writeProbeConfiguration(data);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      factoryConditionFullyClose: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyClose(data);
+      },
+      factoryConditionFullyOpen: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
+      },
+      outTemperatureCalibration: (data) => {
+        return wireDeviceCommon.outTemperatureCalibration(data);
+      },
+      inTemperatureCalibration: (data) => {
+        return wireDeviceCommon.inTemperatureCalibration(data);
+      },
+      readInAndBackTemperatureVerify: (data, type, context) => {
+        return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
+      },
+
+      faceplateCommunication: (data) => {
+        return wireDeviceCommon.faceplateCommunication(data);
+      },
+      creditCard: (data) => {
+        return wireDeviceCommon.creditCardVerify(data);
+      },
+      separationAlarm: (data) => {
+        return wireDeviceCommon.separationAlarmVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify: (data) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+
+    },
+    preprocess: {
+      readValveState: (data, type, context) => {
+        return wireDeviceCommon.readValveState(data, type, context)
+      },
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+      panelDetectionLostNormalState: (context, data, type) => {
+        return wireDeviceCommon.detectPanelState(context, data, type)
+      },
+      creditCardState: (context, data, type) => {
+        return wireDeviceCommon.creditCardState(context, data, type)
+      },
+      separationAlarmState: (data, close, context, type) => {
+        return wireDeviceCommon.separationAlarmState(data, close, context, type)
+      },
+      mainAndAuxiliaryValvesState: (data, context, type) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
+      },
+    },
+  },
+  'VAC201': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeHeatingDate: (data) => {
+        return wireDeviceCommon.writeHeatingPeriod(data);
+      },
+      writeProbesConfig: (data) => {
+        return wireDeviceCommon.writeProbeConfiguration(data);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      factoryConditionFullyClose: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyClose(data);
+      },
+      factoryConditionFullyOpen: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
+      },
+      outTemperatureCalibration: (data) => {
+        return wireDeviceCommon.outTemperatureCalibration(data);
+      },
+      inTemperatureCalibration: (data) => {
+        return wireDeviceCommon.inTemperatureCalibration(data);
+      },
+      readInAndBackTemperatureVerify: (data, type, context) => {
+        return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
+      },
+
+      faceplateCommunication: (data) => {
+        return wireDeviceCommon.faceplateCommunication(data);
+      },
+      creditCard: (data) => {
+        return wireDeviceCommon.creditCardVerify(data);
+      },
+      separationAlarm: (data) => {
+        return wireDeviceCommon.separationAlarmVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify: (data) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+
+    },
+    preprocess: {
+      readValveState: (data, type, context) => {
+        return wireDeviceCommon.readValveState(data, type, context)
+      },
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+      panelDetectionLostNormalState: (context, data, type) => {
+        return wireDeviceCommon.detectPanelState(context, data, type)
+      },
+      creditCardState: (context, data, type) => {
+        return wireDeviceCommon.creditCardState(context, data, type)
+      },
+      separationAlarmState: (data, close, context, type) => {
+        return wireDeviceCommon.separationAlarmState(data, close, context, type)
+      },
+      mainAndAuxiliaryValvesState: (data, context, type) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
+      },
+    },
+  },
+  'VAC300': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeHeatingDate: (data) => {
+        return wireDeviceCommon.writeHeatingPeriod(data);
+      },
+      writeProbesConfig: (data) => {
+        return wireDeviceCommon.writeProbeConfiguration(data);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      factoryConditionFullyClose: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyClose(data);
+      },
+      factoryConditionFullyOpen: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
+      },
+      outTemperatureCalibration: (data) => {
+        return wireDeviceCommon.outTemperatureCalibration(data);
+      },
+      inTemperatureCalibration: (data) => {
+        return wireDeviceCommon.inTemperatureCalibration(data);
+      },
+      readInAndBackTemperatureVerify: (data, type, context) => {
+        return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
+      },
+
+      faceplateCommunication: (data) => {
+        return wireDeviceCommon.faceplateCommunication(data);
+      },
+      creditCard: (data) => {
+        return wireDeviceCommon.creditCardVerify(data);
+      },
+      separationAlarm: (data) => {
+        return wireDeviceCommon.separationAlarmVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify: (data) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+
+    },
+    preprocess: {
+      readValveState: (data, type, context) => {
+        return wireDeviceCommon.readValveState(data, type, context)
+      },
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+      panelDetectionLostNormalState: (context, data, type) => {
+        return wireDeviceCommon.detectPanelState(context, data, type)
+      },
+      creditCardState: (context, data, type) => {
+        return wireDeviceCommon.creditCardState(context, data, type)
+      },
+      separationAlarmState: (data, close, context, type) => {
+        return wireDeviceCommon.separationAlarmState(data, close, context, type)
+      },
+      mainAndAuxiliaryValvesState: (data, context, type) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
+      },
+    },
+  },
+  'VAC300Z': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeHeatingDate: (data) => {
+        return wireDeviceCommon.writeHeatingPeriod(data);
+      },
+      writeProbesConfig: (data) => {
+        return wireDeviceCommon.writeProbeConfiguration(data);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      factoryConditionFullyClose: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyClose(data);
+      },
+      factoryConditionFullyOpen: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
+      },
+      outTemperatureCalibration: (data) => {
+        return wireDeviceCommon.outTemperatureCalibration(data);
+      },
+      inTemperatureCalibration: (data) => {
+        return wireDeviceCommon.inTemperatureCalibration(data);
+      },
+      readInAndBackTemperatureVerify: (data, type, context) => {
+        return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
+      },
+
+      faceplateCommunication: (data) => {
+        return wireDeviceCommon.faceplateCommunication(data);
+      },
+      creditCard: (data) => {
+        return wireDeviceCommon.creditCardVerify(data);
+      },
+      separationAlarm: (data) => {
+        return wireDeviceCommon.separationAlarmVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify: (data) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+
+    },
+    preprocess: {
+      readValveState: (data, type, context) => {
+        return wireDeviceCommon.readValveState(data, type, context)
+      },
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+      panelDetectionLostNormalState: (context, data, type) => {
+        return wireDeviceCommon.detectPanelState(context, data, type)
+      },
+      creditCardState: (context, data, type) => {
+        return wireDeviceCommon.creditCardState(context, data, type)
+      },
+      separationAlarmState: (data, close, context, type) => {
+        return wireDeviceCommon.separationAlarmState(data, close, context, type)
+      },
+      mainAndAuxiliaryValvesState: (data, context, type) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
+      },
+    },
+  },
+  'VAC300H': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeHeatingDate: (data) => {
+        return wireDeviceCommon.writeHeatingPeriod(data);
+      },
+      writeProbesConfig: (data) => {
+        return wireDeviceCommon.writeProbeConfiguration(data);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      factoryConditionFullyClose: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyClose(data);
+      },
+      factoryConditionFullyOpen: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
+      },
+      outTemperatureCalibration: (data) => {
+        return wireDeviceCommon.outTemperatureCalibration(data);
+      },
+      inTemperatureCalibration: (data) => {
+        return wireDeviceCommon.inTemperatureCalibration(data);
+      },
+      readInAndBackTemperatureVerify: (data, type, context) => {
+        return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
+      },
+
+      faceplateCommunication: (data) => {
+        return wireDeviceCommon.faceplateCommunication(data);
+      },
+      creditCard: (data) => {
+        return wireDeviceCommon.creditCardVerify(data);
+      },
+      separationAlarm: (data) => {
+        return wireDeviceCommon.separationAlarmVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify: (data) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+
+    },
+    preprocess: {
+      readValveState: (data, type, context) => {
+        return wireDeviceCommon.readValveState(data, type, context)
+      },
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+      panelDetectionLostNormalState: (context, data, type) => {
+        return wireDeviceCommon.detectPanelState(context, data, type)
+      },
+      creditCardState: (context, data, type) => {
+        return wireDeviceCommon.creditCardState(context, data, type)
+      },
+      separationAlarmState: (data, close, context, type) => {
+        return wireDeviceCommon.separationAlarmState(data, close, context, type)
+      },
+      mainAndAuxiliaryValvesState: (data, context, type) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
+      },
+    },
+  },
+  'VAC300HC': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeHeatingDate: (data) => {
+        return wireDeviceCommon.writeHeatingPeriod(data);
+      },
+      writeProbesConfig: (data) => {
+        return wireDeviceCommon.writeProbeConfiguration(data);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      factoryConditionFullyClose: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyClose(data);
+      },
+      factoryConditionFullyOpen: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
+      },
+      outTemperatureCalibration: (data) => {
+        return wireDeviceCommon.outTemperatureCalibration(data);
+      },
+      inTemperatureCalibration: (data) => {
+        return wireDeviceCommon.inTemperatureCalibration(data);
+      },
+      readInAndBackTemperatureVerify: (data, type, context) => {
+        return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
+      },
+
+      faceplateCommunication: (data) => {
+        return wireDeviceCommon.faceplateCommunication(data);
+      },
+      creditCard: (data) => {
+        return wireDeviceCommon.creditCardVerify(data);
+      },
+      separationAlarm: (data) => {
+        return wireDeviceCommon.separationAlarmVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify: (data) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+
+    },
+    preprocess: {
+      readValveState: (data, type, context) => {
+        return wireDeviceCommon.readValveState(data, type, context)
+      },
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+      panelDetectionLostNormalState: (context, data, type) => {
+        return wireDeviceCommon.detectPanelState(context, data, type)
+      },
+      creditCardState: (context, data, type) => {
+        return wireDeviceCommon.creditCardState(context, data, type)
+      },
+      separationAlarmState: (data, close, context, type) => {
+        return wireDeviceCommon.separationAlarmState(data, close, context, type)
+      },
+      mainAndAuxiliaryValvesState: (data, context, type) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
+      },
+    },
+  },
+  'VAC400': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeHeatingDate: (data) => {
+        return wireDeviceCommon.writeHeatingPeriod(data);
+      },
+      writeProbesConfig: (data) => {
+        return wireDeviceCommon.writeProbeConfiguration(data);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      factoryConditionFullyClose: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyClose(data);
+      },
+      factoryConditionFullyOpen: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
+      },
+      outTemperatureCalibration: (data) => {
+        return wireDeviceCommon.outTemperatureCalibration(data);
+      },
+      inTemperatureCalibration: (data) => {
+        return wireDeviceCommon.inTemperatureCalibration(data);
+      },
+      readInAndBackTemperatureVerify: (data, type, context) => {
+        return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
+      },
+
+      faceplateCommunication: (data) => {
+        return wireDeviceCommon.faceplateCommunication(data);
+      },
+      creditCard: (data) => {
+        return wireDeviceCommon.creditCardVerify(data);
+      },
+      separationAlarm: (data) => {
+        return wireDeviceCommon.separationAlarmVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify: (data) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+
+    },
+    preprocess: {
+      readValveState: (data, type, context) => {
+        return wireDeviceCommon.readValveState(data, type, context)
+      },
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+      panelDetectionLostNormalState: (context, data, type) => {
+        return wireDeviceCommon.detectPanelState(context, data, type)
+      },
+      creditCardState: (context, data, type) => {
+        return wireDeviceCommon.creditCardState(context, data, type)
+      },
+      separationAlarmState: (data, close, context, type) => {
+        return wireDeviceCommon.separationAlarmState(data, close, context, type)
+      },
+      mainAndAuxiliaryValvesState: (data, context, type) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
+      },
+    },
+  },
+  'VAC100': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+      'writeTargetAdjustmentValue': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeTargetAdjustmentValue': 19,
+      'writeForcedTemperatureSetting': 19,
+      'writeCleaningValveCycle': 19
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+      'writeTargetAdjustmentValue': 19,
+      'writeCleaningValveCycle': 19
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeHeatingDate: (data) => {
+        return wireDeviceCommon.writeHeatingPeriod(data);
+      },
+      writeProbesConfig: (data) => {
+        return wireDeviceCommon.writeProbeConfiguration(data);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      factoryConditionFullyClose: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyClose(data);
+      },
+      factoryConditionFullyOpen: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
+      },
+      outTemperatureCalibration: (data) => {
+        return wireDeviceCommon.outTemperatureCalibration(data);
+      },
+      inTemperatureCalibration: (data) => {
+        return wireDeviceCommon.inTemperatureCalibration(data);
+      },
+      readInAndBackTemperatureVerify: (data, type, context) => {
+        return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
+      },
+
+      faceplateCommunication: (data) => {
+        return wireDeviceCommon.faceplateCommunication(data);
+      },
+      creditCard: (data) => {
+        return wireDeviceCommon.creditCardVerify(data);
+      },
+      separationAlarm: (data) => {
+        return wireDeviceCommon.separationAlarmVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify: (data) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+      writeTargetAdjustmentValue: (data) => {
+        return wireDeviceCommon.writeTargetAdjustmentValue(data);
+      },
+      writeCleaningValveCycle: (data) => {
+        return wireDeviceCommon.writeCleaningValveCycle(data);
+      }
+
+    },
+    preprocess: {
+      readValveState: (data, type, context) => {
+        return wireDeviceCommon.readValveState(data, type, context)
+      },
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+      panelDetectionLostNormalState: (context, data, type) => {
+        return wireDeviceCommon.detectPanelState(context, data, type)
+      },
+      creditCardState: (context, data, type) => {
+        return wireDeviceCommon.creditCardState(context, data, type)
+      },
+      separationAlarmState: (data, close, context, type) => {
+        return wireDeviceCommon.separationAlarmState(data, close, context, type)
+      },
+      mainAndAuxiliaryValvesState: (data, context, type) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
+      },
+    },
+  },
+  'VAC100R': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+      'writeTargetAdjustmentValue': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeTargetAdjustmentValue': 19,
+      'writeForcedTemperatureSetting': 19,
+      'writeCleaningValveCycle': 19
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+      'writeTargetAdjustmentValue': 19,
+      'writeCleaningValveCycle': 19
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeHeatingDate: (data) => {
+        return wireDeviceCommon.writeHeatingPeriod(data);
+      },
+      writeProbesConfig: (data) => {
+        return wireDeviceCommon.writeProbeConfiguration(data);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      factoryConditionFullyClose: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyClose(data);
+      },
+      factoryConditionFullyOpen: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
+      },
+      outTemperatureCalibration: (data) => {
+        return wireDeviceCommon.outTemperatureCalibration(data);
+      },
+      inTemperatureCalibration: (data) => {
+        return wireDeviceCommon.inTemperatureCalibration(data);
+      },
+      readInAndBackTemperatureVerify: (data, type, context) => {
+        return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
+      },
+
+      faceplateCommunication: (data) => {
+        return wireDeviceCommon.faceplateCommunication(data);
+      },
+      creditCard: (data) => {
+        return wireDeviceCommon.creditCardVerify(data);
+      },
+      separationAlarm: (data) => {
+        return wireDeviceCommon.separationAlarmVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify: (data) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+      writeTargetAdjustmentValue: (data) => {
+        return wireDeviceCommon.writeTargetAdjustmentValue(data);
+      },
+      writeCleaningValveCycle: (data) => {
+        return wireDeviceCommon.writeCleaningValveCycle(data);
+      }
+
+    },
+    preprocess: {
+      readValveState: (data, type, context) => {
+        return wireDeviceCommon.readValveState(data, type, context)
+      },
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+      panelDetectionLostNormalState: (context, data, type) => {
+        return wireDeviceCommon.detectPanelState(context, data, type)
+      },
+      creditCardState: (context, data, type) => {
+        return wireDeviceCommon.creditCardState(context, data, type)
+      },
+      separationAlarmState: (data, close, context, type) => {
+        return wireDeviceCommon.separationAlarmState(data, close, context, type)
+      },
+      mainAndAuxiliaryValvesState: (data, context, type) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
+      },
+    },
+  },
+  'VAC101': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+      'writeTargetAdjustmentValue': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeTargetAdjustmentValue': 19,
+      'writeForcedTemperatureSetting': 19,
+      'writeCleaningValveCycle': 19
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+      'writeTargetAdjustmentValue': 19,
+      'writeCleaningValveCycle': 19
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeHeatingDate: (data) => {
+        return wireDeviceCommon.writeHeatingPeriod(data);
+      },
+      writeProbesConfig: (data) => {
+        return wireDeviceCommon.writeProbeConfiguration(data);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      factoryConditionFullyClose: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyClose(data);
+      },
+      factoryConditionFullyOpen: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
+      },
+      outTemperatureCalibration: (data) => {
+        return wireDeviceCommon.outTemperatureCalibration(data);
+      },
+      inTemperatureCalibration: (data) => {
+        return wireDeviceCommon.inTemperatureCalibration(data);
+      },
+      readInAndBackTemperatureVerify: (data, type, context) => {
+        return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
+      },
+
+      faceplateCommunication: (data) => {
+        return wireDeviceCommon.faceplateCommunication(data);
+      },
+      creditCard: (data) => {
+        return wireDeviceCommon.creditCardVerify(data);
+      },
+      separationAlarm: (data) => {
+        return wireDeviceCommon.separationAlarmVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify: (data) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      },
+      writeTargetAdjustmentValue: (data) => {
+        return wireDeviceCommon.writeTargetAdjustmentValue(data);
+      },
+      writeCleaningValveCycle: (data) => {
+        return wireDeviceCommon.writeCleaningValveCycle(data);
+      }
+
+    },
+    preprocess: {
+      readValveState: (data, type, context) => {
+        return wireDeviceCommon.readValveState(data, type, context)
+      },
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+      panelDetectionLostNormalState: (context, data, type) => {
+        return wireDeviceCommon.detectPanelState(context, data, type)
+      },
+      creditCardState: (context, data, type) => {
+        return wireDeviceCommon.creditCardState(context, data, type)
+      },
+      separationAlarmState: (data, close, context, type) => {
+        return wireDeviceCommon.separationAlarmState(data, close, context, type)
+      },
+      mainAndAuxiliaryValvesState: (data, context, type) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
+      },
+    },
+  },
+  '东元热表': {
+    protocolCode: undefined,
+    protocolId: 85,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readAddress': false,
+    },
+    deviceActionResponseMessageLength: {
+      'readAddress': 20,
+    },
+    deviceActionResponseMessageLength2: {
+      'readAddress': 20,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readAddress: (context, data) => {
+        return DongYuan.readAddress(context, data);
+      },
+    },
+  },
+  'NBT200': {
+    protocolCode: undefined,
+    protocolId: 75,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readAddress': false,
+      'readVersion': false
+    },
+    deviceActionResponseMessageLength: {
+      'readAddress': 37,
+      'readVersion': 33
+    },
+    deviceActionResponseMessageLength2: {
+      'readAddress': 16,
+      'readVersion': 16
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readAddress: (context, data) => {
+        return NBT200.readAddress(context, data);
+      },
+      readVersion: (context, data, type) => {
+        return NBT200.readVersion(context, data, type);
+      },
+    },
   }
+
+}

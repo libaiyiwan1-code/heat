@@ -504,8 +504,8 @@ export async function nbDeviceRegister(context,type,notPass) {
       iccid: context.iccid, // ICCID
       customer: null, // 定制厂家
       expireDate: null, // SIM卡到期时间
-      TempProbeAddr: context.readDeviceTemperatureProbes, //温度探头
-      PressProbe: context.readDevicePressureProbes, //压力探头
+      TempProbeAddr: context.configDetail.temperatureProbe, //温度探头
+      PressProbe: context.configDetail.pressureProbes, //压力探头
       TorqueNM: context.torque,//扭矩
       valveDN: null //WAC330HE口径
     };
@@ -576,17 +576,17 @@ export async function productionLORALibraryRegistration(context) {
 }
 
 export async function vacProduceDeviceRegister(context) {
-// 默认没有运营商 //TODO
+  // 默认没有运营商 //TODO
   //生产入库
   const productionData = {
-    temperatureProbe: context.configDetail.temperatureProbe,
-    pressure_probe: context.configDetail.pressureProbes,
+    TempProbeAddr: context.configDetail.temperatureProbe,
+    PressProbe: context.configDetail.pressureProbes,
     userid: context.routerParam.userId, // 生产账号id
     customerid: null, // 出厂客户id
     valvetypeid: 38,
     valveVersion: context.version, // 阀门版本号
     macaddr: context.leftGenerateAddress, // 设备8位地址
-    model: context.productName, // 设备型号
+    valveModel: context.productName, // 设备型号
     produceDate: new Date(), // 生产日期
     deliverDate: null, // 出库日期
     description: null, // 描述
@@ -627,8 +627,8 @@ export async function productionNBLibraryRegistration(context) {
     iccid: context.iccid, // ICCID
     customer: null, // 定制厂家
     expireDate: null, // SIM卡到期时间
-    TempProbeAddr: context.readDeviceTemperatureProbes, //温度探头
-    PressProbe: context.readDevicePressureProbes, //压力探头
+    TempProbeAddr: context.configDetail.temperatureProbe, //温度探头
+    PressProbe: context.configDetail.pressureProbes, //压力探头
     TorqueNM: context.torque,//扭矩
     valveDN: context.configDetail.nominalCaliber //WAC330HE口径
   };

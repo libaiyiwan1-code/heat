@@ -19,6 +19,7 @@ export function readData(context, responseMessage) {
     context.readInTemperature = (dataView.getUint16(67, true).toString(16) * 0.01).toFixed(2)
     context.readOutTemperature = (dataView.getUint16(69, true).toString(16) * 0.01).toFixed(2);
     console.log('进温:', context.readInTemperature, '回温：', context.readOutTemperature)
+    context.createLeftSpanMessage(`WAC300C读数据成功,进温:${context.readInTemperature}℃,回温:${context.readOutTemperature}℃`, 'grey')
   } else {
     return notPass
   }

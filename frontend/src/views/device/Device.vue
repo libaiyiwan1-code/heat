@@ -1730,7 +1730,8 @@
                       this.configDetail.printLabel==='WAC300NC'||
                       this.configDetail.printLabel==='WAC300C-LG'||
                       this.configDetail.printLabel==='WAC300CY'||
-                      this.configDetail.printLabel==='WAC300CS'
+                      this.configDetail.printLabel==='WAC300CS'||
+                      this.configDetail.printLabel==='WAC400N'
 "
                         v-show="
                         this.configForm.produceModel!=='东元热表'
@@ -1806,7 +1807,8 @@
                       this.configDetail.printLabel==='VAT100'||
                       this.configDetail.printLabel==='NTP100'||
                       this.configDetail.printLabel==='WAC300C'||
-                      this.configDetail.printLabel==='WAC710C'
+                      this.configDetail.printLabel==='WAC710C'||
+                      this.configDetail.printLabel==='WAC400N'
 
 
                         )&&this.configDetail.communication==='无线'
@@ -1914,7 +1916,8 @@
                       this.configDetail.printLabel==='NBT400'||
                       this.configDetail.printLabel==='WAC300C'||
                       this.configDetail.printLabel==='WAC330N'||
-                      this.configDetail.printLabel==='WAC710C'
+                      this.configDetail.printLabel==='WAC710C'||
+                      this.configDetail.printLabel==='WAC400N'
 
 
 "
@@ -2824,7 +2827,7 @@ export default {
         screenDisplay: undefined, //屏幕显示 0 不轮显 1 轮显
         printLabel: undefined, //打印标签
         customizePrintLabel: undefined,//定制化打印标签
-        pressureProbes: undefined, //压力探头,
+        pressureProbes: '无探头', //压力探头,
         torques: undefined,//扭矩
         temperatureDiff: undefined,//温度误差
         differentialPressureDiff: undefined,//压力误差
@@ -2901,7 +2904,7 @@ export default {
         produceModel: '', // 第一级：产品型号
         secondLevelContainsD: false, // 第二级是否包含 D 显示屏
         temperatureConfig: '', // 第三级：测温配置
-        pressureConfig: '' // 第九级：压力传感器配置
+        pressureConfig: '无探头' // 第九级：压力传感器配置
       },
       uploadAddressList: [],
       isNBDevice: undefined,
@@ -3546,7 +3549,7 @@ export default {
         this.configForm.produceModel === 'NTP100' ||
         this.configForm.produceModel === 'CPT100-10A' ||
         this.configForm.produceModel === 'NBT400'||
-        this.configForm.produceModel==='WAC300C'
+        this.configForm.produceModel==='WAC710C'
       ) {
         console.log('this.configDetail.printLabel',this.configDetail.printLabel)
         this.isNBDevice = true
@@ -3663,6 +3666,7 @@ export default {
           productModel === 'RFT200-CAT1' || productModel === 'WAC300-LG' || productModel === 'VAC710-JL' ||
           productModel === 'NBT100-AC' || productModel === 'NBT400-AC')) {
         const ninthLevel = productNamingConventionsList[9];
+        console.log('ninthLevel',ninthLevel)
         if (ninthLevel === 'P1') {
           // TODO P1单压力暂时不解析
         } else if (ninthLevel === 'P2') {
@@ -5333,7 +5337,7 @@ export default {
           this.configForm.produceModel === 'NTP100' ||
           this.configForm.produceModel === 'CPT100-10A' ||
           this.configForm.produceModel === 'NBT400'||
-          this.configForm.produceModel==='WAC300C'
+          this.configForm.produceModel==='WAC710C'
         ) {
           this.leftProduceViewTitle = '测试验证'
           this.rightProduceViewTitle = '不良记录'
@@ -5446,7 +5450,7 @@ export default {
           this.configForm.produceModel === 'NTP100' ||
           this.configForm.produceModel === 'CPT100-10A' ||
           this.configForm.produceModel === 'NBT400'||
-          this.configForm.produceModel==='WAC300C'
+          this.configForm.produceModel==='WAC710C'
 
         ) {
           console.log('this.configForm.produceModel:',this.configForm.produceModel)

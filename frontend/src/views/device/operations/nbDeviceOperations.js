@@ -20,12 +20,14 @@ import * as WAC100N from './nb/wacdevice/wac100n'
 import * as WAC400NS from './nb/wacdevice/wac400ns'
 import * as WAC300NS from './nb/wacdevice/wac300ns'
 import * as WAC710C from './nb/wacdevice/wac710c'
+import * as VAC710 from './nb/wacdevice/vac710'
 import * as WAC300LH from './nb/wacdevice/wac300lh'
 import * as WAC330HE from './nb/wacdevice/wac330he'
 import * as WAC730C from './nb/wacdevice/wac730c'
 import * as WAC300CD from './nb/wacdevice/wac300cd'
 import * as WAC710CD from './nb/wacdevice/wac710cd'
 import * as WAC300NH from './nb/wacdevice/wac300nh'
+import * as WAC400N from './nb/wacdevice/wac400n'
 import * as WAC300NY from './nb/wacdevice/wac300ny'
 import * as WAC300N from './nb/wacdevice/wac300n'
 import * as WAC330N from './nb/wacdevice/wac330n'
@@ -86,7 +88,7 @@ export const doSelfTest = async (context, protocolId, type) => {
     'NTR300C': NTR300C.selfTest,
     'PTC100-4-20MA': PTC100420MA.selfTest,
     'PTC100-RS485': PTC100RS485.selfTest,
-    'CPT100-10A':CPT100.selfTest,
+    'CPT100-10A': CPT100.selfTest,
     'CTW100': CTW100.selfTest,
     'WAC300LH': WAC300LH.selfTest,
     'WAC710C': WAC710C.selfTest,
@@ -102,7 +104,9 @@ export const doSelfTest = async (context, protocolId, type) => {
     'WAC300C': WAC300C.selfTest,
     'NTR300': NTR300.selfTest,
     'WAC300N': WAC300N.selfTest,
-    'WAC330N':WAC330N.selfTest,
+    'WAC330N': WAC330N.selfTest,
+    'WAC400N': WAC400N.selfTest,
+    'VAC710': VAC710.selfTest,
   };
   const produceModel = context.configForm.produceModel;
   const selfTestFunction = selfTestStrategies[produceModel];
@@ -172,6 +176,8 @@ export async function doWriteAddress(context, protocolId, type) {
     'NTR300': NTR300.writeAddress,
     'WAC300N': WAC300N.writeAddress,
     'WAC330N': WAC330N.writeAddress,
+    'WAC400N': WAC400N.writeAddress,
+    'VAC710': VAC710.writeAddress,
 
 
   };
@@ -214,6 +220,9 @@ export async function doWriteAddress(context, protocolId, type) {
     switch (label) {
       case 'VPT100':
         await vacProduceDeviceRegister(context);
+        break;
+      case 'VAC710':
+        await productionNBLibraryRegistration(context)
         break;
       case 'WAC300LH':
         // LORA 入库
@@ -326,6 +335,8 @@ export const doExitSelfTest = async (context, protocolId, type) => {
     'NTR300': NTR300.exitSelfTest,
     'WAC330N': WAC330N.exitSelfTest,
     'WAC710C': WAC710C.exitSelfTest,
+    'WAC400N': WAC400N.exitSelfTest,
+    'VAC710': VAC710.exitSelfTest,
   };
   const produceModel = context.configForm.produceModel;
   const returnSelfTestFunction = returnSelfTestStrategies[produceModel];
@@ -374,7 +385,7 @@ export async function doScanCodeVerification(context, protocolId, type) {
     }
 
     let notPass = await checkAddress(context, protocolId, type)
-    console.log('writeAddressnotPass:',notPass)
+    console.log('writeAddressnotPass:', notPass)
     if (notPass) {
       context.buttonEnable();
       await playErrorAudio(context)
@@ -384,12 +395,16 @@ export async function doScanCodeVerification(context, protocolId, type) {
       return notPass
     }
 
-    context.createLeftSpanMessage('地址验证成功','grey')
+    context.createLeftSpanMessage('地址验证成功', 'grey')
     if (
       context.configDetail.printLabel === 'WAC300NS' || context.configDetail.printLabel === 'WAC400NS' ||
       context.configDetail.printLabel === 'VAC710S' || context.configDetail.printLabel === 'WAC300C' ||
-      context.configDetail.printLabel==='WAC710C'
+      context.configDetail.printLabel === 'WAC710C' || context.configDetail.printLabel === 'VAC710'
     ) {
+      let cmdCode = '20'
+      if (context.configDetail.printLabel === 'WAC400N') {
+        cmdCode = '1f'
+      }
       const model = context.configForm.produceModel;
       const protocol = protocolIDMap[model];
       //进回温验证
@@ -400,7 +415,7 @@ export async function doScanCodeVerification(context, protocolId, type) {
         actionType: 'readData',
         operationName: '读数据',
         cmdType: '90',                         // afn 的命令类型
-        cmdCode: '20',                         // fn 的命令码
+        cmdCode: cmdCode,                         // fn 的命令码
         protocolId: protocolId,
         maxRetries: context.maxRetries,
         expectedLength: protocol.deviceActionResponseMessageLength['readData'],
@@ -419,17 +434,18 @@ export async function doScanCodeVerification(context, protocolId, type) {
 
       //验证温度以及温度探头
       let baseTemperature = 50
-      console.log('选择的探头：',context.configDetail.temperatureProbe)
-      console.log('回水温度：',context.readOutTemperature)
-      console.log('进水温度：',context.readInTemperature)
-      console.log('温度误差：',context.configDetail.temperatureDiff)
+      console.log('选择的探头：', context.configDetail.temperatureProbe)
+      console.log('回水温度：', context.readOutTemperature)
+      console.log('进水温度：', context.readInTemperature)
+      console.log('温度误差：', context.configDetail.temperatureDiff)
       //鉴定温度是否合格 、是否选错探头的情况
       if (context.configDetail.temperatureProbe === '回温探头') {
         if (Math.abs(baseTemperature - Number(context.readOutTemperature)) > context.configDetail.temperatureDiff) {
-          context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败,回温:' + context.readOutTemperature  , 'red');
+          context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败,回温:' + context.readOutTemperature, 'red');
           context.leftGenerateAddress = ''
           notPass = true
           context.buttonEnable();
+          context.buttonError('scanCode')
           await playErrorAudio(context)
           setTimeout(() => {
             context.buttonWaiting('scanCode');
@@ -437,55 +453,26 @@ export async function doScanCodeVerification(context, protocolId, type) {
           return notPass
         }
         console.log(context.readInTemperature)
-        //判断进温探头是否选错
-        if (context.configDetail.printLabel!=='WAC710C'){
-          if (Number(context.readInTemperature) !== 99.99) {
-            context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败,探头不匹配', 'red');
-            context.leftGenerateAddress = ''
-            notPass = true
-            context.buttonEnable();
-            await playErrorAudio(context)
-            setTimeout(() => {
-              context.buttonWaiting('scanCode');
-            }, 2000);
-            return notPass
-          }
-        }
-
       } else if (context.configDetail.temperatureProbe === '进温探头') {
         if (Math.abs(baseTemperature - Number(context.readInTemperature)) > context.configDetail.temperatureDiff) {
-          context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败,进温:' + context.readInTemperature , 'red');
+          context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败,进温:' + context.readInTemperature, 'red');
           context.leftGenerateAddress = ''
           notPass = true
           context.buttonEnable();
+          context.buttonError('scanCode')
           await playErrorAudio(context)
           setTimeout(() => {
             context.buttonWaiting('scanCode');
           }, 2000);
           return notPass
         }
-        //判断进温探头是否选错
-        if (context.configDetail.printLabel!=='WAC710C'){
-          if (Number(context.readOutTemperature) !== 99.99) {
-            context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '验证温度失败,探头不匹配', 'red');
-            context.leftGenerateAddress = ''
-            notPass = true
-            context.buttonEnable();
-            await playErrorAudio(context)
-            setTimeout(() => {
-              context.buttonWaiting('scanCode');
-            }, 2000);
-            return notPass
-          }
-        }
-
-
       } else if (context.configDetail.temperatureProbe === '双探头') {
         if (Math.abs(baseTemperature - Number(context.readOutTemperature)) > context.configDetail.temperatureDiff) {
-          context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败。,回温:' + context.readOutTemperature  , 'red');
+          context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败。,回温:' + context.readOutTemperature, 'red');
           context.leftGenerateAddress = ''
           notPass = true
           context.buttonEnable();
+          context.buttonError('scanCode')
           await playErrorAudio(context)
           setTimeout(() => {
             context.buttonWaiting('scanCode');
@@ -493,44 +480,20 @@ export async function doScanCodeVerification(context, protocolId, type) {
           return notPass
         }
         if (Math.abs(baseTemperature - Number(context.readInTemperature)) > context.configDetail.temperatureDiff) {
-          context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败,进温:' + context.readInTemperature  , 'red');
+          context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败,进温:' + context.readInTemperature, 'red');
           context.leftGenerateAddress = ''
           notPass = true
           context.buttonEnable();
+          context.buttonError('scanCode')
           await playErrorAudio(context)
           setTimeout(() => {
             context.buttonWaiting('scanCode');
           }, 2000);
           return notPass
         }
-      } else if (context.configDetail.temperatureProbe === '无探头') {
-        if (context.configDetail.printLabel!=='WAC710C'){
-          if (Number(context.readOutTemperature) !== 99.99) {
-            context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败,探头不匹配', 'red');
-            context.leftGenerateAddress = ''
-            notPass = true
-            context.buttonEnable();
-            await playErrorAudio(context)
-            setTimeout(() => {
-              context.buttonWaiting('scanCode');
-            }, 2000);
-            return notPass
-          }
-          if (Number(context.readInTemperature) !== 99.99) {
-            context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败,探头不匹配', 'red');
-            context.leftGenerateAddress = ''
-            notPass = true
-            context.buttonEnable();
-            await playErrorAudio(context)
-            setTimeout(() => {
-              context.buttonWaiting('scanCode');
-            }, 2000);
-            return notPass
-          }
-        }
-
       }
-      context.createLeftSpanMessage('温度验证成功,回温:'+context.readOutTemperature+',进温:'+context.readInTemperature,'grey')
+
+      context.createLeftSpanMessage('温度验证成功,回温:' + context.readOutTemperature + ',进温:' + context.readInTemperature, 'grey')
     }
 
     if (context.configDetail.printLabel === 'WAC300C') {
@@ -548,7 +511,7 @@ export async function doScanCodeVerification(context, protocolId, type) {
         expectedLength2: protocol.deviceActionResponseMessageLength2['readSignal'],
         timeout: context.timeout,
         validateResponse: () => {
-          return protocol.validateResponse.readSignal(context,context.receivedData.globalReceivedOneData)
+          return protocol.validateResponse.readSignal(context, context.receivedData.globalReceivedOneData)
         },
         preprocess: () => {
         },
@@ -582,7 +545,7 @@ export async function doScanCodeVerification(context, protocolId, type) {
         expectedLength2: protocol.deviceActionResponseMessageLength2['readBatteryVoltage'],
         timeout: context.timeout,
         validateResponse: () => {
-          return protocol.validateResponse.readBatteryVoltage(context,context.receivedData.globalReceivedOneData)
+          return protocol.validateResponse.readBatteryVoltage(context, context.receivedData.globalReceivedOneData)
         },
         preprocess: () => {
         },
@@ -596,7 +559,7 @@ export async function doScanCodeVerification(context, protocolId, type) {
 
       //验证电压
       if (context.deviceBatteryVoltage < 3.4) {
-        context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  电池电压验证失败,当前电池电压值:' + context.deviceBatteryVoltage  , 'red');
+        context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  电池电压验证失败,当前电池电压值:' + context.deviceBatteryVoltage, 'red');
         context.leftGenerateAddress = ''
         notPass = true
         context.buttonEnable();
@@ -617,7 +580,10 @@ export async function doScanCodeVerification(context, protocolId, type) {
     }
 
     // 验证联网
-    if (context.configDetail.printLabel !== 'WAC300C'&&context.configDetail.printLabel!=='NTR300'&&context.configDetail.printLabel!=='WAC710C') {
+    if (context.configDetail.printLabel !== 'WAC300C' &&
+      context.configDetail.printLabel !== 'NTR300' &&
+      context.configDetail.printLabel !== 'WAC710C'
+    ) {
       if (!await checkNetWork(context, protocolId, type)) {
         context.leftGoodProductQuantity += 1;
         context.leftGenerateAddress = ''; // 成功后清空地
@@ -635,9 +601,6 @@ export async function doScanCodeVerification(context, protocolId, type) {
 
 }
 
-const checkTemperature = async (context, protocolId, type) => {
-
-}
 const checkAddress = async (context, protocolId, type) => {
   let notPass = true;
   //根据型号区分走不同扫码验证逻辑
@@ -649,7 +612,10 @@ const checkAddress = async (context, protocolId, type) => {
     context.configDetail.printLabel === 'AEC100' || context.configDetail.printLabel === 'CAT400' ||
     context.configDetail.printLabel === 'CAT400S' || context.configDetail.printLabel === 'CTW100' ||
     context.configDetail.printLabel === 'WAC100N' || context.configDetail.printLabel === 'WAC100NY' ||
-    context.configDetail.printLabel === 'WAC300C'||context.configDetail.printLabel === 'NTR300'||context.configDetail.printLabel==='WAC710C'
+    context.configDetail.printLabel === 'WAC300C' || context.configDetail.printLabel === 'NTR300' ||
+    context.configDetail.printLabel === 'WAC710C' || context.configDetail.printLabel === 'WAC400N' ||
+    context.configDetail.printLabel === 'VAC710'
+
   ) {
     let readAddressResult = await serialPortOperation(context, {
       actionType: undefined,
@@ -705,8 +671,7 @@ const checkAddress = async (context, protocolId, type) => {
       }, 2000);
       return notPass
     }
-  }
-  else if (context.configDetail.printLabel === 'WAC300NS' || context.configDetail.printLabel === 'WAC400NS' || context.configDetail.printLabel === 'VAC710S') {
+  } else if (context.configDetail.printLabel === 'WAC300NS' || context.configDetail.printLabel === 'WAC400NS' || context.configDetail.printLabel === 'VAC710S') {
     let readAddressResult = await serialPortOperation(context, {
       actionType: undefined,
       operationName: '读地址',
@@ -770,9 +735,9 @@ const checkNetWork = async (context, protocolId, type) => {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_meter_valve')
   } else if (context.configDetail.printLabel === 'WAC710CD' || context.configDetail.printLabel === 'WAC300CD' ||
     context.configDetail.printLabel === 'WAC300NH'
-    ||context.configDetail.printLabel === 'WAC300NY'
+    || context.configDetail.printLabel === 'WAC300NY'
     || context.configDetail.printLabel === 'WAC300N' || context.configDetail.printLabel === 'WAC300NS'
-    || context.configDetail.printLabel === 'WAC400NS') {
+    || context.configDetail.printLabel === 'WAC400NS' || context.configDetail.printLabel === 'WAC400N') {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_valve')
   } else if (
     context.configDetail.printLabel === 'NTP100C' || context.configDetail.printLabel === 'CT1000' || context.configDetail.printLabel === 'ET01' ||
@@ -890,7 +855,7 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
       }, 'cj88')
       printAddress = context.leftReadAddress
       printNotPass = readAddressResult
-    }   else if (context.configForm.produceModel === 'WAC300NS' || context.configForm.produceModel === 'WAC400NS' || context.configDetail.printLabel === 'VAC710S') {
+    } else if (context.configForm.produceModel === 'WAC300NS' || context.configForm.produceModel === 'WAC400NS' || context.configDetail.printLabel === 'VAC710S') {
       let readAddressResult = await serialPortOperation(context, {
         actionType: 'readAddress',
         operationName: '读地址',
@@ -960,7 +925,7 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
   const params = {
     deviceName: context.defaultDeviceName,
     address: printAddress,
-    model: context.configDetail.customizePrintLabel ,
+    model: context.configDetail.customizePrintLabel,
     configModel: context.configDetail.printLabel,
     listDoubleRowLabels: context.listDoubleRowLabels,
     width: context.configDetail.labelWith,
@@ -972,7 +937,7 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
   };
   if (context.configForm.produceModel === 'NTP100C' || context.configForm.produceModel === 'WAC710CD' || context.configForm.produceModel === 'WAC300CD'
     || context.configForm.produceModel === 'CT1000' || context.configForm.produceModel === 'WAC230CF' || context.configForm.produceModel === 'WAC300N'
-    || context.configForm.produceModel === 'WAC300NH'  || context.configForm.produceModel === 'WAC300NY'|| context.configForm.produceModel === 'ET01'
+    || context.configForm.produceModel === 'WAC300NH' || context.configForm.produceModel === 'WAC300NY' || context.configForm.produceModel === 'ET01'
     || context.configForm.produceModel === 'WAC730C'
     || context.configForm.produceModel === 'CAT400' || context.configForm.produceModel === 'CAT400S' || context.configForm.produceModel === 'CPT100'
     || context.configForm.produceModel === 'VPT100' || context.configForm.produceModel === 'CTW100' || context.configForm.produceModel === 'WAC300LH'
@@ -980,8 +945,8 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
     || context.configForm.produceModel === 'WAC710C' || context.configForm.produceModel === 'WAC300NS' || context.configForm.produceModel === 'WAC400NS'
     || context.configForm.produceModel === 'VAC005C' || context.configForm.produceModel === 'VAC710S' || context.configForm.produceModel === 'RFT200-CAT1'
     || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400' || context.configForm.produceModel === 'WAC300C'
-    ||context.configForm.produceModel === 'NTR300'||context.configForm.produceModel === 'CPT100-10A'
-    || context.configForm.produceModel==='WAC330N'
+    || context.configForm.produceModel === 'NTR300' || context.configForm.produceModel === 'CPT100-10A'
+    || context.configForm.produceModel === 'WAC330N' || context.configForm.produceModel === 'WAC400N' || context.configForm.produceModel === 'VAC710'
   ) {
     await ipc.send(ipcApiRoute.doPrintTest, params)
   } else if (context.configForm.produceModel === 'WAC330HE') {
@@ -1030,7 +995,7 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
       flowRange: flowRange,
       deviceName: context.defaultDeviceName,
       address: printAddress,
-      model: context.configDetail.customizePrintLabel ,
+      model: context.configDetail.customizePrintLabel,
       configModel: context.configDetail.printLabel,
       listDoubleRowLabels: context.listDoubleRowLabels,
       width: context.configDetail.labelWith,
@@ -1073,7 +1038,7 @@ export const doPrintLabelTODO = async (context, flag, protocolId, type) => {
   };
   if (context.configForm.produceModel === 'NTP100C' || context.configForm.produceModel === 'WAC710CD' || context.configForm.produceModel === 'WAC300CD'
     || context.configForm.produceModel === 'CT1000' || context.configForm.produceModel === 'WAC230CF' || context.configForm.produceModel === 'WAC300N'
-    || context.configForm.produceModel === 'WAC300NH'  || context.configForm.produceModel === 'WAC300NY'|| context.configForm.produceModel === 'ET01' || context.configForm.produceModel === 'WAC730C'
+    || context.configForm.produceModel === 'WAC300NH' || context.configForm.produceModel === 'WAC300NY' || context.configForm.produceModel === 'ET01' || context.configForm.produceModel === 'WAC730C'
     || context.configForm.produceModel === 'CAT400' || context.configForm.produceModel === 'CAT400S' || context.configForm.produceModel === 'CPT100'
     || context.configForm.produceModel === 'VPT100' || context.configForm.produceModel === 'CTW100' || context.configForm.produceModel === 'WAC300LH'
     || context.configForm.produceModel === 'LPC230' || context.configForm.produceModel === 'LPC230E' || context.configForm.produceModel === 'AEC100'

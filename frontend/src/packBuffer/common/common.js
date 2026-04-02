@@ -238,6 +238,9 @@ export function packInlineDataDomains(afn, fn, protocolID, context) {
         case '20':
           arrayBuffer = createBuffer(5, [0x01, 0x03, 0x90, 0x20, 0x00]);
           break
+        case '1f':
+          arrayBuffer = createBuffer(5, [0x01, 0x03, 0x90, 0x1f, 0x00]);
+          break;
         default:
       }
       return mergeArrayBuffer(packInlineSevenMacAddr(), arrayBuffer);
@@ -605,7 +608,7 @@ export function cj88PackDataDomains(afn, fn, protocolID, context) {
           break;
 
       }
-      return  mergeArrayBuffer(packBroadcastSevenMacAddr(),arrayBuffer);
+      return mergeArrayBuffer(packBroadcastSevenMacAddr(), arrayBuffer);
     case 'f0':
       switch (fn) {
         case 'dd':
@@ -617,9 +620,9 @@ export function cj88PackDataDomains(afn, fn, protocolID, context) {
         default:
         // Log.error("packages: afn[{}] match fail", afn);
       }
-      return mergeArrayBuffer(packBroadcastSevenMacAddr(),arrayBuffer);
+      return mergeArrayBuffer(packBroadcastSevenMacAddr(), arrayBuffer);
     case 'ac':
-      switch (fn){
+      switch (fn) {
         case '09':
           if (context.configDetail.screenDisplay === '轮显') {
             if (context.configDetail.temperatureProbe === '无探头') {
@@ -649,7 +652,7 @@ export function cj88PackDataDomains(afn, fn, protocolID, context) {
     case 'dd':
       switch (fn) {
         case 'f0':
-          arrayBuffer = createBuffer(4, [0x04, 0x03, 0xdd, 0xf0,0x00]);
+          arrayBuffer = createBuffer(4, [0x04, 0x03, 0xdd, 0xf0, 0x00]);
           break;
         case 'f2':
           if (context.configDetail.temperatureProbe === '无探头') {
@@ -664,8 +667,8 @@ export function cj88PackDataDomains(afn, fn, protocolID, context) {
           break;
       }
       return mergeArrayBuffer(packBroadcastSevenMacAddr(), arrayBuffer);
-    case '81':{
-      switch (fn){
+    case '81': {
+      switch (fn) {
         case '0a':
           arrayBuffer = createBuffer(5, [0x03, 0x03, 0x81, 0x0a, 0x00]);
           break;
