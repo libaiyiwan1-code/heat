@@ -745,6 +745,40 @@ export function countProductCollectorQuantityCountByUserId(userId, date) {
     });
   });
 }
+export function insertCardValueProduce(data) {
+  return new Promise((resolve, reject) => {
+    // 从连接池中获取连接
+    pool.getConnection((err, connection) => {
+      if (err) {
+        console.log(err);
+        reject(err);
+        return;
+      }
+
+      // 执行插入
+      connection.query(
+        `INSERT INTO arc_cardvalveproduce (userid, customerid, valveModel, valveVersion, protocolid,IMEI,
+                                           netprovider, macaddr, produceDate, description, status,iccid,
+                                           customer, expireDate, TempProbeAddr)
+         VALUES (?, ?, ?, ?, ?,? ,?,?, ?, ?,?, ?, ?, ?, ?)`,
+        [data.userid, data.customerid, data.valveModel, data.valveVersion,
+          data.protocolid,data.IMEI, data.netprovider, data.macaddr,
+          data.produceDate, data.description, data.status,data.iccid,
+          data.customer, data.expireDate, data.TempProbeAddr],
+        (error, results) => {
+          // 释放连接
+          connection.release();
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
+          }
+        }
+      );
+    });
+  });
+}
+
 
 export function countProductCardValveDeviceQuantityCountByUserId(userId, date) {
   return new Promise((resolve, reject) => {

@@ -40,9 +40,10 @@
                                &&this.configForm.produceModel!=='CTW100'
                                &&this.configForm.produceModel!=='NBT400'
                                &&this.configForm.produceModel!=='NTR300'
-                                &&this.configForm.produceModel!=='CPT100'
-                              &&this.configForm.produceModel!=='CPT100-10A'
-                                        &&this.configForm.produceModel!=='WAC330N'
+                               &&this.configForm.produceModel!=='CPT100'
+                               &&this.configForm.produceModel!=='CPT100-10A'
+                               &&this.configForm.produceModel!=='WAC330N'
+                               &&this.configForm.produceModel!=='VAC005C'
 ">
                     <a-select
                       v-model:value="this.configForm.pressureProbes"
@@ -276,8 +277,12 @@
                   <a-form-item label="温度误差"
                                v-show="
                                this.isNBDevice===true &&
+                               this.configForm.produceModel!=='CPT100'&&
+                               this.configForm.produceModel!=='CPT100-10A'&&
                                this.configForm.temperatureProbes!=='无探头'||
-                               this.configForm.produceModel==='WAC330HE'">
+                               this.configForm.produceModel==='WAC330HE'
+                              "
+                  >
                     <a-input-number
                       v-model:value="this.configForm.temperatureDiff"
                       style="width: 7vw; margin-left: 4.8vw"
@@ -3457,12 +3462,14 @@ export default {
       }
       console.log('this.configForm.produceModel:',this.configForm.produceModel)
       //根据不同型号展示的页面不同
-      if (this.configForm.produceModel.includes('VAC10') ||
+      if (  this.configForm.produceModel!=='VAC005C'&&
+        (this.configForm.produceModel.includes('VAC10') ||
         this.configForm.produceModel.includes('VAC20') ||
         this.configForm.produceModel.includes('VAC30') ||
         this.configForm.produceModel.includes('VAC40') ||
         this.configForm.produceModel.includes('VAC00') ||
-        this.configForm.produceModel.includes('VAC13')
+        this.configForm.produceModel.includes('VAC13'))
+
       ) {
         this.isNBDevice = false;
         this.leftProduceViewTitle = '左侧工装'
@@ -3549,7 +3556,8 @@ export default {
         this.configForm.produceModel === 'NTP100' ||
         this.configForm.produceModel === 'CPT100-10A' ||
         this.configForm.produceModel === 'NBT400'||
-        this.configForm.produceModel==='WAC710C'
+        this.configForm.produceModel==='WAC710C'||
+        this.configForm.produceModel==='VAC005C'
       ) {
         console.log('this.configDetail.printLabel',this.configDetail.printLabel)
         this.isNBDevice = true
@@ -3961,10 +3969,11 @@ export default {
         }
       }  else if (this.selectLabelPaperSize === '50x12') {
         this.imageDesc = '50mm x 12mm 标签纸预览图'
-        this.labelHeight = 12
+        this.labelHeight = 9
         this.labelWidth = 50
-        this.labelMargin = 0
-        this.lableMarginLeft = 1
+        this.labelMargin = 5.8
+        this.lableMarginLeft = 7
+        this.secondColumnFontSize=3.3
       }
     },
     onSizeChange3012() {
@@ -4018,13 +4027,10 @@ export default {
     }
     ,
     handleProduceModelChange(value) {
-      this.isNBDevice = !value.includes('VAC20') &&
-        !value.includes('VAC00') &&
-        !value.includes('VAC40') &&
-        !value.includes('VAC10') &&
-        !value.includes('VAC30') &&
-        !value.includes('VAC13')
-      ;
+      const excludeList = ['VAC00', 'VAC10', 'VAC20', 'VAC30', 'VAC40', 'VAC50'];
+
+      this.isNBDevice = !(excludeList.some(item => value.includes(item)) && value !== 'VAC005C');
+
       if (value === 'NTP100C') {
         this.configForm.customizePrintLabel = 'NTP100C'
       } else if (value === 'CT1000') {
@@ -5266,12 +5272,13 @@ export default {
         //   }
         // }
         //根据不同型号展示的页面不同
-        if (this.configForm.produceModel.includes('VAC10') ||
+        if ((this.configForm.produceModel.includes('VAC10') ||
           this.configForm.produceModel.includes('VAC20') ||
           this.configForm.produceModel.includes('VAC30') ||
           this.configForm.produceModel.includes('VAC40') ||
           this.configForm.produceModel.includes('VAC00') ||
-          this.configForm.produceModel.includes('VAC13')
+          this.configForm.produceModel.includes('VAC13'))&&
+          this.configForm.produceModel!=='VAC005C'
         ) {
           this.leftProduceViewTitle = '左侧工装'
           this.rightProduceViewTitle = '右侧工装'
@@ -5337,7 +5344,8 @@ export default {
           this.configForm.produceModel === 'NTP100' ||
           this.configForm.produceModel === 'CPT100-10A' ||
           this.configForm.produceModel === 'NBT400'||
-          this.configForm.produceModel==='WAC710C'
+          this.configForm.produceModel==='WAC710C'||
+          this.configForm.produceModel==='VAC005C'
         ) {
           this.leftProduceViewTitle = '测试验证'
           this.rightProduceViewTitle = '不良记录'
@@ -5450,7 +5458,8 @@ export default {
           this.configForm.produceModel === 'NTP100' ||
           this.configForm.produceModel === 'CPT100-10A' ||
           this.configForm.produceModel === 'NBT400'||
-          this.configForm.produceModel==='WAC710C'
+          this.configForm.produceModel==='WAC710C'||
+          this.configForm.produceModel==='VAC005C'
 
         ) {
           console.log('this.configForm.produceModel:',this.configForm.produceModel)
@@ -5463,12 +5472,13 @@ export default {
         }
 
         if (
-          this.configForm.produceModel.includes('VAC00') ||
-          this.configForm.produceModel.includes('VAC20') ||
-          this.configForm.produceModel.includes('VAC10') ||
-          this.configForm.produceModel.includes('VAC30') ||
-          this.configForm.produceModel.includes('VAC40') ||
-          this.configForm.produceModel.includes('VAC13')
+          (this.configForm.produceModel.includes('VAC00') ||
+            this.configForm.produceModel.includes('VAC20') ||
+            this.configForm.produceModel.includes('VAC10') ||
+            this.configForm.produceModel.includes('VAC30') ||
+            this.configForm.produceModel.includes('VAC40') ||
+            this.configForm.produceModel.includes('VAC13'))&&
+            this.configForm.produceModel!=='VAC005C'
 
         ) {
           this.listenLeftFixture(); //开启监听器 监听左侧工装

@@ -1,4 +1,4 @@
-import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
+import {hex2arrayBuffer,arrayBuffer2Hex,addressCover} from "@/packBuffer/common/comUtil";
 
 // 读IMEI解析地址
 export function readAddress(context, responseMessage) {

@@ -775,6 +775,127 @@ const checkNetWork = async (context, protocolId, type) => {
   return notPass
 
 }
+// export const doPrintLabel = async (context, flag, protocolId, type) => {
+//
+//   let printAddress
+//   let printNotPass = true
+//   if (flag) {
+//     //写地址成功
+//     printAddress = context.leftGenerateAddress
+//     printNotPass = false
+//   } else {
+//     // context.messageClean()
+//     //手动打印，需要读地址
+//     // if (!checkPort(context, type)) {
+//     //   await playErrorAudio(context)
+//     //   return
+//     // }
+//
+//   }
+//
+//   console.log('触发打印 , 当前打印机:', context.defaultDeviceName)
+//   Log.info('触发打印 , 当前打印机:', context.defaultDeviceName)
+//   console.log('打印型号：', context.configForm.produceModel)
+//   const params = {
+//     deviceName: context.defaultDeviceName,
+//     address: '12345678',
+//     model: context.configDetail.customizePrintLabel,
+//     configModel: context.configDetail.printLabel,
+//     listDoubleRowLabels: context.listDoubleRowLabels,
+//     width: context.configDetail.labelWith,
+//     margin: context.configDetail.labelMargin,
+//     marginLeft: context.configDetail.lableMarginLeft,
+//     secondColumnFontSize: context.configDetail.secondColumnFontSize,
+//     height: context.configDetail.labelHeight,
+//     isDouble: context.configDetail.whetherDoubleRowPrinting === '是',
+//   };
+//   if (context.configForm.produceModel === 'NTP100C' || context.configForm.produceModel === 'WAC710CD' || context.configForm.produceModel === 'WAC300CD'
+//     || context.configForm.produceModel === 'CT1000' || context.configForm.produceModel === 'WAC230CF' || context.configForm.produceModel === 'WAC300N'
+//     || context.configForm.produceModel === 'WAC300NH' || context.configForm.produceModel === 'WAC300NY' || context.configForm.produceModel === 'ET01'
+//     || context.configForm.produceModel === 'WAC730C'
+//     || context.configForm.produceModel === 'CAT400' || context.configForm.produceModel === 'CAT400S' || context.configForm.produceModel === 'CPT100'
+//     || context.configForm.produceModel === 'VPT100' || context.configForm.produceModel === 'CTW100' || context.configForm.produceModel === 'WAC300LH'
+//     || context.configForm.produceModel === 'LPC230' || context.configForm.produceModel === 'LPC230E' || context.configForm.produceModel === 'AEC100'
+//     || context.configForm.produceModel === 'WAC710C' || context.configForm.produceModel === 'WAC300NS' || context.configForm.produceModel === 'WAC400NS'
+//     || context.configForm.produceModel === 'VAC005C' || context.configForm.produceModel === 'VAC710S' || context.configForm.produceModel === 'RFT200-CAT1'
+//     || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400' || context.configForm.produceModel === 'WAC300C'
+//     || context.configForm.produceModel === 'NTR300' || context.configForm.produceModel === 'CPT100-10A'
+//     || context.configForm.produceModel === 'WAC330N' || context.configForm.produceModel === 'WAC400N' || context.configForm.produceModel === 'VAC710'
+//   ) {
+//     await ipc.send(ipcApiRoute.doPrintTest, params)
+//   } else if (context.configForm.produceModel === 'WAC330HE') {
+//     let commonTraffic;
+//     let flowRange;
+//     if (context.configDetail.nominalCaliber === 'DN15') {
+//       commonTraffic = '1.5m³/h';
+//       flowRange = '(0.03-3)m³/h';
+//     } else if (context.configDetail.nominalCaliber === 'DN20') {
+//       commonTraffic = '2.5m³/h';
+//       flowRange = '(0.05-5)m³/h';
+//     } else if (context.configDetail.nominalCaliber === 'DN25') {
+//       commonTraffic = '3.5m³/h';
+//       flowRange = '(0.07-7)m³/h';
+//     } else if (context.configDetail.nominalCaliber === 'DN32') {
+//       commonTraffic = '6m³/h';
+//       flowRange = '(0.12-12)m³/h';
+//     } else if (context.configDetail.nominalCaliber === 'DN40') {
+//       commonTraffic = '10m³/h';
+//       flowRange = '(0.2-20)m³/h';
+//     } else if (context.configDetail.nominalCaliber === 'DN50') {
+//       commonTraffic = '15m³/h';
+//       flowRange = '(0.3-30)m³/h';
+//     } else if (context.configDetail.nominalCaliber === 'DN65') {
+//       commonTraffic = '25m³/h';
+//       flowRange = '(0.5-50)m³/h';
+//     } else if (context.configDetail.nominalCaliber === 'DN80') {
+//       commonTraffic = '40m³/h';
+//       flowRange = '(0.8-80)m³/h';
+//     } else if (context.configDetail.nominalCaliber === 'DN100') {
+//       commonTraffic = '60m³/h';
+//       flowRange = '(1.2-120)m³/h';
+//     } else if (context.configDetail.nominalCaliber === 'DN125') {
+//       commonTraffic = '100m³/h';
+//       flowRange = '(2-200)m³/h';
+//     } else if (context.configDetail.nominalCaliber === 'DN150') {
+//       commonTraffic = '150m³/h';
+//       flowRange = '(3-300)m³/h';
+//     } else if (context.configDetail.nominalCaliber === 'DN200') {
+//       commonTraffic = '250m³/h';
+//       flowRange = '(5-500)m³/h';
+//     }
+//     let params = {
+//       craftsmanCaliber: context.configDetail.nominalCaliber,
+//       commonTraffic: commonTraffic,
+//       flowRange: flowRange,
+//       deviceName: context.defaultDeviceName,
+//       address: printAddress,
+//       model: context.configDetail.customizePrintLabel,
+//       configModel: context.configDetail.printLabel,
+//       listDoubleRowLabels: context.listDoubleRowLabels,
+//       width: context.configDetail.labelWith,
+//       margin: context.configDetail.labelMargin,
+//       marginLeft: context.configDetail.lableMarginLeft,
+//       secondColumnFontSize: context.configDetail.secondColumnFontSize,
+//       height: context.configDetail.labelHeight,
+//       isDouble: context.configDetail.whetherDoubleRowPrinting === '是',
+//     }
+//     console.log('打印参数：', params)
+//     await ipc.send(ipcApiRoute.doPrintTest, params)
+//   }
+//
+//   context.buttonSuccess('labelPrint')
+//   context.createLeftSpanMessage('打印成功，设备地址:' + printAddress, 'grey');
+//   context.buttonSuccess('leftWorkPromptColor')
+//   await playSuccessAudio(context)
+//   context.leftWorkPrompt = '打印成功'
+//   setTimeout(() => {
+//     context.buttonWaiting('labelPrint')
+//   }, 2000);
+// }
+
+
+
+
 export const doPrintLabel = async (context, flag, protocolId, type) => {
 
   let printAddress
@@ -797,7 +918,8 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
       context.configForm.produceModel !== 'LPC230E' &&
       context.configForm.produceModel !== 'LPC210' &&
       context.configForm.produceModel !== 'LPC210E' &&
-      context.configForm.produceModel !== 'WAC230CF'
+      context.configForm.produceModel !== 'WAC230CF'&&
+      context.configForm.produceModel!=='VAC005C'
     ) {
       let readAddressResult = await serialPortOperation(context, {
         actionType: 'labelPrint',
@@ -878,8 +1000,8 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
       let readAddressResult = await serialPortOperation(context, {
         actionType: 'labelPrint',
         operationName: '读地址',
-        cmdType: 'a0',                         // afn 的命令类型
-        cmdCode: '18',                         // fn 的命令码
+        cmdType: '81',                         // afn 的命令类型
+        cmdCode: '0a',                         // fn 的命令码
         protocolId: protocolId,
         maxRetries: context.maxRetries,
         expectedLength: protocolIDMap[context.configForm.produceModel].deviceActionResponseMessageLength['readAddress'],

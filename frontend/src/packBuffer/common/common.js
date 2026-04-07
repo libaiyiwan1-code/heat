@@ -593,22 +593,22 @@ export function modbusPackDataDomains(afn, fn, context) {
 
 
 export function cj88PackDataDomains(afn, fn, protocolID, context) {
+  console.log('afn, fn ', afn, fn )
   let arrayBuffer = null;
+
   switch (afn) {
     case 'a0':
       switch (fn) {
         case '18':
-          arrayBuffer = mergeArrayBuffer(createBuffer(5, [0x15, 0x0a, 0xa0, 0x18, 0x01]));
-          arrayBuffer = mergeArrayBuffer(
-            packBroadcastSevenMacAddr(),
-            arrayBuffer,
-            Buffer.from(addressCover(context.leftGenerateAddress)),
-            createBuffer(3, [0x00, 0x00, 0x00])); //新地址厂商代码
-          // ), //新地址 逆序
+          let originalAddressBuffer = Buffer.from(addressCover(context.leftReadAddress))
+          let bodyBuffer = createBuffer(5, [  0x15, 0x0a, 0xa0, 0x18, 0x01])
+          let newAddressBuffer = Buffer.from(addressCover(context.leftGenerateAddress))
+          let vendorCodeBuffer=createBuffer(3, [0x00, 0x00, 0x00])
+          arrayBuffer = mergeArrayBuffer(originalAddressBuffer,vendorCodeBuffer, bodyBuffer, newAddressBuffer,vendorCodeBuffer)
           break;
 
       }
-      return mergeArrayBuffer(packBroadcastSevenMacAddr(), arrayBuffer);
+      return arrayBuffer;
     case 'f0':
       switch (fn) {
         case 'dd':
@@ -652,7 +652,7 @@ export function cj88PackDataDomains(afn, fn, protocolID, context) {
     case 'dd':
       switch (fn) {
         case 'f0':
-          arrayBuffer = createBuffer(4, [0x04, 0x03, 0xdd, 0xf0, 0x00]);
+          arrayBuffer = createBuffer(5, [0x04, 0x03, 0xdd, 0xf0, 0x00]);
           break;
         case 'f2':
           if (context.configDetail.temperatureProbe === '无探头') {

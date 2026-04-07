@@ -610,9 +610,115 @@ class HardwareController extends Controller {
 </html>
 `;
 
-        } else if (
+        }
+        else if(configModel==='VAC005C') {
+
+            // --- 生成单个标签 HTML ---
+            const generateLabel = () => `
+<div class="label">
+
+    <div class="left">
+        <div class="barcode-container">
+            <img class="png" src="data:image/jpg;base64,${png.toString('base64')}">
+        </div>
+        <p class="address">${address}</p>
+    </div>
+
+    <div class="right">
+        <div class="row">
+            <span>红黑</span>
+            <span>电源</span>
+        </div>
+        <div class="row">
+            <span>绿黄</span>
+            <span>M-Bus</span>
+        </div>
+    </div>
+
+</div>
+`;
+            // 双排标签
+            const labelsHTML = `
+<div class="container">
+    ${listDoubleRowLabels ? generateLabel() + generateLabel() : generateLabel()}
+</div>
+`;
+            // --- 生成完整 HTML ---
+            htmlStr = `
+<html>
+<head>
+<style>
+ body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Microsoft YaHei', sans-serif;
+        font-size: ${secondColumnFontSize}mm;
+    }
+       .container {
+        gap: 6mm; /*控制左右标签间距*/
+        margin-top: ${marginMM}mm;
+        margin-left: ${marginLeftMM}mm;
+        width: ${widthMM}mm;
+        height: ${heightMM}mm;
+        display: flex;
+    }
+   .label {
+    display: flex;
+    align-items: center;
+    
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+ 
+}
+
+.right {
+    display: flex;
+    flex-direction: column;
+    margin-left: 3.5mm; /* 控制左右间距 */
+    margin-top: -4.4mm;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    width: 20mm; /* 控制两列间距 */
+}
+.row span:first-child {
+    width: 10mm;   /* 左列统一宽度 */
+    display: inline-block;
+}
+
+.row span:last-child {
+    width: 12mm;   /* 右列统一宽度 */
+    display: inline-block;
+}
+.png {
+    width: 23mm;
+}
+
+.address {
+    margin-left: 1.8mm;
+    margin-top: 0.1mm;
+}
+   
+     
+</style>
+</head>
+<body>
+    ${labelsHTML}
+</body>
+</html>
+`;
+        }
+
+
+
+        else if (
             configModel === 'LPC230' || configModel === 'LPC230E'||configModel==='VPT100'||configModel==='AEC100'||configModel==='CTW100'||configModel==='WAC230CF'
-            ||configModel==='WAC300NS'||configModel==='WAC400NS'||configModel==='VAC710S'||configModel==='VAC005C'||configModel==='RFT200-CAT1'||configModel==='RFT200'||
+            ||configModel==='WAC300NS'||configModel==='WAC400NS'||configModel==='VAC710S' ||configModel==='RFT200-CAT1'||configModel==='RFT200'||
             configModel==='NBT400'||configModel==='NTR300'||configModel==='CPT100'||configModel==='CPT100-10A'
         ) {
             //30*12 双排

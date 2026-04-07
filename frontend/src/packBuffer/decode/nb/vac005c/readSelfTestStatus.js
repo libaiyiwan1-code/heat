@@ -39,7 +39,7 @@ export function readSelfTestStatus(context, responseMessage) {
   report(context, '自检通过')
 
   context.productName = decodeGetProductName(raw)
-  if (!context.productName.toLowerCase().includes('wac300ns')) {
+  if (!context.productName.toLowerCase().includes('vac005c')) {
     report(context, `产品名称错误：${context.productName}`)
     return true
   }
@@ -47,11 +47,7 @@ export function readSelfTestStatus(context, responseMessage) {
   context.protocolId = getDeviceProtocolId(raw)
   context.version = decodeGetVersion(raw)
   context.netprovider = decodeGetNetProvider(raw)
-  if (context.netprovider === 1) {
-    protocolIDMap[context.configForm.produceModel].model = 82
-  } else if (context.netprovider === 2) {
-    protocolIDMap[context.configForm.produceModel].model = 83
-  }
+
   return false
 }
 export function decodeGetProductName(responseMessage) {

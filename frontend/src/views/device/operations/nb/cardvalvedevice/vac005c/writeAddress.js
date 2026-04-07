@@ -40,10 +40,10 @@ export async function writeAddress(protocolId, type, context) {
   let response = await getIdByMacAddrCardValve(readAddress);
   if (response.length > 0) {
     context.createLeftSpanMessage(`该设备已写过地址:${readAddress}`, 'red')
-    Log.error('该设备已写过地址', readValueAddress)
+    Log.error('该设备已写过地址:', readAddress)
     return true
   }
-  if (readAddress !== '78563412'){
+  if (readAddress !== '12345678'){
     context.createLeftSpanMessage(`地址为 非12345678:${readAddress}`, 'red')
     Log.error('地址为 非12345678', readAddress)
     return true;

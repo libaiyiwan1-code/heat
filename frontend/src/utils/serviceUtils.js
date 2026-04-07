@@ -3,11 +3,11 @@ import {
   countProductCollectorQuantityCountByUserId,
   countProductLORADeviceQuantityCountByUserId,
   countProductNBDeviceQuantityCountByUserId,
-  countVACProductQuantityCountByUserId,
+  countVACProductQuantityCountByUserId, getIdByMacAddrCardValve,
   getIdByMacAddrCollector,
   getIdByMacAddrLORAProduce,
   getIdByMacAddrNB,
-  getIdByMacAddrVACProduce,
+  getIdByMacAddrVACProduce, insertCardValueProduce,
   insertCollectorProduce, insertLORAValueProduce,
   insertNBValueProduce
 } from "@/components/global/productdb";
@@ -749,22 +749,23 @@ export async function productionCardValveLibraryRegistration(context) {
   const productionData = {
     userid: context.routerParam.userId, // 生产账号id
     customerid: null, // 出厂客户id
-    valveModel: context.productName, // 型号
-    valveVersion: context.version, // 阀版本号
+    valveModel: context.productName, // 阀门型号
+    valveVersion: context.version, // 阀门版本号
     protocolid: context.protocolId, // 协议ID号
     IMEI: null, // IMEI
-    netprovider: context.netprovider, // 运营商（00：无 01：电信，02：移动）
+    netprovider: 4, // 运营商（00：无 01：电信，02：移动）
     macaddr: context.leftGenerateAddress, // 阀门14位地址
     produceDate: new Date(), // 生产日期
     deliverDate: null, // 出库日期
     description: null, // 描述
-    status: 0, // 状态 正常=0  删除=1
+    status: 0, // 状态
     iccid: null, // ICCID
     customer: null, // 定制厂家
-    TempProbeAddr: context.configDetail.temperatureProbe, //温度探头
+    expireDate: null, // SIM卡到期时间
+    TempProbeAddr: context.configDetail.temperatureProbe // 温度探头
   };
   console.log(productionData)
-  let insertResult = await insertCollectorProduce(productionData);
+  let insertResult = await insertCardValueProduce(productionData);
   if (insertResult) {
     context.createLeftSpanMessage('生产入库成功', 'grey');
     await context.uploadMes(context.leftGenerateAddress, 1, '成功')
