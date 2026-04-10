@@ -21,6 +21,7 @@ import * as WAC400NS from './nb/wacdevice/wac400ns'
 import * as WAC300NS from './nb/wacdevice/wac300ns'
 import * as WAC710C from './nb/wacdevice/wac710c'
 import * as VAC710 from './nb/wacdevice/vac710'
+import * as WAC710N from './nb/wacdevice/wac710n'
 import * as WAC300LH from './nb/wacdevice/wac300lh'
 import * as WAC330HE from './nb/wacdevice/wac330he'
 import * as WAC730C from './nb/wacdevice/wac730c'
@@ -107,6 +108,7 @@ export const doSelfTest = async (context, protocolId, type) => {
     'WAC330N': WAC330N.selfTest,
     'WAC400N': WAC400N.selfTest,
     'VAC710': VAC710.selfTest,
+    'WAC710N': WAC710N.selfTest,
   };
   const produceModel = context.configForm.produceModel;
   const selfTestFunction = selfTestStrategies[produceModel];
@@ -178,6 +180,7 @@ export async function doWriteAddress(context, protocolId, type) {
     'WAC330N': WAC330N.writeAddress,
     'WAC400N': WAC400N.writeAddress,
     'VAC710': VAC710.writeAddress,
+    'WAC710N': WAC710N.writeAddress,
 
 
   };
@@ -337,6 +340,7 @@ export const doExitSelfTest = async (context, protocolId, type) => {
     'WAC710C': WAC710C.exitSelfTest,
     'WAC400N': WAC400N.exitSelfTest,
     'VAC710': VAC710.exitSelfTest,
+    'WAC710N': WAC710N.exitSelfTest,
   };
   const produceModel = context.configForm.produceModel;
   const returnSelfTestFunction = returnSelfTestStrategies[produceModel];
@@ -399,7 +403,8 @@ export async function doScanCodeVerification(context, protocolId, type) {
     if (
       context.configDetail.printLabel === 'WAC300NS' || context.configDetail.printLabel === 'WAC400NS' ||
       context.configDetail.printLabel === 'VAC710S' || context.configDetail.printLabel === 'WAC300C' ||
-      context.configDetail.printLabel === 'WAC710C' || context.configDetail.printLabel === 'VAC710'
+      context.configDetail.printLabel === 'WAC710C' || context.configDetail.printLabel === 'VAC710'||
+      context.configDetail.printLabel==='WAC710N'
     ) {
       let cmdCode = '20'
       if (context.configDetail.printLabel === 'WAC400N') {
@@ -614,7 +619,7 @@ const checkAddress = async (context, protocolId, type) => {
     context.configDetail.printLabel === 'WAC100N' || context.configDetail.printLabel === 'WAC100NY' ||
     context.configDetail.printLabel === 'WAC300C' || context.configDetail.printLabel === 'NTR300' ||
     context.configDetail.printLabel === 'WAC710C' || context.configDetail.printLabel === 'WAC400N' ||
-    context.configDetail.printLabel === 'VAC710'
+    context.configDetail.printLabel === 'VAC710'||context.configDetail.printLabel==='WAC710N'
 
   ) {
     let readAddressResult = await serialPortOperation(context, {
@@ -731,6 +736,10 @@ const checkAddress = async (context, protocolId, type) => {
 const checkNetWork = async (context, protocolId, type) => {
   let notPass = true
   let data
+  // 个别设备不验证联网
+  if(context.configDetail.printLabel === 'WAC710N'){
+    return false
+  }
   if (context.configDetail.printLabel === 'WAC230CF') {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_meter_valve')
   } else if (context.configDetail.printLabel === 'WAC710CD' || context.configDetail.printLabel === 'WAC300CD' ||
@@ -1068,7 +1077,8 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
     || context.configForm.produceModel === 'VAC005C' || context.configForm.produceModel === 'VAC710S' || context.configForm.produceModel === 'RFT200-CAT1'
     || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400' || context.configForm.produceModel === 'WAC300C'
     || context.configForm.produceModel === 'NTR300' || context.configForm.produceModel === 'CPT100-10A'
-    || context.configForm.produceModel === 'WAC330N' || context.configForm.produceModel === 'WAC400N' || context.configForm.produceModel === 'VAC710'
+    || context.configForm.produceModel === 'WAC330N' || context.configForm.produceModel === 'WAC400N'
+    || context.configForm.produceModel === 'VAC710'||context.configForm.produceModel === 'WAC710N'
   ) {
     await ipc.send(ipcApiRoute.doPrintTest, params)
   } else if (context.configForm.produceModel === 'WAC330HE') {

@@ -40,6 +40,7 @@ import * as NBT400 from "@/packBuffer/decode/nb/nbt400";
 import * as WAC300C from "@/packBuffer/decode/nb/wac300c";
 import * as NTR300 from "@/packBuffer/decode/nb/ntr300";
 import * as WAC330N from "@/packBuffer/decode/nb/wac330n";
+import * as WAC710N from "@/packBuffer/decode/nb/wac710n";
 /**
  * 其它
  * */
@@ -1650,7 +1651,7 @@ export const protocolIDMap = {
       'readSelfTestStatus': 59,
       'readICCID': 36,
       'readIMEI': 31,
-      'readAddress': 15,
+      'readAddress': 21,
       'writeAddress': 16,
       'readDeviceData': 28,
       'readAmmeterPower': 9,
@@ -2574,17 +2575,17 @@ export const protocolIDMap = {
       writeTemperatureProbe: (data) => {
         return VAC710.writeTemperatureProbe(data)
       },
-      writePressureProbe: ( data) => {
+      writePressureProbe: (data) => {
         return VAC710.writePressureProbe(data)
       },
       readVersion: (context, data) => {
-        return VAC710.readVersion(context,data)
+        return VAC710.readVersion(context, data)
       },
       readSelfTestStatus: (context, data) => {
-        return VAC710.readSelfTestStatus(context,data)
+        return VAC710.readSelfTestStatus(context, data)
       },
       readSelfTestStatus2: (context, data) => {
-        return VAC710.readSelfTestStatus2(context,data)
+        return VAC710.readSelfTestStatus2(context, data)
       },
       writeAddress: (leftGenerateAddress, data) => {
         return VAC710.writeAddress(leftGenerateAddress, data)
@@ -2592,11 +2593,11 @@ export const protocolIDMap = {
       readAddress: (context, data) => {
         return VAC710.readAddress(context, data)
       },
-      exitSelfTest: ( data) => {
+      exitSelfTest: (data) => {
         return VAC710.exitSelfTest(data)
       },
       readData: (context, data) => {
-        return VAC710.readData(context,data)
+        return VAC710.readData(context, data)
       },
     },
   },
@@ -2967,46 +2968,55 @@ export const protocolIDMap = {
   },
   //TODO
   'WAC710N': {
-    protocolCode: null,
-    protocolId: null,
-    model: -1,
-    joinMode: 2,
+    protocolCode: 'EN1434_0096',
+    protocolId: 96,
+    model: 36, //36 电信 57 移动
+    joinMode: 2, //接入模式根据解析读自检状态动态变化
     isInfraredDevice: false,
     isDeviceActionTransparentTransmissionProtocol: {
-      'inquireSelfTest': false,
-      'writeTemperatureProbe': false,
-      'selfTest': false,
-      'readSelfTestStatus': false,
-      'readICCID': false,
-      'readIMEI': false,
+      'inquireSelfTest': true,
+      'writeTemperatureProbe': true,
+      'writePressureProbe': true,
+      'selfTest': true,
+      'readVersion': false,
+      'readSelfTestStatus': true,
+      'readSelfTestStatus2': true,
       'writeAddress': false,
       'readAddress': false,
-      'exitSelfTest': false,
-      'readData': false,
+      'exitSelfTest': true,
+      'readData': true,
+      'readIMEI':false,
+      'readICCID':false,
     },
     deviceActionResponseMessageLength: {
-      'inquireSelfTest': 16,
-      'writeTemperatureProbe': 16,
+      'inquireSelfTest': 34,
+      'writeTemperatureProbe': 34,
+      'writePressureProbe': 34,
       'selfTest': -1,
-      'readSelfTestStatus': 56,
+      'readVersion': 17,
+      'readSelfTestStatus': 73,
+      'readSelfTestStatus2': 81,
+      'readAddress': 21,
+      'writeAddress': 16,
+      'exitSelfTest': 34,
+      'readData': 84,
       'readICCID': 36,
       'readIMEI': 31,
-      'readAddress': 15,
-      'writeAddress': 16,
-      'exitSelfTest': 16,
-      'readData': 16,
     },
     deviceActionResponseMessageLength2: {
-      'inquireSelfTest': 16,
-      'writeTemperatureProbe': 16,
+      'inquireSelfTest': 34,
+      'writeTemperatureProbe': 34,
+      'writePressureProbe': 34,
       'selfTest': -1,
-      'readSelfTestStatus': 56,
+      'readVersion': 17,
+      'readSelfTestStatus': 73,
+      'readSelfTestStatus2': 81,
+      'readAddress': 21,
+      'writeAddress': 16,
+      'exitSelfTest': 34,
+      'readData': 84,
       'readICCID': 36,
       'readIMEI': 31,
-      'readAddress': 15,
-      'writeAddress': 16,
-      'exitSelfTest': 16,
-      'readData': 16,
     },
     portAttribute: {
       parity: '偶校验',
@@ -3016,25 +3026,40 @@ export const protocolIDMap = {
     },
     validateResponse: {
       inquireSelfTest: (data) => {
-        return null
+        return WAC710N.inquireSelfTest(data)
+      },
+      writeTemperatureProbe: (data) => {
+        return WAC710N.writeTemperatureProbe(data)
+      },
+      writePressureProbe: (data) => {
+        return WAC710N.writePressureProbe(data)
+      },
+      readVersion: (context, data) => {
+        return WAC710N.readVersion(context, data)
       },
       readSelfTestStatus: (context, data) => {
-        return null
+        return WAC710N.readSelfTestStatus(context, data)
       },
-      readICCID: (context, data) => {
-        return null
-      },
-      readIMEI: (context, data) => {
-        return null
+      readSelfTestStatus2: (context, data) => {
+        return WAC710N.readSelfTestStatus2(context, data)
       },
       writeAddress: (leftGenerateAddress, data) => {
-        return null
+        return WAC710N.writeAddress(leftGenerateAddress, data)
       },
       readAddress: (context, data) => {
-        return null
+        return WAC710N.readAddress(context, data)
       },
-      exitSelfTest: (context, data) => {
-        return null
+      exitSelfTest: (data) => {
+        return WAC710N.exitSelfTest(data)
+      },
+      readData: (context, data) => {
+        return WAC710N.readData(context, data)
+      },
+      readIMEI: (context, data) => {
+        return WAC710N.readIMEI(context, data);
+      },
+      readICCID: (context, data) => {
+        return WAC710N.readICCID(context, data);
       },
     },
   },
@@ -4357,10 +4382,10 @@ export const protocolIDMap = {
     deviceActionResponseMessageLength: {
       'inquireSelfTest': 16,
       'selfTest': -1,
-      'readSelfTestStatus': 58,
+      'readSelfTestStatus': 59,
       'readICCID': 36,
       'readIMEI': 31,
-      'readAddress': 15,
+      'readAddress': 21,
       'writeAddress': 16,
       'readDeviceData': 28,
       'readAmmeterPower': 9,
@@ -4369,7 +4394,7 @@ export const protocolIDMap = {
     deviceActionResponseMessageLength2: {
       'inquireSelfTest': 32,
       'selfTest': -1,
-      'readSelfTestStatus': 74,
+      'readSelfTestStatus': 75,
       'readICCID': 52,
       'readIMEI': 47,
       'readAddress': 37,

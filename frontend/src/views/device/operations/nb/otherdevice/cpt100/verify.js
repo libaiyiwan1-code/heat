@@ -51,13 +51,14 @@ export const verify = async (context, protocolId, type) => {
 
   let getPower = context.deviceReadPower
   let power = context.voltmeterReadPower
+  console.warn('电表功率', power)
+  console.warn('设备功率', getPower)
+  console.warn('功率绝对值', Math.abs((getPower - power)))
+  console.warn('功率绝对值除数', Math.abs((getPower - power)) / power)
+  console.warn('允许的功率误差', context.configDetail.power_error)
   if (
     ((Math.abs((getPower - power)) / power) * 100 > context.configDetail.power_error) || (power === 0 && getPower === 0)
   ) {
-    console.warn('电表功率', power)
-    console.warn('设备功率', getPower)
-    console.warn('功率绝对值', Math.abs((getPower - power)))
-    console.warn('功率绝对值除数', Math.abs((getPower - power)) / power)
     context.createLeftSpanMessage('红外设备与电表功率超出误差限制,功率误差:' + ((Math.abs((getPower - power)) / power) * 100).toFixed(4) + '%', 'red')
     notPass = true
   } else {

@@ -874,10 +874,10 @@ export function nbPackDataDomains(afn, fn, protocolID, context) {
           arrayBuffer = createBuffer(4, [0x0c, 0xff, 0x11, 0x00]);
           break;
         case '12-fail':
-          arrayBuffer = createBuffer(4, [0x0c, 0xff, 0x12, 0x00]);
+          arrayBuffer = createBuffer(5, [0x0c, 0xff, 0x12, 0x00,0x00]);
           break;
         case '12-success':
-          arrayBuffer = createBuffer(4, [0x0c, 0xff, 0x12, 0x01]);
+          arrayBuffer = createBuffer(5, [0x0c, 0xff, 0x12, 0x00,0x01]);
           break;
         default:
         // Log.error("packages: afn[{}] match fail", afn);

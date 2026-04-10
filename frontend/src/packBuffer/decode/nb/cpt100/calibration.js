@@ -8,5 +8,5 @@ export function calibration(responseMessage) {
     dataView.getUint8(21) !== 0X80 ||
     dataView.getUint8(22) !== 0X84 ||
     dataView.getUint8(27) !== 0X0c ||
-    dataView.getUint8(28) !== 0X12
+    dataView.getUint8(29) !== 0X12
 }

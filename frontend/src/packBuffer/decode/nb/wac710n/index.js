@@ -1,0 +1,13 @@
+
+export {inquireSelfTest} from './inquireSelfTest'
+export {writeTemperatureProbe} from './writeConfig'
+export {writePressureProbe} from './writeConfig'
+export {readVersion} from './readVersion'
+export {readSelfTestStatus} from './readSelfTestStatus'
+export {readSelfTestStatus2} from './readSelfTestStatus2'
+export {writeAddress} from './writeAddress'
+export {readAddress} from './readAddress'
+export {exitSelfTest} from './exitSelfTest'
+export {readData} from './readData'
+export {readIMEI} from './readIMEI'
+export {readICCID} from './readICCID'

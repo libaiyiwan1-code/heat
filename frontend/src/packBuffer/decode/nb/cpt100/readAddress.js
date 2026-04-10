@@ -13,8 +13,8 @@ export function readAddress(context, responseMessage) {
     dataView.getUint8(28) !== 0x06  //afn
   if (!notPass) {
     // 读取6字节地址（从第24字节开始）
-    context.leftReadAddress = Array.from({length: 6}, (_, i) =>
-      dataView.getUint8(22 + i).toString(16).padStart(2, '0')
+    context.leftReadAddress = Array.from({length: 4}, (_, i) =>
+      dataView.getUint8(31 + i).toString(16).padStart(2, '0')
     ).join('').toUpperCase();
   }
   console.log('读取地址:', context.leftReadAddress)

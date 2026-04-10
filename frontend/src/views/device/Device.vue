@@ -1294,7 +1294,7 @@
                   this.configDetail.printLabel==='CPT100-10A'
 ">
                 <a-form-item>
-                  <a-button class="hlm-operate-button-style" @click="getAllPorts('one')">刷新</a-button>
+                  <a-button class="hlm-operate-button-style" @click="getAllPorts('voltmeter')">刷新</a-button>
                 </a-form-item>
                 <a-form-item class="form-item-spacing">
                   <a-button class="hlm-port-button-select-style static-btn ">电压表串口</a-button>
@@ -1665,7 +1665,7 @@
               </a-button>
               <a-button type="primary" block
                         v-if="this.configForm.produceModel==='CPT100'
-                        &&this.configForm.produceModel!=='CPT100-10A'"
+                        ||this.configForm.produceModel==='CPT100-10A'"
                         @click="powerInspection(protocolIDMap[this.configForm.produceModel].protocolId,'one')"
                         :disabled="nbButtonDisabledStatus.powerInspection"
                         :style="{
@@ -1917,7 +1917,6 @@
                       this.configDetail.printLabel==='WAT300NH'||
                       this.configDetail.printLabel==='VAT100'||
                       this.configDetail.printLabel==='NTP100'||
-                      this.configDetail.printLabel==='CPT100-10A'||
                       this.configDetail.printLabel==='NBT400'||
                       this.configDetail.printLabel==='WAC300C'||
                       this.configDetail.printLabel==='WAC330N'||

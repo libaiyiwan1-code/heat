@@ -358,6 +358,24 @@ export const doClosePort = (context, portName, type) => {
       });
     }
 
+  }else if(type==='voltmeter'){
+    if (context.portAttributes.serialPortVoltageSource !== null) {
+      context.portAttributes.portClosedVoltageSourceStatus = true
+      context.portAttributes.serialPortVoltageSource.close((err) => {
+        if (err) {
+          console.error('Failed to close serial port:', err.message);
+          Log.error('Failed to close serial port:', err.message);
+        } else {
+          console.log('串口已暂停:' + portName, context.portAttributes.serialPortVoltageSource.isPaused());
+          Log.info('串口已暂停:' + portName, context.portAttributes.serialPortVoltageSource.isPaused());
+          console.log('串口已打开' + portName, context.portAttributes.serialPortVoltageSource.isOpen);
+          Log.info('串口已打开' + portName, context.portAttributes.serialPortVoltageSource.isOpen);
+          context.createLeftSpanMessage('串口：' + portName + '已关闭', 'grey');
+          context.portAttributes.serialPortVoltageSource = null;
+        }
+      });
+    }
+
   }
 
 };
@@ -751,6 +769,7 @@ export function initializeAllSerialPorts(context, type) {
     context.portAttributes.selectedPortTwo = null
     context.portAttributes.selectedPortSignalSource = null
     context.portAttributes.selectedPortCurrentSource = null
+    context.portAttributes.selectedPortVoltageSource = null
     context.portAttributes.serialPort485=null
     SerialPort.list().then(ports => {
       // context.ports = ports.map(port => ({path: port.path, available: true}));
@@ -788,6 +807,7 @@ export function initializeAllSerialPorts(context, type) {
     context.portAttributes.portClosedSignalSourceStatus = true;
     context.portAttributes.portClosedCurrentSourceStatus = true;
     context.portAttributes.portClosed485Status = true;
+    context.portAttributes.portClosedVoltageSourceStatus = true;
   });
 }
 
@@ -862,6 +882,20 @@ export function doHandleSelectChange(context, type) {
           // 然后将串口对象置为 null
           context.portAttributes.portClosed485Status = true;
           context.portAttributes.selectedPort485 = undefined
+        }
+      });
+    }
+  }else if (type === 'voltmeter') {
+    if (context.portAttributes.serialPortVoltageSource && context.portAttributes.serialPortVoltageSource.isOpen) {
+      // 如果串口对象存在且是打开状态，则关闭串口
+      context.portAttributes.serialPortVoltageSource.close((err) => {
+        if (err) {
+          context.portAttributes.portClosedVoltageSourceStatus = false;
+          context.portAttributes.serialPortVoltageSource = undefined
+        } else {
+          // 然后将串口对象置为 null
+          context.portAttributes.portClosedVoltageSourceStatus = true;
+          context.portAttributes.serialPortVoltageSource = undefined
         }
       });
     }

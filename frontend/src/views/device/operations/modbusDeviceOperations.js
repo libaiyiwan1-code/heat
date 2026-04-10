@@ -138,16 +138,19 @@ export const doPowerInspection = async (context,protocolId, type) => {
   const executeFunction = executeFunctionList[produceModel];
   if (executeFunction && await executeFunction(context,protocolId, type)) {
     context.leftWorkPrompt = '检验电压失败'
+    context.buttonError('powerInspection')
+    await playErrorAudio(context);
     setTimeout(() => {
-      context.buttonWaiting('deviceInspection');
+      context.buttonWaiting('powerInspection');
     }, 2000);
     return;
   }
   context.leftWorkPrompt = `检验电压成功`;
-  context.buttonSuccess('deviceInspection');
+  context.buttonSuccess('powerInspection');
+  context.buttonEnable()
   // 2 秒后切换为成功状态
   setTimeout(() => {
-    context.buttonWaiting('deviceInspection');
+    context.buttonWaiting('powerInspection');
   }, 2000);
 
   await playSuccessAudio(context);

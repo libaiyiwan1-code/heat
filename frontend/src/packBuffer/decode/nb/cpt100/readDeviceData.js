@@ -1,4 +1,4 @@
-import {hex2arrayBuffer} from "@/packBuffer/common/comUtil";
+import {hex2arrayBuffer,hexToFloat} from "@/packBuffer/common/comUtil";
 
 // 读设备数据
 export function readDeviceData(context, responseMessage) {
@@ -15,7 +15,8 @@ export function readDeviceData(context, responseMessage) {
   if (!notPass) {
     power = dataView.getUint32(38, true).toString(16).padStart(8, '0')
   }
-  console.log('CPT100读功率:', power)
-  context.deviceReadPower = power
+  console.log('CPT100读功率:', hexToFloat(power))
+  context.createLeftSpanMessage('CPT100读功率:' +  Number(hexToFloat(power)).toFixed(2) + 'W', 'grey')
+  context.deviceReadPower = hexToFloat(power)
   return notPass
 }
