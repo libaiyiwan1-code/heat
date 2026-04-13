@@ -10,9 +10,9 @@ const SELF_TEST_CHECKS = [
     {offset: 95, msg: '回温标定 不正常'},
     {offset: 96, msg: '进温标定 不正常'},
     {offset: 97, msg: '电压 不正常'},
-    {offset: 98, msg: '气压传感器 不正常'},
-    {offset: 99, msg: '进水压力 不正常'},
-    {offset: 100, msg: '回水压力 不正常'},
+    // {offset: 98, msg: '气压传感器 不正常'},
+    // {offset: 99, msg: '进水压力 不正常'},
+    // {offset: 100, msg: '回水压力 不正常'},
 ]
 
 export function readSelfTestStatus(context, responseMessage) {
@@ -50,7 +50,7 @@ export function readSelfTestStatus(context, responseMessage) {
     report(context, '自检通过')
 
     context.productName = decodeGetProductName(raw)
-    if (!context.productName.toLowerCase().includes('wac300ny')) {
+    if (!context.productName.toLowerCase().includes('wac300nh')) {
         report(context, `产品名称错误：${context.productName}`)
         return true
     }

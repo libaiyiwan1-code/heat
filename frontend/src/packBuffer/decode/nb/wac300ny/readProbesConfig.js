@@ -17,19 +17,19 @@ export function readProbesConfig(context, responseMessage) {
     if (context.configDetail.temperatureProbe === '双探头' && config !== 0) {
       notPass = true
       console.error('双探头配置-不匹配')
-      context.createLeftSpanMessage('温度探头配置-不匹配', 'red')
+      context.createLeftSpanMessage('温度探头配置(进温探头、回温探头)-不匹配', 'red')
     } else if (context.configDetail.temperatureProbe === '回温探头' && config !== 1) {
       notPass = true
       console.error('回温探头配置-不匹配')
-      context.createLeftSpanMessage('温度探头配置-不匹配', 'red')
+      context.createLeftSpanMessage('温度探头配置(回温探头)-不匹配', 'red')
     } else if (context.configDetail.temperatureProbe === '进温探头' && config !== 2) {
       notPass = true
       console.error('进温探头配置-不匹配')
-      context.createLeftSpanMessage('温度探头配置-不匹配', 'red')
+      context.createLeftSpanMessage('温度探头配置(进温探头)-不匹配', 'red')
     } else if (context.configDetail.temperatureProbe === '无探头' && config !== 3) {
       notPass = true
       console.error('无探头配置-不匹配')
-      context.createLeftSpanMessage('温度探头配置-不匹配', 'red')
+      context.createLeftSpanMessage('温度探头配置(无探头)-不匹配', 'red')
     }
     if (config === 0x01) {
       context.readDeviceTemperatureProbes = '回温探头'

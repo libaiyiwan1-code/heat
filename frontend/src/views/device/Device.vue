@@ -44,6 +44,7 @@
                                &&this.configForm.produceModel!=='CPT100-10A'
                                &&this.configForm.produceModel!=='WAC330N'
                                &&this.configForm.produceModel!=='VAC005C'
+                               &&this.configForm.produceModel!=='WAC300NY'
 ">
                     <a-select
                       v-model:value="this.configForm.pressureProbes"
@@ -708,6 +709,7 @@
                          &&this.configForm.produceModel!=='CPT100'
                              &&this.configForm.produceModel!=='CPT100-10A'
                                        &&this.configForm.produceModel!=='WAC330N'
+                                           &&this.configForm.produceModel!=='WAC300NY'
 ">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">压力探头:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{

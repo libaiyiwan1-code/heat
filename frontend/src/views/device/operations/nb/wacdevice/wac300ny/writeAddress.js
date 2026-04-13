@@ -40,24 +40,26 @@ export async function writeAddress(protocolId, type, context) {
     if (!(context.readOutTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
       context.readOutTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
       await badRecordUpload(context,'回温温度误差过大' , + context.readOutTemperature, 'writeAddress')
+      context.createLeftSpanMessage('回温温度误差过大:'  + context.readOutTemperature,'error')
       await context.uploadMes(context.leftGenerateAddress, 0, '回温温度误差过大:' + context.readOutTemperature)
       context.leftBadProductQuantity += 1
       await playErrorAudio(context)
       return true
     }
-    context.createLeftSpanMessage('回温验证成功:' + context.readOutTemperature, 'grey')
+    context.createLeftSpanMessage('回温验证成功:' + Number(context.readOutTemperature).toFixed(2), 'grey')
 
   } else if (context.configDetail.temperatureProbe === '进温探头') {
     //进温探头
     if (!(context.readInTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
       context.readInTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
       await badRecordUpload(context,'进温温度误差过大' , + context.readInTemperature, 'writeAddress')
+      context.createLeftSpanMessage('进温温度误差过大:'  + context.readOutTemperature,'error')
       await context.uploadMes(context.leftGenerateAddress, 0, '进温温度误差过大:' + context.readInTemperature)
       context.leftBadProductQuantity += 1
       await playErrorAudio(context)
       return true
     }
-    context.createLeftSpanMessage('进温验证成功:' + context.readInTemperature, 'grey')
+    context.createLeftSpanMessage('进温验证成功:' + Number(context.readInTemperature).toFixed(2), 'grey')
 
   } else if (context.configDetail.temperatureProbe === '双探头') {
     //双探头
@@ -69,7 +71,7 @@ export async function writeAddress(protocolId, type, context) {
       await playErrorAudio(context)
       return true
     }
-    context.createLeftSpanMessage('回温验证成功:' + context.readOutTemperature, 'grey')
+    context.createLeftSpanMessage('回温验证成功:' + Number(context.readOutTemperature).toFixed(2), 'grey')
     if (!(context.readInTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
       context.readInTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
       await badRecordUpload(context,'进温温度误差过大' , + context.readInTemperature, 'writeAddress')
@@ -78,7 +80,7 @@ export async function writeAddress(protocolId, type, context) {
       await playErrorAudio(context)
       return true
     }
-    context.createLeftSpanMessage('进温验证成功:' + context.readInTemperature, 'grey')
+    context.createLeftSpanMessage('进温验证成功:' + Number(context.readInTemperature).toFixed(2), 'grey')
   }
   let notPass = await generateAddressByNB(context)
   if (notPass) {

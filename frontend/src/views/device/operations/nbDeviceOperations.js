@@ -592,12 +592,18 @@ export async function doScanCodeVerification(context, protocolId, type) {
       if (!await checkNetWork(context, protocolId, type)) {
         context.leftGoodProductQuantity += 1;
         context.leftGenerateAddress = ''; // 成功后清空地
+      }else{
+        context.buttonError('scanCode')
+        context.leftWorkPrompt = `扫码验证失败`;
+        setTimeout(() => {
+          context.buttonWaiting('scanCode');
+        }, 2000);
+        return
       }
     }
     context.leftWorkPrompt = `扫码验证成功`;
     await playSuccessAudio(context)
     context.buttonEnable();
-    context.buttonSuccess('leftWorkPromptColor')
     context.buttonSuccess('scanCode')
     setTimeout(() => {
       context.buttonWaiting('scanCode');
@@ -746,7 +752,9 @@ const checkNetWork = async (context, protocolId, type) => {
     context.configDetail.printLabel === 'WAC300NH'
     || context.configDetail.printLabel === 'WAC300NY'
     || context.configDetail.printLabel === 'WAC300N' || context.configDetail.printLabel === 'WAC300NS'
-    || context.configDetail.printLabel === 'WAC400NS' || context.configDetail.printLabel === 'WAC400N') {
+    || context.configDetail.printLabel === 'WAC400NS' || context.configDetail.printLabel === 'WAC400N'
+    ||context.configDetail.printLabel==='WAC300NY'
+  ) {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_valve')
   } else if (
     context.configDetail.printLabel === 'NTP100C' || context.configDetail.printLabel === 'CT1000' || context.configDetail.printLabel === 'ET01' ||
@@ -757,16 +765,18 @@ const checkNetWork = async (context, protocolId, type) => {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_meter_valve')
   }
   console.log('hems最近上传的数据', data[0])
-  if (data[0] === undefined || data [0] === null) {
+  if (data===undefined||data[0] === undefined || data [0] === null) {
     if (!context.uploadAddressList.includes(context.leftReadAddress)) {
       context.uploadAddressList.push(context.leftReadAddress)
       context.leftBadProductQuantity += 1;
     }
     await badRecordUpload(context, '扫码地址验证联网', '网络未上传', 'scanCode')
+    context.createLeftSpanMessage('扫码地址验证联网(网络未上传) ','red')
     await context.uploadMes(context.leftGenerateAddress, 0, '扫码地址验证联网(网络未上传) ')
     context.leftBadProductQuantity += 1
     context.leftGenerateAddress = ''
     context.buttonEnable();
+
     await playErrorAudio(context)
     setTimeout(() => {
       context.buttonWaiting('scanCode');
