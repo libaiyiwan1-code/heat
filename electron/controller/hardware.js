@@ -807,7 +807,7 @@ class HardwareController extends Controller {
             <div >
                  <p  style="line-height:0.15mm ; font-weight: 500;margin-top: 2mm;" >${address}</p>
                 <p style="line-height:0.15mm ;  font-weight: 500; margin-top: -0.3mm">型号: ${model}</p>
-                   <p style="line-height:0.15mm ;margin-left: -2mm;  font-weight: 500; margin-top: -0.3mm">${date}</p>
+                   <p style="line-height:0.15mm ;margin-left: -4.5mm;  font-weight: 500; margin-top: -0.3mm">${date}</p>
                 
             </div>
         </div>

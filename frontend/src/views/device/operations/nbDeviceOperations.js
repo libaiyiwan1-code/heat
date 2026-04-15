@@ -1169,7 +1169,8 @@ export const doPrintLabelTODO = async (context, flag, protocolId, type) => {
   const params = {
     deviceName: context.defaultDeviceName,
     address: printAddress,
-    model: 'WAC300CD',
+    model: 'WAC300NS',
+    configModel: 'WAC300NS',
     listDoubleRowLabels: context.listDoubleRowLabels,
     width: context.configDetail.labelWith,
     margin: context.configDetail.labelMargin,

@@ -2776,10 +2776,10 @@ export default {
       customizePrintLabelList: [],
       selectLabelPaperSize: '40x20',
       labelWidth: 40,
-      labelHeight: 15,
-      labelMargin: -1,
-      lableMarginLeft: 12,
-      secondColumnFontSize: 3,
+      labelHeight: 19,
+      labelMargin: 1,
+      lableMarginLeft: 14,
+      secondColumnFontSize: 3.3,
       listDoubleRowLabels: '是',
       currentSourceList: ['有', '无'],
       selectDoubleRowLabels: ['是', '否'],
@@ -3949,30 +3949,31 @@ export default {
       this.updatePreview()
       if (this.selectLabelPaperSize === '40x20') {
         this.imageDesc = '40mm x 20mm 标签纸预览图'
-        this.labelHeight = 15
+        this.labelHeight = 19
         this.labelWidth = 40
-        this.labelMargin = -1
-        this.lableMarginLeft = 12
-        this.secondColumnFontSize = 3
+        this.labelMargin = 1
+        this.lableMarginLeft = 14
+        this.secondColumnFontSize = 3.3
       } else if (this.selectLabelPaperSize === '30x12') {
         this.imageDesc = '30mm x 12mm 标签纸预览图'
-        this.labelHeight = 12
-        this.labelWidth = 33
-        this.labelMargin = 5
-        this.lableMarginLeft = this.labelWidth
+        this.labelHeight = 11
+        this.labelWidth = 30
+        this.labelMargin = 8
+        this.lableMarginLeft = 31
         this.secondColumnFontSize = 4
         if(this.listDoubleRowLabels==='是'){
           this.imageDesc = '30mm x 12mm 标签纸预览图'
-          this.labelHeight = 10
+          this.labelHeight = 11
           this.labelWidth = 30
-          this.labelMargin = 6
-          this.lableMarginLeft=28
+          this.labelMargin = 8
+          this.lableMarginLeft=31
+          this.secondColumnFontSize = 4
         }
       }  else if (this.selectLabelPaperSize === '50x12') {
         this.imageDesc = '50mm x 12mm 标签纸预览图'
-        this.labelHeight = 9
+        this.labelHeight = 11
         this.labelWidth = 50
-        this.labelMargin = 5.8
+        this.labelMargin = 8
         this.lableMarginLeft = 7
         this.secondColumnFontSize=3.3
       }
@@ -3981,10 +3982,10 @@ export default {
       this.updatePreview()
      if (this.selectLabelPaperSize === '30x12'&&this.listDoubleRowLabels==='是') {
         this.imageDesc = '30mm x 12mm 标签纸预览图'
-        this.labelHeight = 10
+        this.labelHeight = 11
         this.labelWidth = 30
-        this.labelMargin = 6
-       this.lableMarginLeft=28
+        this.labelMargin = 8
+        this.lableMarginLeft=31
       }
     }
     ,
