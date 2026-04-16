@@ -3987,6 +3987,14 @@ export default {
         this.labelMargin = 8
         this.lableMarginLeft=31
       }
+     if(this.selectLabelPaperSize === '50x12'&&this.listDoubleRowLabels==='否'){
+       this.imageDesc = '50mm x 12mm 标签纸预览图'
+       this.labelHeight = 11
+       this.labelWidth = 50
+       this.labelMargin = 8
+       this.lableMarginLeft = 33
+       this.secondColumnFontSize=3.3
+     }
     }
     ,
     updatePreview() {
@@ -5680,6 +5688,52 @@ export default {
       await ipc.send(ipcApiRoute.printSuccessSingleRowInspectLabel5012, params)
     }
     ,
+    async wireDevicePrintLabelTODO(type) {
+      // await readWireDeviceAddress(protocolIDMap[this.configForm.produceModel].protocolId, type, this, false);
+      // //读地址=>打印标签
+      // await executeWithAddress(protocolIDMap[this.configForm.produceModel].protocolId, type, this, false,async (valveAddress) => {
+      //     Log.info('读地址->打印标签', valveAddress)
+      // })
+      // await executeWithAddress(protocolIDMap[this.configForm.produceModel].protocolId, type, this, false, async (writeAfterAddress) => {
+      //   console.log('writeAfterAddress:', writeAfterAddress)
+      // })
+      // await serialPortOperation(this, {
+      //   actionType: 'readWireDeviceAddress',
+      //   operationName: '有线设备读地址',
+      //   cmdType: '81',                         // afn 的命令类型
+      //   cmdCode: '0a',                         // fn 的命令码
+      //   protocolId: protocolIDMap[this.configForm.produceModel].protocolId,
+      //   maxRetries: this.maxRetries,
+      //   expectedLength: protocolIDMap[this.configForm.produceModel].deviceActionResponseMessageLength['readWireDeviceAddress'],
+      //   expectedLength2: protocolIDMap[this.configForm.produceModel].deviceActionResponseMessageLength2['readWireDeviceAddress'],
+      //   timeout: this.timeout,
+      //   validateResponse: () => protocolIDMap[this.configForm.produceModel].validateResponse.readWireDeviceAddress(this, type === 'one' ? this.receivedData.globalReceivedOneData : this.receivedData.globalReceivedTwoData, type,false),
+      //   preprocess: () => {
+      //   },
+      //   isInfraredDevice: false,
+      //   isTransparentTransmissionProtocol: false,
+      //   isWireDevice: protocolIDMap[this.configForm.produceModel].isWireDevice,
+      // }, type)
+
+      let address = '12345678'
+      // if (type === 'one') {
+      //   address = this.leftReadAddress
+      // } else if (type === 'two') {
+      //   address = this.rightReadAddress
+      // }
+      const params = {
+        deviceName: this.defaultDeviceName,
+        address: arrayBuffer2Hex(addressCover(address.substring(0, 8))),
+        message: '检  ' + this.routerParam.pwd,
+        isDouble: this.configDetail.whetherDoubleRowPrinting === '是',
+        width: this.configDetail.labelWith,
+        margin: this.configDetail.labelMargin,
+        marginLeft: this.configDetail.lableMarginLeft,
+        secondColumnFontSize: this.configDetail.secondColumnFontSize,
+        height: this.configDetail.labelHeight,
+      };
+      await ipc.send(ipcApiRoute.printSuccessSingleRowInspectLabel5012, params)
+    },
 
     async openPort(portName, type) {
       console.warn(this.configDetail.printLabel)
