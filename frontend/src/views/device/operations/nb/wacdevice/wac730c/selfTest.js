@@ -27,26 +27,29 @@ export const selfTest = async (context, protocolId, type) => {
   }
 
 
-  let writeTemperatureProbesConfigResult = await serialPortOperation(context, {
-    actionType: 'selfTest',
-    operationName: '写温度探头配置',
-    cmdType: 'ac',                         // afn 的命令类型
-    cmdCode: '09',                         // fn 的命令码
-    protocolId: protocolId,
-    maxRetries: context.maxRetries,
-    expectedLength: protocol.deviceActionResponseMessageLength['writeTemperatureProbesConfig'],
-    expectedLength2: protocol.deviceActionResponseMessageLength2['writeTemperatureProbesConfig'],
-    timeout: context.timeout,
-    validateResponse: () => protocol.validateResponse.writeTemperatureProbesConfig(context.receivedData.globalReceivedOneData),
-    preprocess: () => {
-    },
-    isInfraredDevice: protocol.isInfraredDevice,
-    isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.writeTemperatureProbesConfig,
-  }, type)
-  if (writeTemperatureProbesConfigResult) {
-    await playErrorAudio(context)
-    return true
+  if (context.configDetail.temperatureProbe!=='无探头'){
+    let writeTemperatureProbesConfigResult = await serialPortOperation(context, {
+      actionType: 'selfTest',
+      operationName: '写温度探头配置',
+      cmdType: 'ac',                         // afn 的命令类型
+      cmdCode: '09',                         // fn 的命令码
+      protocolId: protocolId,
+      maxRetries: context.maxRetries,
+      expectedLength: protocol.deviceActionResponseMessageLength['writeTemperatureProbesConfig'],
+      expectedLength2: protocol.deviceActionResponseMessageLength2['writeTemperatureProbesConfig'],
+      timeout: context.timeout,
+      validateResponse: () => protocol.validateResponse.writeTemperatureProbesConfig(context.receivedData.globalReceivedOneData),
+      preprocess: () => {
+      },
+      isInfraredDevice: protocol.isInfraredDevice,
+      isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.writeTemperatureProbesConfig,
+    }, type)
+    if (writeTemperatureProbesConfigResult) {
+      await playErrorAudio(context)
+      return true
+    }
   }
+
 
   let writePressureProbesConfigResult = await serialPortOperation(context, {
     actionType: 'selfTest',

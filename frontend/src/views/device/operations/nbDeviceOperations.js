@@ -154,7 +154,7 @@ export async function doWriteAddress(context, protocolId, type) {
     'LPC230E': LPC230E.writeAddress,
     'LPC210': LPC210.writeAddress,
     'LPC210E': LPC210E.writeAddress,
-    'WAC730C': WAC730C.selfTest,
+    'WAC730C': WAC730C.writeAddress,
     'CAT400': CAT400.writeAddress,
     'CAT400S': CAT400S.writeAddress,
     'CPT100': CPT100.writeAddress,

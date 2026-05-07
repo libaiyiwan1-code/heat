@@ -4985,7 +4985,7 @@ export const protocolIDMap = {
       'readIMEI': 31,
       'readICCID': 36,
       'readTemperatureProbes': 36,
-      'writeAddress': 37,
+      'writeAddress': 16,
       'awaken': 16,
       'exitSelfTest': 34,
       'readAddress': 21,
@@ -4999,7 +4999,7 @@ export const protocolIDMap = {
       'readIMEI': 47,
       'readICCID': 52,
       'readTemperatureProbes': 69,
-      'writeAddress': 58,
+      'writeAddress': 37,
       'awaken': 32,
       'exitSelfTest': 67,
       'readAddress': 37,
@@ -5265,6 +5265,8 @@ export const protocolIDMap = {
       'readAddress': false,
       'writePressureProbesConfig': true,
       'writeTemperatureProbesConfig': true,
+      'readVersion': false,
+      'readSelfTestStatus2': true,
     },
     protocolId: 148,
     deviceActionResponseMessageLength: {
@@ -5278,6 +5280,8 @@ export const protocolIDMap = {
       'selfTest': -1,
       'writeTemperatureProbesConfig': 34,
       'writePressureProbesConfig': 34,
+      'readVersion': 17,
+      'readSelfTestStatus2': 81,
     },
     deviceActionResponseMessageLength2: {
       'inquireSelfTest': 34,
@@ -5290,6 +5294,8 @@ export const protocolIDMap = {
       'selfTest': -1,
       'writeTemperatureProbesConfig': 34,
       'writePressureProbesConfig': 34,
+      'readVersion': 17,
+      'readSelfTestStatus2': 81,
     },
     portAttribute: {
       parity: '偶校验',
@@ -5325,7 +5331,12 @@ export const protocolIDMap = {
       writePressureProbesConfig: (data) => {
         return WAC730C.writePressureProbesConfig(data);
       },
-
+      readVersion: (context, data) => {
+        return WAC730C.readVersion(context, data);
+      },
+      readSelfTestStatus2: (context, data) => {
+        return WAC730C.readSelfTestStatus2(context, data);
+      },
     },
   },
   'PTC100-4-20MA': {
