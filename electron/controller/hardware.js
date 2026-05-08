@@ -795,7 +795,7 @@ class HardwareController extends Controller {
             || configModel === 'WAC300NH' || configModel === 'ET01' || configModel === 'WAC730C'||
             configModel==='CAT400'||configModel==='CAT400S'||configModel==='WAC710C'||configModel==='WAC300C'
             ||configModel==='WAC330N'||configModel==='WAC400N'||configModel==='VAC710'||configModel==='WAC710N'||
-            configModel==='WAC300NY'
+            configModel==='WAC300NY'||configModel==='WAC730N'
         ) {
             // 40*20 双排
             // 生成单个标签 HTML

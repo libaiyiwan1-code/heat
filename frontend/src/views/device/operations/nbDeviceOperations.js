@@ -22,6 +22,7 @@ import * as WAC300NS from './nb/wacdevice/wac300ns'
 import * as WAC710C from './nb/wacdevice/wac710c'
 import * as VAC710 from './nb/wacdevice/vac710'
 import * as WAC710N from './nb/wacdevice/wac710n'
+import * as WAC730N from './nb/wacdevice/wac730n'
 import * as WAC300LH from './nb/wacdevice/wac300lh'
 import * as WAC330HE from './nb/wacdevice/wac330he'
 import * as WAC730C from './nb/wacdevice/wac730c'
@@ -61,6 +62,7 @@ const Log = require('ee-core/log');
 
 
 export const doSelfTest = async (context, protocolId, type) => {
+  console.log(protocolId,type)
   context.messageClean();
   if (!checkPort(context, type)) {
     await playErrorAudio(context);
@@ -109,6 +111,7 @@ export const doSelfTest = async (context, protocolId, type) => {
     'WAC400N': WAC400N.selfTest,
     'VAC710': VAC710.selfTest,
     'WAC710N': WAC710N.selfTest,
+    'WAC730N': WAC730N.selfTest,
   };
   const produceModel = context.configForm.produceModel;
   const selfTestFunction = selfTestStrategies[produceModel];
@@ -181,6 +184,8 @@ export async function doWriteAddress(context, protocolId, type) {
     'WAC400N': WAC400N.writeAddress,
     'VAC710': VAC710.writeAddress,
     'WAC710N': WAC710N.writeAddress,
+    'WAC730N': WAC730N.writeAddress,
+
 
 
   };
@@ -341,6 +346,7 @@ export const doExitSelfTest = async (context, protocolId, type) => {
     'WAC400N': WAC400N.exitSelfTest,
     'VAC710': VAC710.exitSelfTest,
     'WAC710N': WAC710N.exitSelfTest,
+    'WAC730N': WAC730N.exitSelfTest,
   };
   const produceModel = context.configForm.produceModel;
   const returnSelfTestFunction = returnSelfTestStrategies[produceModel];

@@ -41,6 +41,7 @@ import * as WAC300C from "@/packBuffer/decode/nb/wac300c";
 import * as NTR300 from "@/packBuffer/decode/nb/ntr300";
 import * as WAC330N from "@/packBuffer/decode/nb/wac330n";
 import * as WAC710N from "@/packBuffer/decode/nb/wac710n";
+import * as WAC730N from "@/packBuffer/decode/nb/wac730n";
 /**
  * 其它
  * */
@@ -3211,46 +3212,52 @@ export const protocolIDMap = {
   },
   //TODO
   'WAC730N': {
-    protocolCode: null,
-    protocolId: null,
-    model: -1,
+    protocolCode: 'EN1434_0106',
+    protocolId: 105,
+    model: -1,//电信42,移动46
     joinMode: 2,
     isInfraredDevice: false,
     isDeviceActionTransparentTransmissionProtocol: {
-      'inquireSelfTest': false,
-      'writeTemperatureProbe': false,
-      'selfTest': false,
-      'readSelfTestStatus': false,
+      'inquireSelfTest': true,
+      'writePressureProbesConfig': true,
+      'selfTest': true,
+      'readVersion': false,
+      'readSelfTestStatus': true,
+      'readSelfTestStatus2': true,
       'readICCID': false,
       'readIMEI': false,
       'writeAddress': false,
       'readAddress': false,
-      'exitSelfTest': false,
-      'readData': false,
+      'exitSelfTest': true,
+      'awaken': false,
     },
     deviceActionResponseMessageLength: {
-      'inquireSelfTest': 16,
-      'writeTemperatureProbe': 16,
+      'inquireSelfTest': 34,
+      'writePressureProbesConfig': 34,
       'selfTest': -1,
-      'readSelfTestStatus': 56,
+      'readVersion': 17,
+      'readSelfTestStatus': 73,
+      'readSelfTestStatus2': 81,
       'readICCID': 36,
       'readIMEI': 31,
-      'readAddress': 15,
       'writeAddress': 16,
-      'exitSelfTest': 16,
-      'readData': 16,
+      'readAddress': 21,
+      'exitSelfTest': 34,
+      'awaken': 16,
     },
     deviceActionResponseMessageLength2: {
-      'inquireSelfTest': 16,
-      'writeTemperatureProbe': 16,
+      'inquireSelfTest': 34,
+      'writePressureProbesConfig': 34,
       'selfTest': -1,
-      'readSelfTestStatus': 56,
+      'readVersion': 17,
+      'readSelfTestStatus': 73,
+      'readSelfTestStatus2': 81,
       'readICCID': 36,
       'readIMEI': 31,
-      'readAddress': 15,
       'writeAddress': 16,
-      'exitSelfTest': 16,
-      'readData': 16,
+      'readAddress': 21,
+      'exitSelfTest': 34,
+      'awaken': 16,
     },
     portAttribute: {
       parity: '偶校验',
@@ -3260,25 +3267,38 @@ export const protocolIDMap = {
     },
     validateResponse: {
       inquireSelfTest: (data) => {
-        return null
+        return WAC730N.inquireSelfTest(data);
       },
       readSelfTestStatus: (context, data) => {
-        return null
-      },
-      readICCID: (context, data) => {
-        return null
+        return WAC730N.readSelfTestStatus(context, data);
       },
       readIMEI: (context, data) => {
-        return null
+        return WAC730N.readIMEI(context, data);
+      },
+      readICCID: (context, data) => {
+        return WAC730N.readICCID(context, data);
       },
       writeAddress: (leftGenerateAddress, data) => {
-        return null
+        return WAC730N.writeAddress(leftGenerateAddress, data);
       },
       readAddress: (context, data) => {
-        return null
+        return WAC730N.readAddress(context, data);
       },
-      exitSelfTest: (context, data) => {
-        return null
+      exitSelfTest: (data) => {
+        return WAC730N.exitSelfTest(data);
+      },
+
+      writePressureProbesConfig: (data) => {
+        return WAC730N.writePressureProbesConfig(data);
+      },
+      readVersion: (context, data) => {
+        return WAC730N.readVersion(context, data);
+      },
+      readSelfTestStatus2: (context, data) => {
+        return WAC730N.readSelfTestStatus2(context, data);
+      },
+      awaken: (data) => {
+        return WAC730N.awaken(data);
       },
     },
   },
@@ -5267,6 +5287,7 @@ export const protocolIDMap = {
       'writeTemperatureProbesConfig': true,
       'readVersion': false,
       'readSelfTestStatus2': true,
+      'awaken':false,
     },
     protocolId: 148,
     deviceActionResponseMessageLength: {
@@ -5282,6 +5303,7 @@ export const protocolIDMap = {
       'writePressureProbesConfig': 34,
       'readVersion': 17,
       'readSelfTestStatus2': 81,
+      'awaken': 16,
     },
     deviceActionResponseMessageLength2: {
       'inquireSelfTest': 34,
@@ -5296,6 +5318,7 @@ export const protocolIDMap = {
       'writePressureProbesConfig': 34,
       'readVersion': 17,
       'readSelfTestStatus2': 81,
+      'awaken': 16,
     },
     portAttribute: {
       parity: '偶校验',
@@ -5336,6 +5359,9 @@ export const protocolIDMap = {
       },
       readSelfTestStatus2: (context, data) => {
         return WAC730C.readSelfTestStatus2(context, data);
+      },
+      awaken: (data) => {
+        return WAC730C.awaken(data);
       },
     },
   },

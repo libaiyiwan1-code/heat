@@ -1,3 +1,5 @@
+import {awaken} from "@/packBuffer/decode/nb/wac730c/awaken";
+
 export {inquireSelfTest} from './inquireSelfTest'
 export {exitSelfTest} from './exitSelfTest'
 export {readSelfTestStatus} from './readSelfTestStatus'
@@ -9,3 +11,4 @@ export {readIMEI} from './readIMEI'
 export {writeTemperatureProbesConfig} from './writeTemperatureProbesConfig'
 export {writePressureProbesConfig} from './writePressureProbesConfig'
 export {readVersion} from './readVersion'
+export {awaken} from './awaken'

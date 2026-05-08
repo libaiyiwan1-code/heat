@@ -1738,7 +1738,9 @@
                       this.configDetail.printLabel==='WAC300C-LG'||
                       this.configDetail.printLabel==='WAC300CY'||
                       this.configDetail.printLabel==='WAC300CS'||
-                      this.configDetail.printLabel==='WAC400N'
+                      this.configDetail.printLabel==='WAC400N'||
+                      this.configDetail.printLabel==='WAC730C'||
+                      this.configDetail.printLabel==='WAC730N'
 "
                         v-show="
                         this.configForm.produceModel!=='东元热表'
@@ -1766,7 +1768,6 @@
                       this.configDetail.printLabel === 'LPC230'||
                       this.configDetail.printLabel === 'LPC230E'||
                       this.configDetail.printLabel === 'AEC100'||
-                      this.configDetail.printLabel === 'WAC730C'||
                       this.configDetail.printLabel === 'CT1000'||
                       this.configDetail.printLabel === 'ET01'||
                       this.configDetail.printLabel === 'WAC330HE'||
@@ -1798,7 +1799,6 @@
                       this.configDetail.printLabel==='WAC710N'||
                       this.configDetail.printLabel==='WAC710NS'||
                       this.configDetail.printLabel==='WAC710CS'||
-                      this.configDetail.printLabel==='WAC730N'||
                       this.configDetail.printLabel==='WAC710L'||
                       this.configDetail.printLabel==='WAC550N'||
                       this.configDetail.printLabel==='WAC600N'||
