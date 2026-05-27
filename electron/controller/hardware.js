@@ -927,6 +927,79 @@ class HardwareController extends Controller {
 `;
 
 
+        }else if (
+            configModel === 'CAT200'
+        ) {
+            //28*15 单排
+            let generateLabel = () => `
+            <div class="label-parent">
+                <div class="barcode-container">
+                    <img style="width: 23mm;height: 3.5mm;" src="data:image/jpg;base64,${png.toString('base64')}" >
+                </div>
+          
+                <div class="label">
+                     ${address}
+                </div>
+           </div> 
+        
+    `;
+
+            Log.info('listDoubleRowLabels:', listDoubleRowLabels)
+            // 双排标签
+            let labelsHTML = listDoubleRowLabels
+                ? generateLabel() + generateLabel()
+                : generateLabel();
+            Log.info(labelsHTML)
+            // 返回完整 HTML
+            htmlStr = `
+<html>
+<head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Microsoft YaHei', sans-serif;
+        font-size: ${secondColumnFontSize}mm;
+    }
+     .barcode-container {
+            width: 16mm;
+            height: 4mm;
+            margin-left: 2.5mm;
+                 margin-top: ${marginMM}mm;
+        }
+        .label-parent{
+          width: ${Number(widthMM)+2}mm;
+        }
+    .container {
+        display: flex;
+        padding-left: ${marginLeftMM}mm;
+        width: fit-content;
+        height: ${heightMM}mm;
+      
+    }
+
+    .label {
+        margin-top: 0.5mm;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        box-sizing: border-box;
+        text-align: center;
+        margin-left: 1.5mm;
+    }
+
+     
+</style>
+</head>
+<body>
+    <div class="container">
+        ${labelsHTML}
+    </div>
+</body>
+</html>
+`;
+
+
         }
 
         return htmlStr;

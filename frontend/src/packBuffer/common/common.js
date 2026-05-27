@@ -901,13 +901,32 @@ export function nbPackDataDomains(afn, fn, protocolID, context) {
         default:
         // Log.error("packages: afn[{}] match fail", afn);
       }
+
       //采集器地址6位,NB协议
       if (context.configDetail.printLabel === 'LPC230' || context.configDetail.printLabel === 'LPC230E' || context.configDetail.printLabel === 'AEC100') {
         return mergeArrayBuffer(startBuffer, packInlineSixMacAddr(), arrayBuffer);
       } else {
         return mergeArrayBuffer(startBuffer, packInlineFourMacAddr(), arrayBuffer);
       }
-
+    case 'f2':
+      switch (fn) {
+        case '01':
+          arrayBuffer = createBuffer(4, [0xf2, 0xff, 0x01, 0x00]);
+          break;
+        case '02':
+          //0x00 默认普通自检
+          arrayBuffer = createBuffer(5, [0xf2, 0xff, 0x02, 0x00, 0x00]);
+          break;
+        case '1e':
+          arrayBuffer = createBuffer(4, [0xf2, 0xff, 0x1e, 0x00]);
+          break;
+        case '14':
+          arrayBuffer = createBuffer(4, [0xf2, 0xff, 0x14, 0x00]);
+          break;
+        default:
+        // Log.error("packages: afn[{}] match fail", afn);
+      }
+      return mergeArrayBuffer(startBuffer, packInlineFourMacAddr(), arrayBuffer);
     case 'dd':
       switch (fn) {
         case 'aa':

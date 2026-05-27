@@ -5,6 +5,7 @@ import * as WAC230CF from "@/packBuffer/decode/nb/wac230cf";
 import * as DPC100420mA from "@/packBuffer/decode/nb/dpc100-4-20ma";
 import * as WAC710CD from "@/packBuffer/decode/nb/wac710cd";
 import * as WAC300CD from "@/packBuffer/decode/nb/wac300cd";
+import * as BEACONM from "@/packBuffer/decode/nb/beaconM";
 import * as WAC710C from "@/packBuffer/decode/nb/wac710c";
 import * as VAC710 from "@/packBuffer/decode/nb/vac710";
 import * as WAC400N from "@/packBuffer/decode/nb/wac400n";
@@ -23,6 +24,7 @@ import * as NTR300C from "@/packBuffer/decode/nb/ntr300c";
 import * as LPC210 from "@/packBuffer/decode/nb/lpc210";
 import * as LPC210E from "@/packBuffer/decode/nb/lpc210";
 import * as CAT400 from "@/packBuffer/decode/nb/cat400";
+import * as CAT200 from "@/packBuffer/decode/nb/cat200";
 import * as CAT400S from "@/packBuffer/decode/nb/cat400s";
 import * as CPT100 from "@/packBuffer/decode/nb/cpt100";
 import * as VPT100 from "@/packBuffer/decode/nb/vpt100";
@@ -461,6 +463,94 @@ export const protocolIDMap = {
       },
       readTemperatureProbes: (context, data) => {
         return WAC300CD.readTemperatureProbesConfig(context, data);
+      },
+    },
+  },
+  'BeaconM': {
+    protocolCode: `EN1434_0204`,
+    model: 87,
+    joinMode: 2,
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'writeTemperatureProbesConfig': true,
+      'writePressureProbesConfig': true,
+      'awaken': false,
+      'inquireSelfTest': true,
+      'selfTest': true,
+      'writeAddress': false,
+      'readICCID': false,
+      'readIMEI': false,
+      'readSelfTestStatus': true,
+      'exitSelfTest': true,
+      'readAddress': false,
+      'readData': true,
+      'readTemperatureProbes': true
+    },
+    protocolId: 150,
+    deviceActionResponseMessageLength: {
+      'writeTemperatureProbesConfig': 69,
+      'writePressureProbesConfig': 69,
+      'awaken': 32,
+      'inquireSelfTest': 67,
+      'writeAddress': 37,
+      'readICCID': 52,
+      'readIMEI': 47,
+      'readSelfTestStatus': 114,
+      'exitSelfTest': 67,
+      'readAddress': 37,
+      'selfTest': 99,
+      'readData': 98,
+    },
+    deviceActionResponseMessageLength2: {
+      'writeTemperatureProbesConfig': 34,
+      'writePressureProbesConfig': 34,
+      'awaken': 16,
+      'inquireSelfTest': 34,
+      'writeAddress': 16,
+      'readICCID': 36,
+      'readIMEI': 31,
+      'readSelfTestStatus': 81,
+      'exitSelfTest': 34,
+      'readAddress': 21,
+      'selfTest': 99,
+      'readData': 65,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return BEACONM.inquireSelfTest(data);
+      },
+      writeTemperatureProbesConfig: (data) => {
+        return BEACONM.writeTemperatureProbesConfig(data);
+      },
+      writePressureProbesConfig: (data) => {
+        return BEACONM.writePressureProbesConfig(data);
+      },
+      readSelfTestStatus: (context, data) => {
+        return BEACONM.readSelfTestStatus(context, data);
+      },
+      awaken: (data) => {
+        return BEACONM.awaken(data);
+      },
+      readIMEI: (context, data) => {
+        return BEACONM.readIMEI(context, data);
+      },
+      readICCID: (context, data) => {
+        return BEACONM.readICCID(context, data);
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return BEACONM.writeAddress(leftGenerateAddress, data);
+      },
+      readAddress: (context, data) => {
+        return BEACONM.readAddress(context, data);
+      },
+      readData: (context, data) => {
+        return BEACONM.readData(context, data);
       },
     },
   },
@@ -3949,16 +4039,15 @@ export const protocolIDMap = {
         return null
       },
     },
-  },  //TODO
+  },
   'CAT200': {
-    protocolCode: null,
-    protocolId: null,
-    model: -1,
+    protocolCode: 'EN1434_0126',
+    protocolId: 116,
+    model: 59,
     joinMode: 2,
-    isInfraredDevice: false,
+    isInfraredDevice: true,
     isDeviceActionTransparentTransmissionProtocol: {
       'inquireSelfTest': false,
-      'writeTemperatureProbe': false,
       'selfTest': false,
       'readSelfTestStatus': false,
       'readICCID': false,
@@ -3966,31 +4055,29 @@ export const protocolIDMap = {
       'writeAddress': false,
       'readAddress': false,
       'exitSelfTest': false,
-      'readData': false,
+      'awaken': false
     },
     deviceActionResponseMessageLength: {
       'inquireSelfTest': 16,
-      'writeTemperatureProbe': 16,
       'selfTest': -1,
-      'readSelfTestStatus': 56,
+      'readSelfTestStatus': 54,
       'readICCID': 36,
       'readIMEI': 31,
-      'readAddress': 15,
+      'readAddress': 21,
       'writeAddress': 16,
       'exitSelfTest': 16,
-      'readData': 16,
+      'awaken': 16
     },
     deviceActionResponseMessageLength2: {
-      'inquireSelfTest': 16,
-      'writeTemperatureProbe': 16,
+      'inquireSelfTest': 32,
       'selfTest': -1,
-      'readSelfTestStatus': 56,
-      'readICCID': 36,
-      'readIMEI': 31,
-      'readAddress': 15,
-      'writeAddress': 16,
-      'exitSelfTest': 16,
-      'readData': 16,
+      'readSelfTestStatus': 70,
+      'readICCID': 52,
+      'readIMEI': 47,
+      'readAddress': 37,
+      'writeAddress': 37,
+      'exitSelfTest': 32,
+      'awaken': 32
     },
     portAttribute: {
       parity: '偶校验',
@@ -4000,25 +4087,25 @@ export const protocolIDMap = {
     },
     validateResponse: {
       inquireSelfTest: (data) => {
-        return null
+        return CAT200.inquireSelfTest(data);
       },
       readSelfTestStatus: (context, data) => {
-        return null
+        return CAT200.readSelfTestStatus(context, data);
       },
       readICCID: (context, data) => {
-        return null
+        return CAT200.readICCID(context, data);
       },
       readIMEI: (context, data) => {
-        return null
+        return CAT200.readIMEI(context, data);
       },
       writeAddress: (leftGenerateAddress, data) => {
-        return null
+        return CAT200.writeAddress(leftGenerateAddress, data);
       },
       readAddress: (context, data) => {
-        return null
+        return CAT200.readAddress(context, data);
       },
-      exitSelfTest: (context, data) => {
-        return null
+      awaken(data) {
+        return CAT200.awaken(data);
       },
     },
   },//TODO

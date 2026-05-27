@@ -458,7 +458,8 @@
                   <!-- 双排标签设置 -->
                   <a-form-item label="双排标签设置">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                      <a-select v-model:value="listDoubleRowLabels" style="width: 7vw;margin-left: 18px" @change="onSizeChange3012">
+                      <a-select v-model:value="listDoubleRowLabels" style="width: 7vw;margin-left: 18px"
+                                @change="onSizeChange3012">
                         <a-select-option v-for="item in selectDoubleRowLabels" :key="item" :value="item">
                           {{ item }}
                         </a-select-option>
@@ -1720,6 +1721,8 @@
                       this.configDetail.printLabel === 'WAC230CF'||
                       this.configDetail.printLabel === 'WAC710CD'||
                       this.configDetail.printLabel === 'WAC300CD'||
+                      this.configDetail.printLabel === 'BeaconM'||
+                      this.configDetail.printLabel === 'BeaconM'||
                       this.configDetail.printLabel === 'NTP100C' ||
                       this.configDetail.printLabel==='CT1000' ||
                       this.configDetail.printLabel==='ET01' ||
@@ -1728,6 +1731,7 @@
                       this.configDetail.printLabel==='WAC300NH'||
                       this.configDetail.printLabel==='WAC300NY'||
                       this.configDetail.printLabel==='CAT400'||
+                      this.configDetail.printLabel==='CAT200'||
                       this.configDetail.printLabel==='CAT400S' ||
                       this.configDetail.printLabel==='CTW100'||
                       this.configDetail.printLabel==='WAC100N'||
@@ -1762,6 +1766,7 @@
                       (this.configDetail.printLabel === 'WAC710CD'||
                       this.configDetail.printLabel === 'WAC230CF'||
                       this.configDetail.printLabel === 'WAC300CD'||
+                      this.configDetail.printLabel === 'BeaconM'||
                       this.configDetail.printLabel === 'NTP100C'||
                       this.configDetail.printLabel === 'LPC210'||
                       this.configDetail.printLabel === 'LPC210E'||
@@ -1775,6 +1780,7 @@
                       this.configDetail.printLabel==='WAC300NH'||
                       this.configDetail.printLabel==='WAC300NY'||
                       this.configDetail.printLabel==='CAT400'||
+                      this.configDetail.printLabel==='CAT200'||
                       this.configDetail.printLabel==='CAT400S'||
                       this.configDetail.printLabel==='CTW100'||
                       this.configDetail.printLabel==='WAC300NS'||
@@ -1847,26 +1853,27 @@
 
                 </a-button>
 
-<!--                  <a-button type="primary" block-->
-<!--                            v-show="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'"-->
-<!--                            @click="printLabel2(-->
-<!--                      false,-->
-<!--                        protocolIDMap[this.configForm.produceModel].protocolId,'one'-->
-<!--                        )"-->
-<!--                            :disabled="nbButtonDisabledStatus.labelPrint"-->
-<!--                            class="hlm-nb-not-important-business-start-button-style"-->
-<!--                            :style="{-->
-<!--                           color: nbButtonColor.labelPrint-->
-<!--                        }"-->
-<!--                  >-->
-<!--                    标Q<br/>重D-->
+<!--                                  <a-button type="primary" block-->
+<!--                                            v-show="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'"-->
+<!--                                            @click="printLabel2(-->
+<!--                                      false,-->
+<!--                                        protocolIDMap[this.configForm.produceModel].protocolId,'one'-->
+<!--                                        )"-->
+<!--                                            :disabled="nbButtonDisabledStatus.labelPrint"-->
+<!--                                            class="hlm-nb-not-important-business-start-button-style"-->
+<!--                                            :style="{-->
+<!--                                           color: nbButtonColor.labelPrint-->
+<!--                                        }"-->
+<!--                                  >-->
+<!--                                    标Q<br/>重D-->
 
-<!--                  </a-button>-->
+<!--                                  </a-button>-->
 
                 <a-button type="primary" block
                           v-if="
                       this.configDetail.printLabel === 'WAC710CD'||
                       this.configDetail.printLabel === 'WAC300CD'||
+                      this.configDetail.printLabel === 'BeaconM'||
                       this.configDetail.printLabel === 'NTP100C'||
                       this.configDetail.printLabel === 'WAC730C'||
                       this.configDetail.printLabel === 'LPC230E'||
@@ -1878,6 +1885,7 @@
                       this.configDetail.printLabel==='WAC300NH'||
                       this.configDetail.printLabel==='WAC300NY'||
                       this.configDetail.printLabel==='CAT400'||
+                      this.configDetail.printLabel==='CAT200'||
                       this.configDetail.printLabel==='CAT400S'||
                       this.configDetail.printLabel==='NTR300C'||
                       this.configDetail.printLabel==='PTC100-4-20MA'||
@@ -2654,6 +2662,7 @@ import {addressCover, arrayBuffer2Hex} from "@/packBuffer/common/comUtil";
 import preview40x20 from '@/assets/label/40x20.png'
 import preview50x12 from '@/assets/label/50x12.png'
 import preview30x12 from '@/assets/label/30x12.png'
+import preview28x15 from '@/assets/label/30x12.png'
 import {
   doZeroMpaDemarcate,
   doOnePointSixMpaDemarcate,
@@ -2681,6 +2690,7 @@ export default {
         "40x20": preview40x20,
         "30x12": preview30x12,
         "50x12": preview50x12,
+        "28x15": preview28x15,
       },
       imageDesc: '40x20标签样例',
       leftScanAddressMissionStop: false,
@@ -2768,7 +2778,7 @@ export default {
       levelProbesList: ['有液位探头', '无液位探头'],
       torquesList: ['25Nm', '50Nm'],
       vendorCodeList: ['0000000',],
-      labelPaperSizeList: ['30x12', '40x20', '50x12'],
+      labelPaperSizeList: ['30x12', '40x20', '50x12','28x15'],
       customerList: ['青岛海龙马电子', '泉州七阳'],
       baudRateList: ['2400', '9600'],
       checkDigitList: ['偶校验', '无'],
@@ -2804,7 +2814,7 @@ export default {
         torques: '25Nm',
         currentSource: '无',
         analogError: 0.5,
-        power_error:1.5
+        power_error: 1.5
       },
       workNumberForm: {
         workNumber: undefined,
@@ -2851,7 +2861,7 @@ export default {
         analogError: undefined,//模拟量误差
         selectTemperatureProbes: '无探头', //CTW100 专用
         selectLevelProbes: '无探头', //CTW100 专用
-        power_error:undefined,//功率误差 CPT100-10A 专用
+        power_error: undefined,//功率误差 CPT100-10A 专用
       },
       diffTemperature: 0.2, //温度偏差值±0.2
       leftGenerateAddress: data.leftGenerateAddress,
@@ -3206,6 +3216,7 @@ export default {
         'WAC330NE',
         'WAC330HE',
         'WAC300CD',
+        'BeaconM',
         'WAC400N',
         'WAC400NS',
         'WAC500N',
@@ -3315,10 +3326,10 @@ export default {
       pressureDeviceValue: undefined, //ptc100 读压力
       readCurrentMeterValue: undefined,//温度电流表读取电流
       readCurrentPressureMeterValue: undefined,//压力电流表读取压力
-      deviceSignal:undefined,//设备信号
-      deviceBatteryVoltage:undefined,//设备电池电压
-      deviceReadPower:undefined,///CPT100-10A 读功率
-      voltmeterReadPower:undefined,//电流表读取功率
+      deviceSignal: undefined,//设备信号
+      deviceBatteryVoltage: undefined,//设备电池电压
+      deviceReadPower: undefined,///CPT100-10A 读功率
+      voltmeterReadPower: undefined,//电流表读取功率
     };
   },
   /*移除监听器 */
@@ -3445,7 +3456,7 @@ export default {
       } else {
         this.productModel = '生产测试软件 - 二次验证系列 - '
       }
-      console.log('this.configForm.produceModel:',this.configForm.produceModel)
+      console.log('this.configForm.produceModel:', this.configForm.produceModel)
 
       let printList = await getPrintListByProductName(this.configForm.produceModel)
 
@@ -3461,15 +3472,15 @@ export default {
           this.configForm.customizePrintLabel = this.customizePrintLabelList[0]
         }
       }
-      console.log('this.configForm.produceModel:',this.configForm.produceModel)
+      console.log('this.configForm.produceModel:', this.configForm.produceModel)
       //根据不同型号展示的页面不同
-      if (  this.configForm.produceModel!=='VAC005C'&&
+      if (this.configForm.produceModel !== 'VAC005C' &&
         (this.configForm.produceModel.includes('VAC10') ||
-        this.configForm.produceModel.includes('VAC20') ||
-        this.configForm.produceModel.includes('VAC30') ||
-        this.configForm.produceModel.includes('VAC40') ||
-        this.configForm.produceModel.includes('VAC00') ||
-        this.configForm.produceModel.includes('VAC13'))
+          this.configForm.produceModel.includes('VAC20') ||
+          this.configForm.produceModel.includes('VAC30') ||
+          this.configForm.produceModel.includes('VAC40') ||
+          this.configForm.produceModel.includes('VAC00') ||
+          this.configForm.produceModel.includes('VAC13'))
 
       ) {
         this.isNBDevice = false;
@@ -3491,6 +3502,7 @@ export default {
       } else if (this.configForm.produceModel === 'WAC710CD' ||
         this.configForm.produceModel === 'WAC230CF' ||
         this.configForm.produceModel === 'WAC300CD' ||
+        this.configForm.produceModel === 'BeaconM' ||
         this.configForm.produceModel === 'WAC730C' ||
         this.configForm.produceModel === 'WAC330HE' ||
         this.configForm.produceModel === 'NTP100C' ||
@@ -3505,6 +3517,7 @@ export default {
         this.configForm.produceModel === 'WAC300NH' ||
         this.configForm.produceModel === 'WAC300NY' ||
         this.configForm.produceModel === 'CAT400' ||
+        this.configForm.produceModel === 'CAT200' ||
         this.configForm.produceModel === 'CAT400S' ||
         this.configForm.produceModel === 'CPT100' ||
         this.configForm.produceModel === 'VPT100' ||
@@ -3556,11 +3569,11 @@ export default {
         this.configForm.produceModel === 'VAT100' ||
         this.configForm.produceModel === 'NTP100' ||
         this.configForm.produceModel === 'CPT100-10A' ||
-        this.configForm.produceModel === 'NBT400'||
-        this.configForm.produceModel==='WAC710C'||
-        this.configForm.produceModel==='VAC005C'
+        this.configForm.produceModel === 'NBT400' ||
+        this.configForm.produceModel === 'WAC710C' ||
+        this.configForm.produceModel === 'VAC005C'
       ) {
-        console.log('this.configDetail.printLabel',this.configDetail.printLabel)
+        console.log('this.configDetail.printLabel', this.configDetail.printLabel)
         this.isNBDevice = true
         this.leftProduceViewTitle = '测试验证'
         this.rightProduceViewTitle = '不良记录'
@@ -3675,7 +3688,7 @@ export default {
           productModel === 'RFT200-CAT1' || productModel === 'WAC300-LG' || productModel === 'VAC710-JL' ||
           productModel === 'NBT100-AC' || productModel === 'NBT400-AC')) {
         const ninthLevel = productNamingConventionsList[9];
-        console.log('ninthLevel',ninthLevel)
+        console.log('ninthLevel', ninthLevel)
         if (ninthLevel === 'P1') {
           // TODO P1单压力暂时不解析
         } else if (ninthLevel === 'P2') {
@@ -3961,40 +3974,56 @@ export default {
         this.labelMargin = 8
         this.lableMarginLeft = 31
         this.secondColumnFontSize = 4
-        if(this.listDoubleRowLabels==='是'){
+        if (this.listDoubleRowLabels === '是') {
           this.imageDesc = '30mm x 12mm 标签纸预览图'
           this.labelHeight = 11
           this.labelWidth = 30
           this.labelMargin = 8
-          this.lableMarginLeft=31
+          this.lableMarginLeft = 31
           this.secondColumnFontSize = 4
         }
-      }  else if (this.selectLabelPaperSize === '50x12') {
+      } else if (this.selectLabelPaperSize === '50x12') {
         this.imageDesc = '50mm x 12mm 标签纸预览图'
         this.labelHeight = 11
         this.labelWidth = 50
         this.labelMargin = 8
         this.lableMarginLeft = 7
-        this.secondColumnFontSize=3.3
+        this.secondColumnFontSize = 3.3
+      }else if  (this.selectLabelPaperSize === '28x15') {
+        this.imageDesc = '28mm x 15mm 标签纸预览图'
+        this.labelHeight = 11
+        this.listDoubleRowLabels='否'
+        this.labelWidth = 28
+        this.labelMargin = 8
+        this.lableMarginLeft = 12
+        this.secondColumnFontSize = 5
       }
     },
     onSizeChange3012() {
       this.updatePreview()
-     if (this.selectLabelPaperSize === '30x12'&&this.listDoubleRowLabels==='是') {
+      if (this.selectLabelPaperSize === '30x12' && this.listDoubleRowLabels === '是') {
         this.imageDesc = '30mm x 12mm 标签纸预览图'
         this.labelHeight = 11
         this.labelWidth = 30
         this.labelMargin = 8
-        this.lableMarginLeft=31
+        this.lableMarginLeft = 31
       }
-     if(this.selectLabelPaperSize === '50x12'&&this.listDoubleRowLabels==='否'){
-       this.imageDesc = '50mm x 12mm 标签纸预览图'
-       this.labelHeight = 11
-       this.labelWidth = 50
-       this.labelMargin = 8
-       this.lableMarginLeft = 33
-       this.secondColumnFontSize=3.3
-     }
+      if (this.selectLabelPaperSize === '50x12' && this.listDoubleRowLabels === '否') {
+        this.imageDesc = '50mm x 12mm 标签纸预览图'
+        this.labelHeight = 11
+        this.labelWidth = 50
+        this.labelMargin = 8
+        this.lableMarginLeft = 33
+        this.secondColumnFontSize = 3.3
+      }
+      if (this.selectLabelPaperSize === '28x15' && this.listDoubleRowLabels === '否') {
+        this.imageDesc = '28mm x 15mm 标签纸预览图'
+        this.labelHeight = 11
+        this.labelWidth = 28
+        this.labelMargin = 8
+        this.lableMarginLeft = 12
+        this.secondColumnFontSize = 5
+      }
     }
     ,
     updatePreview() {
@@ -5283,18 +5312,19 @@ export default {
         // }
         //根据不同型号展示的页面不同
         if ((this.configForm.produceModel.includes('VAC10') ||
-          this.configForm.produceModel.includes('VAC20') ||
-          this.configForm.produceModel.includes('VAC30') ||
-          this.configForm.produceModel.includes('VAC40') ||
-          this.configForm.produceModel.includes('VAC00') ||
-          this.configForm.produceModel.includes('VAC13'))&&
-          this.configForm.produceModel!=='VAC005C'
+            this.configForm.produceModel.includes('VAC20') ||
+            this.configForm.produceModel.includes('VAC30') ||
+            this.configForm.produceModel.includes('VAC40') ||
+            this.configForm.produceModel.includes('VAC00') ||
+            this.configForm.produceModel.includes('VAC13')) &&
+          this.configForm.produceModel !== 'VAC005C'
         ) {
           this.leftProduceViewTitle = '左侧工装'
           this.rightProduceViewTitle = '右侧工装'
         } else if (this.configForm.produceModel === 'WAC710CD' ||
           this.configForm.produceModel === 'WAC230CF' ||
           this.configForm.produceModel === 'WAC300CD' ||
+          this.configForm.produceModel === 'BeaconM' ||
           this.configForm.produceModel === 'WAC730C' ||
           this.configForm.produceModel === 'WAC330HE' ||
           this.configForm.produceModel === 'NTP100C' ||
@@ -5309,6 +5339,7 @@ export default {
           this.configForm.produceModel === 'WAC300NH' ||
           this.configForm.produceModel === 'WAC300NY' ||
           this.configForm.produceModel === 'CAT400' ||
+          this.configForm.produceModel === 'CAT200' ||
           this.configForm.produceModel === 'CAT400S' ||
           this.configForm.produceModel === 'CPT100' ||
           this.configForm.produceModel === 'VPT100' ||
@@ -5353,9 +5384,9 @@ export default {
           this.configForm.produceModel === 'VAT100' ||
           this.configForm.produceModel === 'NTP100' ||
           this.configForm.produceModel === 'CPT100-10A' ||
-          this.configForm.produceModel === 'NBT400'||
-          this.configForm.produceModel==='WAC710C'||
-          this.configForm.produceModel==='VAC005C'
+          this.configForm.produceModel === 'NBT400' ||
+          this.configForm.produceModel === 'WAC710C' ||
+          this.configForm.produceModel === 'VAC005C'
         ) {
           this.leftProduceViewTitle = '测试验证'
           this.rightProduceViewTitle = '不良记录'
@@ -5396,8 +5427,8 @@ export default {
           this.configDetail.analogError = this.configForm.analogError
         }
 
-        if (this.configForm.produceModel==='CPT100-10A'||this.configForm.produceModel==='CPT100'){
-          this.configDetail.power_error=this.configForm.power_error
+        if (this.configForm.produceModel === 'CPT100-10A' || this.configForm.produceModel === 'CPT100') {
+          this.configDetail.power_error = this.configForm.power_error
         }
         this.configDetail.temperatureDiff = this.configForm.temperatureDiff
         this.configDetail.cs_device_err = this.configForm.cs_device_err
@@ -5408,6 +5439,7 @@ export default {
         if (this.configForm.produceModel === 'WAC710CD' ||
           this.configForm.produceModel === 'WAC230CF' ||
           this.configForm.produceModel === 'WAC300CD' ||
+          this.configForm.produceModel === 'BeaconM' ||
           this.configForm.produceModel === 'WAC730C' ||
           this.configForm.produceModel === 'WAC330HE' ||
           this.configForm.produceModel === 'NTP100C' ||
@@ -5423,6 +5455,7 @@ export default {
           this.configForm.produceModel === 'WAC300NH' ||
           this.configForm.produceModel === 'WAC300NY' ||
           this.configForm.produceModel === 'CAT400' ||
+          this.configForm.produceModel === 'CAT200' ||
           this.configForm.produceModel === 'CAT400S' ||
           this.configForm.produceModel === 'CPT100' ||
           this.configForm.produceModel === 'VPT100' ||
@@ -5467,13 +5500,13 @@ export default {
           this.configForm.produceModel === 'VPT100' ||
           this.configForm.produceModel === 'NTP100' ||
           this.configForm.produceModel === 'CPT100-10A' ||
-          this.configForm.produceModel === 'NBT400'||
-          this.configForm.produceModel==='WAC710C'||
-          this.configForm.produceModel==='VAC005C'
+          this.configForm.produceModel === 'NBT400' ||
+          this.configForm.produceModel === 'WAC710C' ||
+          this.configForm.produceModel === 'VAC005C'
 
         ) {
-          console.log('this.configForm.produceModel:',this.configForm.produceModel)
-          console.log('this.configForm.version:',this.configForm.version)
+          console.log('this.configForm.produceModel:', this.configForm.produceModel)
+          console.log('this.configForm.version:', this.configForm.version)
           this.isNBDevice = true
           if (this.configForm.version === undefined) {
             this.$message.error('请配置版本号');
@@ -5487,8 +5520,8 @@ export default {
             this.configForm.produceModel.includes('VAC10') ||
             this.configForm.produceModel.includes('VAC30') ||
             this.configForm.produceModel.includes('VAC40') ||
-            this.configForm.produceModel.includes('VAC13'))&&
-            this.configForm.produceModel!=='VAC005C'
+            this.configForm.produceModel.includes('VAC13')) &&
+          this.configForm.produceModel !== 'VAC005C'
 
         ) {
           this.listenLeftFixture(); //开启监听器 监听左侧工装
@@ -5745,8 +5778,8 @@ export default {
       }
       let parity = protocolIDMap[this.configForm.produceModel].portAttribute.parity
       let dataBits = protocolIDMap[this.configForm.produceModel].portAttribute.dataBits
-      let baudRate = protocolIDMap[this.configForm.produceModel].portAttribute.baudRate
-      let stopBits = protocolIDMap[this.configForm.produceModel].portAttribute.stopBits
+      let baudRate = this.portAttributes.selectedBadRate
+      let stopBits = this.portAttributes.selectedCheckDigit
 
       console.log('串口属性：', portName, parity, dataBits, baudRate, stopBits)
       if (!this.isNBDevice) {

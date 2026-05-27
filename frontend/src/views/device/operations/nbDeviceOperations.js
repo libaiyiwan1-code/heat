@@ -43,6 +43,7 @@ import * as NTR300C from './nb/otherdevice/ntr300c'
 import * as VPT100 from './nb/otherdevice/vpt100'
 import * as CPT100 from './nb/otherdevice/cpt100'
 import * as CAT400S from './nb/otherdevice/cat400s'
+import * as CAT200 from './nb/otherdevice/cat200'
 import * as CAT400 from './nb/otherdevice/cat400'
 import * as LPC210 from './nb/otherdevice/lpc210'
 import * as LPC210E from './nb/otherdevice/lpc210'
@@ -56,6 +57,7 @@ import * as LPC230E from './nb/collector/lpc230'
 import * as NBT400 from './nb/point/NBT400'
 import * as WAC300C from './nb/wacdevice/WAC300C'
 import * as NTR300 from './nb/point/ntr300'
+import * as BEACONM from './nb/wacdevice/beaconm'
 import {selfTest} from "./nb/wacdevice/wac330n";
 
 const Log = require('ee-core/log');
@@ -84,6 +86,7 @@ export const doSelfTest = async (context, protocolId, type) => {
     'LPC210E': LPC210E.selfTest,
     'WAC730C': WAC730C.selfTest,
     'CAT400': CAT400.selfTest,
+    'CAT200': CAT200.selfTest,
     'CAT400S': CAT400S.selfTest,
     'CPT100': CPT100.selfTest,
     'AEC100': AEC100.selfTest,
@@ -112,6 +115,7 @@ export const doSelfTest = async (context, protocolId, type) => {
     'VAC710': VAC710.selfTest,
     'WAC710N': WAC710N.selfTest,
     'WAC730N': WAC730N.selfTest,
+    'BeaconM': BEACONM.selfTest,
   };
   const produceModel = context.configForm.produceModel;
   const selfTestFunction = selfTestStrategies[produceModel];
@@ -159,6 +163,7 @@ export async function doWriteAddress(context, protocolId, type) {
     'LPC210E': LPC210E.writeAddress,
     'WAC730C': WAC730C.writeAddress,
     'CAT400': CAT400.writeAddress,
+    'CAT200': CAT200.writeAddress,
     'CAT400S': CAT400S.writeAddress,
     'CPT100': CPT100.writeAddress,
     'CPT100-10A': CPT100.writeAddress,
@@ -185,6 +190,7 @@ export async function doWriteAddress(context, protocolId, type) {
     'VAC710': VAC710.writeAddress,
     'WAC710N': WAC710N.writeAddress,
     'WAC730N': WAC730N.writeAddress,
+    'BeaconM': BEACONM.writeAddress,
 
 
 
@@ -332,6 +338,7 @@ export const doExitSelfTest = async (context, protocolId, type) => {
     'WAC330HE': WAC330HE.exitSelfTest,
     'WAC730C': WAC730C.exitSelfTest,
     'CAT400': CAT400.exitSelfTest,
+    'CAT200': CAT200.exitSelfTest,
     'CAT400S': CAT400S.exitSelfTest,
     'AEC100': AEC100.exitSelfTest,
     'NTR300C': NTR300C.exitSelfTest,
@@ -626,7 +633,9 @@ const checkAddress = async (context, protocolId, type) => {
     context.configDetail.printLabel === 'CT1000' || context.configDetail.printLabel === 'ET01' ||
     context.configDetail.printLabel === 'WAC330HE' || context.configDetail.printLabel === 'WAC730C' ||
     context.configDetail.printLabel === 'LPC230' || context.configDetail.printLabel === 'LPC230E' ||
-    context.configDetail.printLabel === 'AEC100' || context.configDetail.printLabel === 'CAT400' ||
+    context.configDetail.printLabel === 'AEC100' ||
+    context.configDetail.printLabel === 'CAT400' ||
+    context.configDetail.printLabel === 'CAT200' ||
     context.configDetail.printLabel === 'CAT400S' || context.configDetail.printLabel === 'CTW100' ||
     context.configDetail.printLabel === 'WAC100N' || context.configDetail.printLabel === 'WAC100NY' ||
     context.configDetail.printLabel === 'WAC300C' || context.configDetail.printLabel === 'NTR300' ||
@@ -764,7 +773,8 @@ const checkNetWork = async (context, protocolId, type) => {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_valve')
   } else if (
     context.configDetail.printLabel === 'NTP100C' || context.configDetail.printLabel === 'CT1000' || context.configDetail.printLabel === 'ET01' ||
-    context.configDetail.printLabel === 'CAT400' || context.configDetail.printLabel === 'CAT400S' || context.configDetail.printLabel === 'CTW100'
+    context.configDetail.printLabel === 'CAT400' || context.configDetail.printLabel === 'CAT400S' || context.configDetail.printLabel === 'CTW100'||
+    context.configDetail.printLabel === 'CAT200'
   ) {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_measure_point')
   } else if (context.configDetail.printLabel === 'WAC330HE' || context.configDetail.printLabel === 'WAC730C') {
@@ -1085,7 +1095,7 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
   if (context.configForm.produceModel === 'NTP100C' || context.configForm.produceModel === 'WAC710CD' || context.configForm.produceModel === 'WAC300CD'
     || context.configForm.produceModel === 'CT1000' || context.configForm.produceModel === 'WAC230CF' || context.configForm.produceModel === 'WAC300N'
     || context.configForm.produceModel === 'WAC300NH' || context.configForm.produceModel === 'WAC300NY' || context.configForm.produceModel === 'ET01'
-    || context.configForm.produceModel === 'WAC730C'
+    || context.configForm.produceModel === 'WAC730C'||  context.configForm.produceModel === 'CAT200'
     || context.configForm.produceModel === 'CAT400' || context.configForm.produceModel === 'CAT400S' || context.configForm.produceModel === 'CPT100'
     || context.configForm.produceModel === 'VPT100' || context.configForm.produceModel === 'CTW100' || context.configForm.produceModel === 'WAC300LH'
     || context.configForm.produceModel === 'LPC230' || context.configForm.produceModel === 'LPC230E' || context.configForm.produceModel === 'AEC100'
@@ -1175,20 +1185,21 @@ export const doPrintLabelTODO = async (context, flag, protocolId, type) => {
   const params = {
     deviceName: context.defaultDeviceName,
     address: printAddress,
-    model: 'WAC300NS',
-    configModel: 'WAC300NS',
+    model: 'CAT200',
+    configModel: 'CAT200',
     listDoubleRowLabels: context.listDoubleRowLabels,
     width: context.configDetail.labelWith,
     margin: context.configDetail.labelMargin,
     marginLeft: context.configDetail.lableMarginLeft,
     secondColumnFontSize: context.configDetail.secondColumnFontSize,
     height: context.configDetail.labelHeight,
-    isDouble: context.configDetail.whetherDoubleRowPrinting === '是',
+    isDouble: context.configDetail.whetherDoubleRowPrinting === '否',
   };
   if (context.configForm.produceModel === 'NTP100C' || context.configForm.produceModel === 'WAC710CD' || context.configForm.produceModel === 'WAC300CD'
     || context.configForm.produceModel === 'CT1000' || context.configForm.produceModel === 'WAC230CF' || context.configForm.produceModel === 'WAC300N'
     || context.configForm.produceModel === 'WAC300NH' || context.configForm.produceModel === 'WAC300NY' || context.configForm.produceModel === 'ET01' || context.configForm.produceModel === 'WAC730C'
-    || context.configForm.produceModel === 'CAT400' || context.configForm.produceModel === 'CAT400S' || context.configForm.produceModel === 'CPT100'
+    || context.configForm.produceModel === 'CAT400' || context.configForm.produceModel === 'CAT200'||
+    context.configForm.produceModel === 'CAT400S' || context.configForm.produceModel === 'CPT100'
     || context.configForm.produceModel === 'VPT100' || context.configForm.produceModel === 'CTW100' || context.configForm.produceModel === 'WAC300LH'
     || context.configForm.produceModel === 'LPC230' || context.configForm.produceModel === 'LPC230E' || context.configForm.produceModel === 'AEC100'
     || context.configForm.produceModel === 'WAC710C' || context.configForm.produceModel === 'WAC300NS' || context.configForm.produceModel === 'WAC400NS'
