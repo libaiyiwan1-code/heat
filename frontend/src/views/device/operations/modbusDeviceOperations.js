@@ -21,6 +21,7 @@ import {doDeviceInspectionPTC100RS485} from "@/views/device/operations/modbus/pt
 const Log = require('ee-core/log');
 
 import * as CPT100 from './nb/otherdevice/cpt100'
+import * as BDC100 from './nb/otherdevice/bdc100'
 
 export const doZeroMpaDemarcate = async (context, type) => {
   context.messageClean();
@@ -133,6 +134,7 @@ export const doPowerInspection = async (context,protocolId, type) => {
   const executeFunctionList = {
     'CPT100': CPT100.verify,
     'CPT100-10A': CPT100.verify,
+    'BDC100': BDC100.verify,
   };
   const produceModel = context.configForm.produceModel;
   const executeFunction = executeFunctionList[produceModel];

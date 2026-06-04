@@ -79,12 +79,11 @@ export const doOpenPort = (context, portName, parity, dataBits, baudRate, stopBi
     return
   }
   if (type === 'one') {
-    if (context.configForm.produceModel === 'WAC710CD') {
-      parity = context.portAttributes.selectedCheckDigit
-      baudRate = context.portAttributes.selectedBadRate
-      console.log(parity)
-      console.log(baudRate)
-    }
+    parity = context.portAttributes.selectedCheckDigit
+    baudRate = context.portAttributes.selectedBadRate
+    console.log('校验位',parity)
+    console.log('波特率',baudRate)
+    Log.info('校验位:'+parity+'校验位:'+baudRate)
     return new Promise((resolve, reject) => {
       doCreatePort(context.portAttributes.serialPortOne, portName, parity, dataBits, baudRate, stopBits, context, type);
       context.portAttributes.portClosedOneStatus = false

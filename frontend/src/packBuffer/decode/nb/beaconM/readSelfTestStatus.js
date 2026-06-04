@@ -2,17 +2,22 @@ import {getDataView, hex2arrayBuffer, hexToAscii, isStatusNotPass, report} from 
 import {protocolIDMap} from "@/views/device/enum/enum";
 
 const SELF_TEST_CHECKS = [
-  {offset: 54, msg: '未自检过'},
-  {offset: 58, msg: 'EEP 不正常'},
-  {offset: 59, msg: '联网 不正常'},
-  {offset: 60, msg: '阀门最小开度标定 不正常'},
-  {offset: 61, msg: '阀门最大开度标定 不正常'},
-  {offset: 62, msg: '回温标定 不正常'},
-  {offset: 63, msg: '进温标定 不正常'},
-  {offset: 64, msg: '电压 不正常'},
-  {offset: 65, msg: '气压传感器 不正常'},
-  {offset: 66, msg: '进水压力 不正常'},
-  {offset: 67, msg: '回水压力 不正常'},
+  {offset: 87, msg: '未自检过'},
+  {offset: 91, msg: 'EEP 不正常'},
+  {offset: 92, msg: '联网 不正常'},
+  {offset: 93, msg: '阀门最小开度标定 不正常'},
+  {offset: 94, msg: '阀门最大开度标定 不正常'},
+  {offset: 95, msg: '回温标定 不正常'},
+  {offset: 96, msg: '进温标定 不正常'},
+  {offset: 97, msg: '电压 不正常'},
+  {offset: 98, msg: '气压传感器 不正常'},
+  {offset: 99, msg: '进水压力 不正常'},
+  {offset: 100, msg: '回水压力 不正常'},
+  {offset: 101, msg: '磁性传感器 不正常'},
+  {offset: 102, msg: '回温探头 不匹配'},
+  {offset: 103, msg: '进温探头 不匹配'},
+  {offset: 104, msg: '回水压力探头 不匹配'},
+  {offset: 105, msg: '进水压力探头 不匹配'},
 ]
 
 export function readSelfTestStatus(context, responseMessage) {
@@ -22,15 +27,11 @@ export function readSelfTestStatus(context, responseMessage) {
 
   const baseCheck =
     dv.getUint8(0) !== 0x68 ||
-    dv.getUint8(3) !== 0x68 ||
-    dv.getUint8(4) !== 0x80 ||
-    dv.getUint8(5) !== 0x96 ||
-    dv.getUint8(10) !== 0x0C ||
-    dv.getUint8(12) !== 0x01 ||
-    dv.getUint8(16) !== 0x68 ||
-    dv.getUint8(17) !== 0x96 ||
-    dv.getUint8(27) !== 0xF0 ||
-    dv.getUint8(28) !== 0xDD
+    dv.getUint8(49) !== 0x68 ||
+    dv.getUint8(50) !== 0x96 ||
+    dv.getUint8(60) !== 0xf0 ||
+    dv.getUint8(61) !== 0xde ||
+
 
   SELF_TEST_CHECKS.forEach(({offset, msg}) => {
     if (isStatusNotPass(dv, offset)) {
@@ -57,13 +58,7 @@ export function readSelfTestStatus(context, responseMessage) {
   context.protocolId = getDeviceProtocolId(raw)
   context.version = decodeGetVersion(raw)
   context.netprovider = decodeGetNetProvider(raw)
-  if (context.netprovider === 1) {//电信
-    protocolIDMap[context.configForm.produceModel].model = 42
-    protocolIDMap[context.configForm.produceModel].joinMode = 8 //NB_IOT_CTWING
-  } else if (context.netprovider === 2) {//移动
-    protocolIDMap[context.configForm.produceModel].model = 46
-    protocolIDMap[context.configForm.produceModel].joinMode = 2
-  }
+
   return false
 }
 
@@ -72,7 +67,7 @@ export function decodeGetProductName(responseMessage) {
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
   // 判断型号
-  for (let i = 30; i <= 53; i++) {
+  for (let i = 63; i <= 86; i++) {
     model += dataView.getUint8(i).toString(16);
   }
   const productName = hexToAscii(model);
@@ -83,15 +78,15 @@ export function decodeGetProductName(responseMessage) {
 
 export function getDeviceProtocolId(responseMessage) {
   const dv = getDataView(responseMessage)
-  return parseInt(dv.getUint8(55).toString(16), 16)
+  return parseInt(dv.getUint8(88).toString(16), 16)
 }
 
 export function decodeGetNetProvider(responseMessage) {
   const dv = getDataView(responseMessage)
-  return parseInt(dv.getUint8(56).toString(16), 16)
+  return parseInt(dv.getUint8(89).toString(16), 16)
 }
 
 export function decodeGetVersion(responseMessage) {
   const dv = getDataView(responseMessage)
-  return parseInt(dv.getUint8(57).toString(16), 16)
+  return parseInt(dv.getUint8(90).toString(16), 16)
 }

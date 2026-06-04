@@ -489,7 +489,7 @@ export const protocolIDMap = {
     protocolId: 150,
     deviceActionResponseMessageLength: {
       'writeTemperatureProbesConfig': 69,
-      'writePressureProbesConfig': 69,
+      'writePressureProbesConfig': 68,
       'awaken': 32,
       'inquireSelfTest': 67,
       'writeAddress': 37,
@@ -499,7 +499,7 @@ export const protocolIDMap = {
       'exitSelfTest': 67,
       'readAddress': 37,
       'selfTest': 99,
-      'readData': 98,
+      'readData': 132,
     },
     deviceActionResponseMessageLength2: {
       'writeTemperatureProbesConfig': 34,
@@ -513,7 +513,7 @@ export const protocolIDMap = {
       'exitSelfTest': 34,
       'readAddress': 21,
       'selfTest': 99,
-      'readData': 65,
+      'readData': 99,
     },
     portAttribute: {
       parity: '偶校验',
@@ -1778,6 +1778,72 @@ export const protocolIDMap = {
       },
       readIMEI: (context, data) => {
         return CPT100.readIMEI(context, data);
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return CPT100.writeAddress(leftGenerateAddress, data);
+      },
+      readAddress: (context, data) => {
+        return CPT100.readAddress(context, data);
+      },
+      readDeviceData: (context, data) => {
+        return CPT100.readDeviceData(context, data);
+      },
+      readAmmeterPower: (context, data) => {
+        return CPT100.readAmmeterPower(context, data);
+      },
+      calibration: (data) => {
+        return CPT100.calibration(data);
+      },
+    },
+  },
+  'BDC100': {
+    protocolCode: null,
+    protocolId: 132,
+    model: null,
+    joinMode: null,
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': false,
+      'selfTest': false,
+      'readSelfTestStatus': false,
+      'writeAddress': false,
+      'readAddress': false,
+      'readDeviceData': false,
+      'readAmmeterPower': false,
+      'calibration': false,
+    },
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 16,
+      'selfTest': -1,
+      'readSelfTestStatus': 59,
+      'readAddress': 21,
+      'writeAddress': 16,
+      'readDeviceData': 28,
+      'readAmmeterPower': 9,
+      'calibration': 16,
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 32,
+      'selfTest': -1,
+      'readSelfTestStatus': 75,
+      'readAddress': 37,
+      'writeAddress': 43,
+      'readDeviceData': 44,
+      'readAmmeterPower': 9,
+      'calibration': 33,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return CPT100.inquireSelfTest(data);
+      },
+      readSelfTestStatus: (context, data) => {
+        return CPT100.readSelfTestStatus(context, data);
       },
       writeAddress: (leftGenerateAddress, data) => {
         return CPT100.writeAddress(leftGenerateAddress, data);

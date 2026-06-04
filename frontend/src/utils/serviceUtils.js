@@ -476,15 +476,28 @@ export async function generateAddressByVACProduce(context) {
 }
 
 
-export async function nbDeviceRegister(context,type,notPass) {
-
-  let registerResponse = await axios.post(`http://hems.chaobiao.qdhlm.cn:20206/produce/imei/${context.leftGenerateAddress}?joinMode=${protocolIDMap[context.configForm.produceModel].joinMode}&model=${protocolIDMap[context.configForm.produceModel].model}&imei=${context.imei}&protocolCode=${protocolIDMap[context.configForm.produceModel].protocolCode}&simNumber=${context.iccid}&applicationId=2&productId=3`, null, {
-    // let registerResponse = await axios.post(`http://124.70.68.52:20206/produce/imei/${context.leftGenerateAddress}?joinMode=2&model=${protocolIDMap[context.configForm.produceModel].model}&imei=${context.imei}&protocolCode=${protocolIDMap[context.configForm.produceModel].protocolCode}&simNumber=${context.iccid}`, null, {
-    headers: {
-      Authorization: '3a80979e67318eea69f03e65fe9a8e49' //正式
-      // Authorization: '18fce9806e6a99feebf5a7d034eebbd3' //dev
-    }
-  });
+export async function nbDeviceRegister(context, type, notPass) {
+  let registerResponse
+  try {
+    //http://124.70.68.52:20206
+    registerResponse = await axios.post(`http://hems.chaobiao.qdhlm.cn:20206/produce/imei/${context.leftGenerateAddress}?joinMode=${protocolIDMap[context.configForm.produceModel].joinMode}&model=${protocolIDMap[context.configForm.produceModel].model}&imei=${context.imei}&protocolCode=${protocolIDMap[context.configForm.produceModel].protocolCode}&simNumber=${context.iccid}&applicationId=2&productId=3`,
+      null, {
+        // let registerResponse = await axios.post(`http://124.70.68.52:20206/produce/imei/${context.leftGenerateAddress}?joinMode=2&model=${protocolIDMap[context.configForm.produceModel].model}&imei=${context.imei}&protocolCode=${protocolIDMap[context.configForm.produceModel].protocolCode}&simNumber=${context.iccid}`, null, {
+        headers: {
+          Authorization: '3a80979e67318eea69f03e65fe9a8e49' //正式
+          // Authorization: '18fce9806e6a99feebf5a7d034eebbd3' //dev
+        },
+        timeout: 8000
+      });
+  } catch (e) {
+    let errorMsg = '平台接口请求超时:'+e.message;
+    // 执行失败日志及流程控制
+    context.createLeftSpanMessage(errorMsg, 'red');
+    context.leftWorkPrompt = `地址写入失败(${errorMsg})`;
+    Log.error(`${errorMsg}: ${e.message}`);
+    console.error(errorMsg, e);
+    return true;
+  }
   if (registerResponse.data.s === 0 && registerResponse.status === 200) {
     context.createLeftSpanMessage('hems平台注册成功', 'grey');
     //生产入库
@@ -514,30 +527,23 @@ export async function nbDeviceRegister(context,type,notPass) {
     if (insertResult) {
       context.createLeftSpanMessage('生产入库成功', 'grey');
       await context.uploadMes(context.leftGenerateAddress, 1, '成功')
-      await context.printLabel(context,false,protocolIDMap[context.configForm.produceModel].protocolId,type)
+      await context.printLabel(context, true, protocolIDMap[context.configForm.produceModel].protocolId, type)
+      return false;
     } else {
-      context.leftBadProductQuantity += 1;
+      await context.uploadMes(context.leftGenerateAddress, 0, '生产入库失败')
       context.createLeftSpanMessage('生产入库失败', 'red');
-      context.leftWorkPrompt = '地址写入失败(生产入库失败)';
-      context.buttonError('writeAddress')
-      await playErrorAudio(context)
-      Log.error('生产入库失败');
-      console.error('生产入库失败')
+      return true;
     }
   } else {
-    context.leftBadProductQuantity += 1;
     context.createLeftSpanMessage('平台注册失败', 'red');
+    await context.uploadMes(context.leftGenerateAddress, 0, '平台注册失败')
     context.leftWorkPrompt = '地址写入失败(平台注册失败)';
-    context.buttonError('writeAddress')
-    await playErrorAudio(context)
-    Log.error('平台注册失败');
-    console.error('平台注册失败')
+    return true;
   }
-
 
 }
 
-export async function productionLORALibraryRegistration(context) {
+export async function productionLORALibraryRegistration(context,type) {
   //生产入库
   const productionData = {
     userid: context.routerParam.userId, // 生产账号id
@@ -563,20 +569,14 @@ export async function productionLORALibraryRegistration(context) {
   if (insertResult) {
     context.createLeftSpanMessage('生产入库成功', 'grey');
     await context.uploadMes(context.leftGenerateAddress, 1, '成功')
-    await context.printLabel(true)
+    await context.printLabel(context, true, protocolIDMap[context.configForm.produceModel].protocolId, type)
   } else {
-    context.leftBadProductQuantity += 1;
     context.createLeftSpanMessage('生产入库失败', 'red');
-    context.leftWorkPrompt = '地址写入-失败(生产入库失败)';
-    context.buttonError('writeAddress')
-    await playErrorAudio(context)
-    Log.error('生产入库失败');
-    console.error('生产入库失败')
+    await context.uploadMes(context.leftGenerateAddress, 0, '生产入库失败')
   }
 }
 
-export async function vacProduceDeviceRegister(context) {
-  // 默认没有运营商 //TODO
+export async function vacProduceDeviceRegister(context,type) {
   //生产入库
   const productionData = {
     TempProbeAddr: context.configDetail.temperatureProbe,
@@ -595,21 +595,17 @@ export async function vacProduceDeviceRegister(context) {
 
   let insertResult = await insertNBValueProduce(productionData);
   if (insertResult) {
+    await context.uploadMes(context.leftGenerateAddress, 1, '成功')
     context.createSpanMessage('生产入库成功', 'green')
+    await context.printLabel(context, true, protocolIDMap[context.configForm.produceModel].protocolId, type)
   } else {
+    await context.uploadMes(context.leftGenerateAddress, 0, '生产库注册(失败)')
     context.createSpanMessage('生产入库失败', 'red')
-    context.updateOperationMessage('写地址失败(生产入库失败)', 'red');
-    Log.error('生产入库失败');
-    console.error('生产入库失败')
   }
-  //最后执行标签打印
-  context.printLabel(true)
-  context.updateOperationMessage('写地址成功', 'green');
-  Log.info('写地址成功');
-  console.log('写地址成功')
+
 }
 
-export async function productionNBLibraryRegistration(context) {
+export async function productionNBLibraryRegistration(context,type) {
   //生产入库
   const productionData = {
     userid: context.routerParam.userId, // 生产账号id
@@ -637,20 +633,16 @@ export async function productionNBLibraryRegistration(context) {
   if (insertResult) {
     context.createLeftSpanMessage('生产入库成功', 'grey');
     await context.uploadMes(context.leftGenerateAddress, 1, '成功')
-    await context.printLabel(true)
+    await context.printLabel(true, protocolIDMap[context.configForm.produceModel].protocolId, type)
   } else {
-    context.leftBadProductQuantity += 1;
+    await context.uploadMes(context.leftGenerateAddress, 0, '生产入库失败')
     context.createLeftSpanMessage('生产入库失败', 'red');
-    context.leftWorkPrompt = '地址写入-失败(生产入库失败)';
-    context.buttonError('writeAddress')
-    await playErrorAudio(context)
-    Log.error('生产入库失败');
-    console.error('生产入库失败')
   }
 }
 
 export async function productionCollectorPlatformRegistration(context, newAddress) {
   let result = true;
+  let registerResponse
   let params = {
     customerId: 195, // 生产检测专用
     collectorNo: newAddress,
@@ -678,16 +670,29 @@ export async function productionCollectorPlatformRegistration(context, newAddres
     iccid: context.iccid,
     imei: context.imei,
   }
-  let registerResponse = await axios.post(`http://hems.chaobiao.qdhlm.cn:20206/produce/collector`,
-    // let registerResponse = await axios.post(`http://124.70.68.52:20206/produce/collector`,
-    params,
-    {
-      headers: {
-        Authorization: '3a80979e67318eea69f03e65fe9a8e49' //正式
-        // Authorization: '79256bec3711c5774dcb520e60690f5b' //dev
+  try {
+    registerResponse = await axios.post(`http://hems.chaobiao.qdhlm.cn:20206/produce/collector`,
+      // let registerResponse = await axios.post(`http://124.70.68.52:20206/produce/collector`,
+      params,
+      {
+        headers: {
+          Authorization: '3a80979e67318eea69f03e65fe9a8e49' //正式
+          // Authorization: '79256bec3711c5774dcb520e60690f5b' //dev
+        },
+        timeout: 8000
       }
-    }
-  );
+    );
+  } catch (e) {
+    let errorMsg = '平台接口请求超时'+e.message;
+    // 执行失败日志及流程控制
+    context.createLeftSpanMessage(errorMsg, 'red');
+    context.leftWorkPrompt = `地址写入失败(${errorMsg})`;
+    context.buttonError('writeAddress');
+    await playErrorAudio(context);
+    Log.error(`${errorMsg}: ${e.message}`);
+    console.error(errorMsg, e);
+    result = true
+  }
 
   if (registerResponse.data.s === 0 && registerResponse.status === 200) {
     result = false
@@ -696,7 +701,7 @@ export async function productionCollectorPlatformRegistration(context, newAddres
 }
 
 
-export async function productionCollectorLibraryRegistration(context) {
+export async function productionCollectorLibraryRegistration(context,type) {
   let notPass = true
   let registerResponseData;
   if (context.configDetail.printLabel === 'RFT200-CAT1') {
@@ -707,7 +712,9 @@ export async function productionCollectorLibraryRegistration(context) {
       context.createLeftSpanMessage('hems平台注册失败:' + registerResponseData.data.msg, 'red');
       Log.error('hems平台注册失败,msg:' + registerResponseData.data.msg);
       console.error('hems平台注册失败,msg:' + registerResponseData.data.msg);
+      return notPass
     }
+
   }
 
   //生产入库
@@ -732,19 +739,18 @@ export async function productionCollectorLibraryRegistration(context) {
   if (insertResult) {
     context.createLeftSpanMessage('生产入库成功', 'grey');
     await context.uploadMes(context.leftGenerateAddress, 1, '成功')
-    await context.printLabel(true, protocolIDMap[context.configForm.produceModel].protocolId, 'one')
+    await context.printLabel(true, protocolIDMap[context.configForm.produceModel].protocolId, type)
+    notPass=false
   } else {
-    context.leftBadProductQuantity += 1;
     context.createLeftSpanMessage('生产入库失败', 'red');
-    context.leftWorkPrompt = '地址写入-失败(生产入库失败)';
-    context.buttonError('writeAddress')
-    await playErrorAudio(context)
-    Log.error('生产入库失败');
-    console.error('生产入库失败')
+    await context.uploadMes(context.leftGenerateAddress, 0, '生产入库失败')
+    notPass=true
   }
+
+  return notPass
 }
 
-export async function productionCardValveLibraryRegistration(context) {
+export async function productionCardValveLibraryRegistration(context,type) {
   //生产入库
   const productionData = {
     userid: context.routerParam.userId, // 生产账号id
@@ -769,15 +775,10 @@ export async function productionCardValveLibraryRegistration(context) {
   if (insertResult) {
     context.createLeftSpanMessage('生产入库成功', 'grey');
     await context.uploadMes(context.leftGenerateAddress, 1, '成功')
-    await context.printLabel(true, protocolIDMap[context.configForm.produceModel].protocolId, 'one')
+    await context.printLabel(true, protocolIDMap[context.configForm.produceModel].protocolId, type)
   } else {
-    context.leftBadProductQuantity += 1;
     context.createLeftSpanMessage('生产入库失败', 'red');
-    context.leftWorkPrompt = '地址写入-失败(生产入库失败)';
-    context.buttonError('writeAddress')
-    await playErrorAudio(context)
-    Log.error('生产入库失败');
-    console.error('生产入库失败')
+    await context.uploadMes(context.leftGenerateAddress, 0, '生产入库失败')
   }
 }
 

@@ -719,7 +719,7 @@ class HardwareController extends Controller {
         else if (
             configModel === 'LPC230' || configModel === 'LPC230E'||configModel==='VPT100'||configModel==='AEC100'||configModel==='CTW100'||configModel==='WAC230CF'
             ||configModel==='WAC300NS'||configModel==='WAC400NS'||configModel==='VAC710S' ||configModel==='RFT200-CAT1'||configModel==='RFT200'||
-            configModel==='NBT400'||configModel==='NTR300'||configModel==='CPT100'||configModel==='CPT100-10A'
+            configModel==='NBT400'||configModel==='NTR300'||configModel==='CPT100'||configModel==='CPT100-10A'||configModel==='BDC100'
         ) {
             //30*12 双排
             let generateLabel = () => `

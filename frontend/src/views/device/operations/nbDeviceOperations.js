@@ -42,6 +42,7 @@ import * as PTC100420MA from './nb/otherdevice/ptc100-4-20ma'
 import * as NTR300C from './nb/otherdevice/ntr300c'
 import * as VPT100 from './nb/otherdevice/vpt100'
 import * as CPT100 from './nb/otherdevice/cpt100'
+import * as BDC100 from './nb/otherdevice/bdc100'
 import * as CAT400S from './nb/otherdevice/cat400s'
 import * as CAT200 from './nb/otherdevice/cat200'
 import * as CAT400 from './nb/otherdevice/cat400'
@@ -116,6 +117,7 @@ export const doSelfTest = async (context, protocolId, type) => {
     'WAC710N': WAC710N.selfTest,
     'WAC730N': WAC730N.selfTest,
     'BeaconM': BEACONM.selfTest,
+    'BDC100': BDC100.selfTest,
   };
   const produceModel = context.configForm.produceModel;
   const selfTestFunction = selfTestStrategies[produceModel];
@@ -191,6 +193,7 @@ export async function doWriteAddress(context, protocolId, type) {
     'WAC710N': WAC710N.writeAddress,
     'WAC730N': WAC730N.writeAddress,
     'BeaconM': BEACONM.writeAddress,
+    'BDC100': BDC100.writeAddress,
 
 
 
@@ -233,32 +236,33 @@ export async function doWriteAddress(context, protocolId, type) {
     const label = context.configDetail.printLabel;
     switch (label) {
       case 'VPT100':
-        await vacProduceDeviceRegister(context);
+        await vacProduceDeviceRegister(context, type);
         break;
       case 'VAC710':
-        await productionNBLibraryRegistration(context)
+      case 'BDC100':
+        await productionNBLibraryRegistration(context, type)
         break;
       case 'WAC300LH':
         // LORA 入库
-        await productionLORALibraryRegistration(context);
+        await productionLORALibraryRegistration(context, type);
         break;
       case 'VAC005C':
         // 卡阀一体
-        await productionCardValveLibraryRegistration(context);
+        await productionCardValveLibraryRegistration(context, type);
         break;
       case 'LPC230':
       case 'LPC230E':
       case 'AEC100':
         // 采集器
-        await productionCollectorLibraryRegistration(context);
+       notPass= await productionCollectorLibraryRegistration(context, type);
         break;
       default:
         // NB 设备
-        await nbDeviceRegister(context, type, notPass);
+        notPass= await nbDeviceRegister(context, type, notPass);
     }
     if (notPass) {
       context.leftWorkPrompt = `地址写入失败`;
-      await playSuccessAudio(context)
+      await playErrorAudio(context)
       context.buttonError('writeAddress')
       setTimeout(() => {
         context.buttonWaiting('writeAddress');
@@ -640,7 +644,7 @@ const checkAddress = async (context, protocolId, type) => {
     context.configDetail.printLabel === 'WAC100N' || context.configDetail.printLabel === 'WAC100NY' ||
     context.configDetail.printLabel === 'WAC300C' || context.configDetail.printLabel === 'NTR300' ||
     context.configDetail.printLabel === 'WAC710C' || context.configDetail.printLabel === 'WAC400N' ||
-    context.configDetail.printLabel === 'VAC710'||context.configDetail.printLabel==='WAC710N'
+    context.configDetail.printLabel === 'VAC710'||context.configDetail.printLabel==='WAC710N'||context.configDetail.printLabel==='BeaconM'
 
   ) {
     let readAddressResult = await serialPortOperation(context, {
@@ -768,7 +772,7 @@ const checkNetWork = async (context, protocolId, type) => {
     || context.configDetail.printLabel === 'WAC300NY'
     || context.configDetail.printLabel === 'WAC300N' || context.configDetail.printLabel === 'WAC300NS'
     || context.configDetail.printLabel === 'WAC400NS' || context.configDetail.printLabel === 'WAC400N'
-    ||context.configDetail.printLabel==='WAC300NY'
+    ||context.configDetail.printLabel==='WAC300NY'||context.configDetail.printLabel==='WAC300NY'||context.configDetail.printLabel==='BeaconM'
   ) {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_valve')
   } else if (
@@ -780,7 +784,7 @@ const checkNetWork = async (context, protocolId, type) => {
   } else if (context.configDetail.printLabel === 'WAC330HE' || context.configDetail.printLabel === 'WAC730C') {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_meter_valve')
   }
-  console.log('hems最近上传的数据', data[0])
+
   if (data===undefined||data[0] === undefined || data [0] === null) {
     if (!context.uploadAddressList.includes(context.leftReadAddress)) {
       context.uploadAddressList.push(context.leftReadAddress)
@@ -799,6 +803,7 @@ const checkNetWork = async (context, protocolId, type) => {
     }, 2000);
     return notPass
   } else {
+    console.log('hems最近上传的数据', data[0])
     let formattedTime = moment(data[0].collectTime).format('YYYY-MM-DD HH:mm:ss');
     await handleSuccess(context, '扫码地址验证联网', '地址：' + context.leftGenerateAddress + ' 联网验证成功', 'scanCode')
     context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  网络上传成功,上传时间：' + formattedTime, 'grey');
@@ -1104,7 +1109,7 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
     || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400' || context.configForm.produceModel === 'WAC300C'
     || context.configForm.produceModel === 'NTR300' || context.configForm.produceModel === 'CPT100-10A'
     || context.configForm.produceModel === 'WAC330N' || context.configForm.produceModel === 'WAC400N'
-    || context.configForm.produceModel === 'VAC710'||context.configForm.produceModel === 'WAC710N'
+    || context.configForm.produceModel === 'VAC710'||context.configForm.produceModel === 'WAC710N'||context.configForm.produceModel === 'BDC100'
   ) {
     await ipc.send(ipcApiRoute.doPrintTest, params)
   } else if (context.configForm.produceModel === 'WAC330HE') {
