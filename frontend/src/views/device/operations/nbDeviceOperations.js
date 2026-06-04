@@ -358,6 +358,7 @@ export const doExitSelfTest = async (context, protocolId, type) => {
     'VAC710': VAC710.exitSelfTest,
     'WAC710N': WAC710N.exitSelfTest,
     'WAC730N': WAC730N.exitSelfTest,
+    'BeaconM': BEACONM.exitSelfTest,
   };
   const produceModel = context.configForm.produceModel;
   const returnSelfTestFunction = returnSelfTestStrategies[produceModel];
