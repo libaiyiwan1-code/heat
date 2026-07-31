@@ -7,8 +7,8 @@ export function readAddress(context, responseMessage) {
   let notPass =
     dataView.getUint8(16) !== 0x68 ||
     dataView.getUint8(17) !== 0x78 ||
-    dataView.getUint8(27) !== 0xDD ||
-    dataView.getUint8(28) !== 0xF0
+    dataView.getUint8(27) !== 0xF0 ||
+    dataView.getUint8(28) !== 0xDD
   if (!notPass) {
     // 读取4字节地址（从第18字节开始）
     context.leftReadAddress = Array.from({length: 4}, (_, i) =>

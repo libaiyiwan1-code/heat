@@ -48,24 +48,14 @@ const ipcApiRoute = {
   getAppPath: 'controller.os.getAppPath',
   getPath: 'controller.os.getPath',
 
-  // hardware
-  printAddressSingleRowLabelWAC330HE: 'controller.hardware.printAddressSingleRowLabelWAC330HE',/*50*12单排*/
-  printDoubleRowLabel3012LPC230: 'controller.hardware.printDoubleRowLabel3012LPC230',/*50*12单排*/
-  printDoubleRowLabel4020: 'controller.hardware.printDoubleRowLabel4020',
-  printAddressSingleRowLabelVAC5012: 'controller.hardware.printAddressSingleRowLabelVAC5012',
-  printAddressSingleRowLabelWAC5012: 'controller.hardware.printAddressSingleRowLabelWAC5012',
+
   printSuccessSingleRowInspectLabel5012: 'controller.hardware.printSuccessSingleRowInspectLabel5012',
   printErrorSingleRowInspectLabel5012: 'controller.hardware.printErrorSingleRowInspectLabel5012',
   getPrinterList: 'controller.hardware.getPrinterList',
-  print: 'controller.hardware.print',
-  print4020: 'controller.hardware.print4020',
-  print3012: 'controller.hardware.print3012',
-  printErrorMessage: 'controller.hardware.printErrorMessage',
   printStatus: 'controller.hardware.printStatus',
-  printAddressAndModel: 'controller.hardware.printAddressAndModel',
-  printSuccessMessage:'controller.hardware.printSuccessMessage',
   doPrint: 'controller.hardware.doPrint',
   doPrintTest: 'controller.hardware.doPrintTest',
+  productionWarehousingFailurePrint: 'controller.hardware.productionWarehousingFailurePrint',
   // effect
   selectFile: 'controller.effect.selectFile',
   loginWindow: 'controller.effect.loginWindow',

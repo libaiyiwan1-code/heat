@@ -1,5 +1,7 @@
+
 export {inquireSelfTest} from './inquireSelfTest'
 export {writeConfig} from './writeConfig'
 export {readSelfTestStatus} from './readSelfTestStatus'
 export {writeAddress} from './writeAddress'
 export {readAddress} from './readAddress'
+export {readData} from './readData'

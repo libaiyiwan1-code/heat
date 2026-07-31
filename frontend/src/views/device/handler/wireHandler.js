@@ -245,6 +245,7 @@ export const executionProcess = async (type, protocolId, startOperation, context
           await executeWithAddress(protocolId, type, context, isInfraredDevice, async (writeAfterAddress) => {
             valveAddress = writeAfterAddress;
           })
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
         console.log(`当前执行流程： ${name} - ${type === 'one' ? '左侧工装' : '右侧工装'} `);
         Log.info(`当前执行流程： ${name} - ${type === 'one' ? '左侧工装' : '右侧工装'} `);
@@ -259,7 +260,9 @@ export const executionProcess = async (type, protocolId, startOperation, context
             context.listenRightFixture('scan', type)
           }
         }
+        await new Promise(resolve => setTimeout(resolve, 500));
         const result = await fn(protocolId, type, context, buttonColor, isInfraredDevice);
+
 
         if (result) {
           if (type === 'one') {

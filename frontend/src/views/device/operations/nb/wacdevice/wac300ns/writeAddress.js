@@ -1,7 +1,7 @@
 import {badRecordUpload, serialPortOperation} from "@/views/device/action/deviceAction";
 import {protocolIDMap} from "@/views/device/enum/enum";
-import {playErrorAudio, playSuccessAudio} from "@/utils/audioUtils";
-import {generateAddressByNB, nbDeviceRegister, checkIMEIByTerminal, generateAddressByLORA} from "@/utils/serviceUtils";
+import {playErrorAudio} from "@/utils/audioUtils";
+import {checkIMEIByTerminal, generateAddressByNB} from "@/utils/serviceUtils";
 
 export async function writeAddress(protocolId, type, context) {
   const model = context.configForm.produceModel;
@@ -32,7 +32,7 @@ export async function writeAddress(protocolId, type, context) {
     return true
   }
   if (context.version.toString() !== context.configDetail.version.toString()) {
-    await badRecordUpload(context,'版本号不一致' ,  '设备版本号:' + context.version + '配置版本号：' + context.configDetail.version, 'writeAddress')
+    await badRecordUpload(context, '版本号不一致', '设备版本号:' + context.version + '配置版本号：' + context.configDetail.version, 'writeAddress')
     await context.uploadMes(context.leftGenerateAddress, 0, '版本号不一致,设备版本号:' + context.version + '配置版本号：' + context.configDetail.version)
     context.leftBadProductQuantity += 1
     await playErrorAudio(context)

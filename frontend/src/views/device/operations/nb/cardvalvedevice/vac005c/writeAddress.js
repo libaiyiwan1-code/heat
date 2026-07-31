@@ -1,14 +1,9 @@
 import {badRecordUpload, serialPortOperation} from "@/views/device/action/deviceAction";
 import {protocolIDMap} from "@/views/device/enum/enum";
-import {playErrorAudio, playSuccessAudio} from "@/utils/audioUtils";
-import {
-  generateAddressByNB,
-  nbDeviceRegister,
-  checkIMEIByTerminal,
-  generateAddressByLORA,
-  generateAddressByCardValve
-} from "@/utils/serviceUtils";
-import {getIdByMacAddrCardValve, getIdByMacAddrNB} from "@/components/global/productdb";
+import {playErrorAudio} from "@/utils/audioUtils";
+import {generateAddressByCardValve} from "@/utils/serviceUtils";
+import {getIdByMacAddrCardValve} from "@/components/global/productdb";
+
 const Log = require('ee-core/log');
 
 

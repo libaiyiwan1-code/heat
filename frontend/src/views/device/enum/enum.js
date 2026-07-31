@@ -25,6 +25,7 @@ import * as LPC210 from "@/packBuffer/decode/nb/lpc210";
 import * as LPC210E from "@/packBuffer/decode/nb/lpc210";
 import * as CAT400 from "@/packBuffer/decode/nb/cat400";
 import * as CAT200 from "@/packBuffer/decode/nb/cat200";
+import * as CAT200P from "@/packBuffer/decode/nb/cat200p";
 import * as CAT400S from "@/packBuffer/decode/nb/cat400s";
 import * as CPT100 from "@/packBuffer/decode/nb/cpt100";
 import * as VPT100 from "@/packBuffer/decode/nb/vpt100";
@@ -76,11 +77,11 @@ export const protocolIDMap = {
       'readIMEI': false,
       'readSelfTestStatus': true,
       'exitSelfTest': true,
-      'readAddress': false,//TODO
+      'readAddress': false,
     },
     protocolId: 139,
     deviceActionResponseMessageLength: {
-      'inquireSelfTest': 18,
+      'inquireSelfTest': 34,
       'selfTest': -1,
       'readSelfTestStatus': 74,
       'readIMEI': 31,
@@ -88,11 +89,11 @@ export const protocolIDMap = {
       'writeAddress': 16,
       'awaken': 16,
       'exitSelfTest': 34,
-      'readAddress': 37,//TODO
+      'readAddress': 21,
 
     },
     deviceActionResponseMessageLength2: {
-      'inquireSelfTest': 51,
+      'inquireSelfTest': 67,
       'selfTest': -1,
       'readSelfTestStatus': 107,
       'readIMEI': 47,
@@ -100,7 +101,7 @@ export const protocolIDMap = {
       'writeAddress': 37,
       'awaken': 32,
       'exitSelfTest': 67,
-      'readAddress': 37,//TODO
+      'readAddress': 37,
 
     },
     portAttribute: {
@@ -128,7 +129,7 @@ export const protocolIDMap = {
       awaken: (data) => {
         return WAC230CF.awaken(data);
       },
-      readAddress: (context, data) => {//TODO
+      readAddress: (context, data) => {
         return WAC230CF.readAddress(context, data);
       },
       exitSelfTest: (data) => {
@@ -961,35 +962,37 @@ export const protocolIDMap = {
   },
   'WAC300LH': {
     //不注册平台
-    protocolCode: `EN1434_0140`,
+    protocolCode: undefined,
     model: -1,
     joinMode: -1,
     isInfraredDevice: true,
     isDeviceActionTransparentTransmissionProtocol: {
       'inquireSelfTest': false,
       'writeConfig': false,
-      'awaken': false,
       'selfTest': false,
-      'writeAddress': false,
-      'readSelfTestStatus': false,
       'readAddress': false,
+      'readData':false,
+      'readSelfTestStatus': false,
+      'writeAddress': false,
     },
     protocolId: 120,
     deviceActionResponseMessageLength: {
       'inquireSelfTest': 16,
-      'writeConfig': 16, //TODO
+      'writeConfig': 16,
       'selfTest': -1,
-      'readSelfTestStatus': 55,
-      'writeAddress': 37,//TODO
       'readAddress': 55,//使用读自检取地址
+      'readData':50,
+      'readSelfTestStatus': 55,
+      'writeAddress': 16,
     },
     deviceActionResponseMessageLength2: {
       'inquireSelfTest': 32,
-      'writeConfig': 34,//TODO
+      'writeConfig': 34,
       'selfTest': -1,
-      'readSelfTestStatus': 71,
-      'writeAddress': 16,//TODO
       'readAddress': 71,//使用读自检取地址
+      'readData':66,
+      'readSelfTestStatus': 71,
+      'writeAddress': 39,
     },
     portAttribute: {
       parity: '偶校验',
@@ -1002,17 +1005,22 @@ export const protocolIDMap = {
         return WAC300LH.inquireSelfTest(data);
       },
       writeConfig: (data) => {
-        return WAC300LH.writeConfig(data);//TODO
-      },
-      readSelfTestStatus: (context, data) => {
-        return WAC300LH.readSelfTestStatus(context, data);
-      },
-      writeAddress: (leftGenerateAddress, data) => {//TODO
-        return WAC300LH.writeAddress(leftGenerateAddress, data);
+        return WAC300LH.writeConfig(data);
       },
       readAddress: (context, data) => {
         return WAC300LH.readAddress(context, data);
       },
+      readData: (context, data) => {
+        return WAC300LH.readData(context, data);
+      },
+
+      readSelfTestStatus: (context, data) => {
+        return WAC300LH.readSelfTestStatus(context, data);
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return WAC300LH.writeAddress(leftGenerateAddress, data);
+      },
+
 
     },
   },
@@ -1796,7 +1804,7 @@ export const protocolIDMap = {
       },
     },
   },
-  'BDC100': {
+  'BDC100&C17': {
     protocolCode: null,
     protocolId: 132,
     model: null,
@@ -1811,6 +1819,7 @@ export const protocolIDMap = {
       'readDeviceData': false,
       'readAmmeterPower': false,
       'calibration': false,
+      'settingEnergyError':false,
     },
     deviceActionResponseMessageLength: {
       'inquireSelfTest': 16,
@@ -1821,6 +1830,7 @@ export const protocolIDMap = {
       'readDeviceData': 28,
       'readAmmeterPower': 9,
       'calibration': 16,
+      'settingEnergyError':16,
     },
     deviceActionResponseMessageLength2: {
       'inquireSelfTest': 32,
@@ -1831,10 +1841,11 @@ export const protocolIDMap = {
       'readDeviceData': 44,
       'readAmmeterPower': 9,
       'calibration': 33,
+      'settingEnergyError':36,
     },
     portAttribute: {
-      parity: '偶校验',
       dataBits: 8,
+      parity: '偶校验',
       baudRate: 2400,
       stopBits: 1
     },
@@ -1860,6 +1871,9 @@ export const protocolIDMap = {
       calibration: (data) => {
         return CPT100.calibration(data);
       },
+      settingEnergyError:(data)=>{
+        return CPT100.settingEnergyError(data)
+      }
     },
   },
   'NTR300C': {
@@ -4174,7 +4188,78 @@ export const protocolIDMap = {
         return CAT200.awaken(data);
       },
     },
-  },//TODO
+  },
+  'CAT200P': {
+    protocolCode: '-',
+    protocolId: 152,
+    model: -1,
+    joinMode: 2,
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': false,
+      'selfTest': false,
+      'readSelfTestStatus': false,
+      'readICCID': false,
+      'readIMEI': false,
+      'writeAddress': false,
+      'readAddress': false,
+      'exitSelfTest': false,
+      'awaken': false
+    },
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 16,
+      'selfTest': -1,
+      'readSelfTestStatus': 54,
+      'readICCID': 36,
+      'readIMEI': 31,
+      'readAddress': 21,
+      'writeAddress': 16,
+      'exitSelfTest': 16,
+      'awaken': 16
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 32,
+      'selfTest': -1,
+      'readSelfTestStatus': 70,
+      'readICCID': 52,
+      'readIMEI': 47,
+      'readAddress': 37,
+      'writeAddress': 37,
+      'exitSelfTest': 32,
+      'awaken': 32
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return CAT200P.inquireSelfTest(data);
+      },
+      readSelfTestStatus: (context, data) => {
+        return CAT200P.readSelfTestStatus(context, data);
+      },
+      readICCID: (context, data) => {
+        return CAT200P.readICCID(context, data);
+      },
+      readIMEI: (context, data) => {
+        return CAT200P.readIMEI(context, data);
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return CAT200P.writeAddress(leftGenerateAddress, data);
+      },
+      readAddress: (context, data) => {
+        return CAT200P.readAddress(context, data);
+      },
+      awaken(data) {
+        return CAT200P.awaken(data);
+      },
+    },
+  },
+
+  //TODO
   'NTR300': {
     protocolCode: 'EN1434_0044',
     protocolId: 74,

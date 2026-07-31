@@ -1,89 +1,71 @@
-import {hex2arrayBuffer, hexToAscii} from "@/packBuffer/common/comUtil";
+import {getDataView, hex2arrayBuffer, hexToAscii, isStatusNotPass, report} from "@/packBuffer/common/comUtil";
+import {protocolIDMap} from "@/views/device/enum/enum";
 
-const Log = require('ee-core/log');
+const SELF_TEST_CHECKS = [
+  {offset: 87, msg: '未自检过'},
+  {offset: 91, msg: 'EEP 不正常'},
+  {offset: 92, msg: '联网 不正常'},
+  {offset: 93, msg: '阀门最小开度标定 不正常'},
+  {offset: 94, msg: '阀门最大开度标定 不正常'},
+  {offset: 95, msg: '无线通讯fsk 不正常'},
+  {offset: 96, msg: 'mbus通讯 不正常'},
+  {offset: 97, msg: '按键自检 不正常'},
+  {offset: 98, msg: '电池电压 不正常'},
+]
 
-export function decodeCheckEEP(responseMessage) {
-  let messageBuffer = hex2arrayBuffer(responseMessage);
-  let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(91) !== 0x01 && dataView.getUint8(91) !== 0x02;
+export function readSelfTestStatus(context, responseMessage) {
+  const dv = getDataView(responseMessage)
+  const raw = context.receivedData.globalReceivedOneData
+  let hasError = false
 
+  const baseCheck =
+    dv.getUint8(33) !== 0x68 ||
+    dv.getUint8(36) !== 0x68 ||
+    dv.getUint8(37) !== 0x80 ||
+    dv.getUint8(38) !== 0x8B ||
+    dv.getUint8(43) !== 0x0C ||
+    dv.getUint8(45) !== 0x01 ||
+    dv.getUint8(49) !== 0x68 ||
+    dv.getUint8(50) !== 0x8B ||
+    dv.getUint8(60) !== 0xF0 ||
+    dv.getUint8(61) !== 0xDD
+
+  SELF_TEST_CHECKS.forEach(({offset, msg}) => {
+    if (isStatusNotPass(dv, offset)) {
+      report(context, msg, false)
+      hasError = true
+    }
+  })
+
+  if (baseCheck || hasError) {
+    report(context, '自检不通过')
+    context.leftWorkPrompt = '自检失败(读自检状态不通过)'
+    context.receivedData.globalReceivedOneData = ''
+    return true
+  }
+
+  report(context, '自检通过')
+
+  context.productName = decodeGetProductName(raw)
+  if (!context.productName.toLowerCase().includes('wac230cf')) {
+    report(context, `产品名称错误：${context.productName}`)
+    return true
+  }
+
+  context.protocolId = getDeviceProtocolId(raw)
+  context.version = decodeGetVersion(raw)
+  context.netprovider = decodeGetNetProvider(raw)
+  if (context.netprovider === 1) {//电信
+    protocolIDMap[context.configForm.produceModel].model = 42
+    protocolIDMap[context.configForm.produceModel].joinMode = 8 //NB_IOT_CTWING
+  } else if (context.netprovider === 2) {//移动
+    protocolIDMap[context.configForm.produceModel].model = 46
+    protocolIDMap[context.configForm.produceModel].joinMode = 2
+  }
+  return false
 }
 
-export function decodeCheckNetwork(responseMessage) {
-  let messageBuffer = hex2arrayBuffer(responseMessage);
-  let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(92) !== 0x01 && dataView.getUint8(92) !== 0x02;
-
-}
-
-export function decodeCheckValveClose(responseMessage) {
-  let messageBuffer = hex2arrayBuffer(responseMessage);
-  let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(93) !== 0x01 && dataView.getUint8(93) !== 0x02;
-
-}
-
-export function decodeCheckValveOpen(responseMessage) {
-  let messageBuffer = hex2arrayBuffer(responseMessage);
-  let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(94) !== 0x01 && dataView.getUint8(94) !== 0x02;
-
-}
-
-export function decodeGetProtocolId(responseMessage) {
-  let responseBuffer = hex2arrayBuffer(responseMessage)
-  let responseDataView = new DataView(responseBuffer)
-  return parseInt(responseDataView.getUint8(88).toString(16), 16);
-}
-
-export function decodeGetVersion(responseMessage) {
-  let responseBuffer = hex2arrayBuffer(responseMessage)
-  let responseDataView = new DataView(responseBuffer)
-  return parseInt(responseDataView.getUint8(90).toString(16), 16)
-}
-
-export function decodeGetNetprovider(responseMessage) {
-  let responseBuffer = hex2arrayBuffer(responseMessage)
-  let responseDataView = new DataView(responseBuffer)
-  return parseInt(responseDataView.getUint8(89).toString(16), 16)
-}
-
-export function decodeCheckFsk(responseMessage) {
-  let messageBuffer = hex2arrayBuffer(responseMessage);
-  let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(95) !== 0x01 && dataView.getUint8(95) !== 0x02;
-
-}
-
-export function decodeCheckMbus(responseMessage) {
-  let messageBuffer = hex2arrayBuffer(responseMessage);
-  let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(96) !== 0x01 && dataView.getUint8(96) !== 0x02;
-
-}
-
-export function decodeCheckHall(responseMessage) {
-  let messageBuffer = hex2arrayBuffer(responseMessage);
-  let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(97) !== 0x01 && dataView.getUint8(97) !== 0x02;
-
-}
-
-export function decodeCheckBatteryVoltage(responseMessage) {
-  let messageBuffer = hex2arrayBuffer(responseMessage);
-  let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(98) !== 0x01 && dataView.getUint8(98) !== 0x02;
-
-}
-
-export function notHasSelfTestCompleted(responseMessage) {
-  let messageBuffer = hex2arrayBuffer(responseMessage);
-  let dataView = new DataView(messageBuffer)
-  return dataView.getUint8(87) !== 0x01;
-
-}
-
-export function decodeGetProductNameWAC230CF(responseMessage) {
+export function decodeGetProductName(responseMessage) {
   let model = '';
   let messageBuffer = hex2arrayBuffer(responseMessage);
   let dataView = new DataView(messageBuffer)
@@ -97,86 +79,17 @@ export function decodeGetProductNameWAC230CF(responseMessage) {
 
 }
 
-export function readSelfTestStatus(context, responseMessage) {
-  let messageBuffer = hex2arrayBuffer(responseMessage)
-  let dataView = new DataView(messageBuffer)
-  let baseCheck = dataView.getUint8(37) !== 0x80
-    || dataView.getUint8(38) !== 0x8B
-    || dataView.getUint8(60) !== 0xF0
-    || dataView.getUint8(61) !== 0xDD
-  let selfTestCompletedNotPass = notHasSelfTestCompleted(context.receivedData.globalReceivedOneData)               //是否自检过
-  let eepNotPass = decodeCheckEEP(context.receivedData.globalReceivedOneData)     //             EEP
-  let networkNotPass = decodeCheckNetwork(context.receivedData.globalReceivedOneData)     //             联网
-  let valveCloseNotPass = decodeCheckValveClose(context.receivedData.globalReceivedOneData)     //             阀关
-  let valveOpenNotPass = decodeCheckValveOpen(context.receivedData.globalReceivedOneData)     //             阀开
-  let fskNotPass = decodeCheckFsk(context.receivedData.globalReceivedOneData)     //             fsk
-  let mbusNotPass = decodeCheckMbus(context.receivedData.globalReceivedOneData)     //             mbus
-  let hallNotPass = decodeCheckHall(context.receivedData.globalReceivedOneData)               //霍尔
-  let batteryVoltageNotPass = decodeCheckBatteryVoltage(context.receivedData.globalReceivedOneData)               //电池电压
-  if (selfTestCompletedNotPass) {
-    context.createLeftSpanMessage('未进行过自检', 'grey');
-    Log.error('未进行过自检');
-    console.log('未进行过自检');
-  }
+export function getDeviceProtocolId(responseMessage) {
+  const dv = getDataView(responseMessage)
+  return parseInt(dv.getUint8(88).toString(16), 16)
+}
 
-  if (eepNotPass) {
-    context.createLeftSpanMessage('eep 不正常', 'grey');
-    Log.error('eep 不正常');
-    console.log('eep 不正常');
-  }
-  if (networkNotPass) {
-    context.createLeftSpanMessage('联网 不正常', 'grey');
-    Log.error('联网 不正常');
-    console.log('联网 不正常');
-  }
-  if (valveCloseNotPass) {
-    context.createLeftSpanMessage('阀关 不正常', 'grey');
-    Log.error('阀关 不正常');
-    console.log('阀关 不正常');
-  }
-  if (valveOpenNotPass) {
-    context.createLeftSpanMessage('阀开 不正常', 'grey');
-    Log.error('阀开 不正常');
-    console.log('阀开 不正常');
-  }
-  if (fskNotPass) {
-    context.createLeftSpanMessage('无线通信fsk 不正常', 'grey');
-    Log.error('无线通信fsk 不正常');
-    console.log('无线通信fsk 不正常');
-  }
-  if (mbusNotPass) {
-    context.createLeftSpanMessage('MBUS 不正常', 'grey');
-    Log.error('MBUS 不正常');
-    console.log('MBUS 不正常');
-  }
-  if (hallNotPass) {
-    context.createLeftSpanMessage('霍尔 不正常', 'grey');
-    Log.error('霍尔 不正常');
-    console.log('霍尔 不正常');
-  }
-  if (batteryVoltageNotPass) {
-    context.createLeftSpanMessage('电池电压 不正常', 'grey');
-    Log.error('电池电压 不正常');
-    console.log('电池电压 不正常');
-  }
+export function decodeGetNetProvider(responseMessage) {
+  const dv = getDataView(responseMessage)
+  return parseInt(dv.getUint8(89).toString(16), 16)
+}
 
-  if (selfTestCompletedNotPass || eepNotPass || networkNotPass || valveCloseNotPass || valveOpenNotPass ||
-    fskNotPass || mbusNotPass || hallNotPass || batteryVoltageNotPass || baseCheck) {
-    context.createLeftSpanMessage('自检不通过', 'grey');
-    console.error('自检不通过');
-    Log.error('自检不通过');
-    context.leftWorkPrompt = '自检失败(读自检状态不通过)'
-    context.receivedData.globalReceivedOneData = '';
-    return true
-  }
-  //解析通过
-  context.productName = decodeGetProductNameWAC230CF(context.receivedData.globalReceivedOneData); //产品名称
-  if (!context.productName.toLowerCase().includes('wac230cf')) {
-    context.createLeftSpanMessage('产品名称错误：' + context.productName, 'grey');
-    return true
-  }
-  context.protocolId = decodeGetProtocolId(context.receivedData.globalReceivedOneData);//协议id
-  context.version = decodeGetVersion(context.receivedData.globalReceivedOneData)//版本号
-  context.netprovider = decodeGetNetprovider(context.receivedData.globalReceivedOneData) //运营商
-  return false
+export function decodeGetVersion(responseMessage) {
+  const dv = getDataView(responseMessage)
+  return parseInt(dv.getUint8(90).toString(16), 16)
 }

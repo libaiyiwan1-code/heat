@@ -7,4 +7,5 @@ export {readSelfTestStatus} from './readSelfTestStatus'
 export {readDeviceData} from './readDeviceData'
 export {readAmmeterPower} from './readAmmeterPower'
 export {calibration} from './calibration'
+export {settingEnergyError} from './settingEnergyError'
 

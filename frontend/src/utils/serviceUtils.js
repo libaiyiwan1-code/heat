@@ -274,6 +274,12 @@ export async function generateAddressByLORA(context) {
   const day = currentDate.getDate(); // 获取当前日期
   //生成地址
   let productQuantity = await countProductLORADeviceQuantityCountByUserId(context.routerParam.userId, `${year}-${month}-${day}`);
+ //增加读序号 响应超时、连接超时
+  if (!productQuantity){
+    await playErrorAudio(context)
+    return notPass
+ }
+
   //当日数量+1
   if (productQuantity.length === 0) {
     productQuantity[0] = []
@@ -319,7 +325,7 @@ export async function generateAddressByLORA(context) {
     return notPass
   }
   //地址重复查询
-  let response = await getIdByMacAddrNB(context.leftGenerateAddress);
+  let response = await getIdByMacAddrLORAProduce(context,context.leftGenerateAddress);
   if (response.length > 0) {
     context.leftWorkPrompt = `地址写入失败(生成地址非法,生产库已存在该地址)`;
     context.createLeftSpanMessage('生产库已存在该地址 ,请重新写地址 :' + address, 'red');
@@ -461,7 +467,12 @@ export async function generateAddressByVACProduce(context) {
     return notPass
   }
   //地址重复查询
-  let response = await getIdByMacAddrLORAProduce(context.valveAddress);
+  let response = await getIdByMacAddrLORAProduce(context,context.valveAddress);
+  // 连接超时或sql响应超时
+  if (!response){
+    await playErrorAudio(context)
+    return true
+  }
   if (response.length > 0) {
     context.leftWorkPrompt = `地址写入失败(生成地址非法,生产库已存在该地址)`;
     context.createLeftSpanMessage('生产库已存在该地址 ,请重新写地址 :' + address, 'red');
@@ -523,7 +534,7 @@ export async function nbDeviceRegister(context, type, notPass) {
       valveDN: null //WAC330HE口径
     };
 
-    let insertResult = await insertNBValueProduce(productionData);
+    let insertResult = await insertNBValueProduce(context,productionData);
     if (insertResult) {
       context.createLeftSpanMessage('生产入库成功', 'grey');
       await context.uploadMes(context.leftGenerateAddress, 1, '成功')
@@ -531,12 +542,11 @@ export async function nbDeviceRegister(context, type, notPass) {
       return false;
     } else {
       await context.uploadMes(context.leftGenerateAddress, 0, '生产入库失败')
-      context.createLeftSpanMessage('生产入库失败', 'red');
       return true;
     }
   } else {
-    context.createLeftSpanMessage('平台注册失败', 'red');
-    await context.uploadMes(context.leftGenerateAddress, 0, '平台注册失败')
+    context.createLeftSpanMessage('平台注册失败:'+registerResponse.data.msg, 'red');
+    await context.uploadMes(context.leftGenerateAddress, 0, '平台注册失败:'+registerResponse.data.msg)
     context.leftWorkPrompt = '地址写入失败(平台注册失败)';
     return true;
   }
@@ -544,6 +554,7 @@ export async function nbDeviceRegister(context, type, notPass) {
 }
 
 export async function productionLORALibraryRegistration(context,type) {
+  let notPass=false
   //生产入库
   const productionData = {
     userid: context.routerParam.userId, // 生产账号id
@@ -562,17 +573,45 @@ export async function productionLORALibraryRegistration(context,type) {
     TempProbeAddr: context.readDeviceTemperatureProbes, //温度探头
     PressProbe: context.readDevicePressureProbes, //压力探头
     TorqueNM: context.torque,//扭矩
-    valveDN: context.configDetail.nominalCaliber //WAC330HE口径
+    valveDN: null //WAC330HE口径
   };
 
-  let insertResult = await insertLORAValueProduce(productionData);
+  let insertResult = await  insertLORAValueProduce(productionData);
   if (insertResult) {
     context.createLeftSpanMessage('生产入库成功', 'grey');
     await context.uploadMes(context.leftGenerateAddress, 1, '成功')
     await context.printLabel(context, true, protocolIDMap[context.configForm.produceModel].protocolId, type)
+    return  notPass
   } else {
     context.createLeftSpanMessage('生产入库失败', 'red');
     await context.uploadMes(context.leftGenerateAddress, 0, '生产入库失败')
+    //写默认出厂地址全0
+    context.context.leftGenerateAddress='00000000'
+    let writeAddressResult = await serialPortOperation(context, {
+      actionType: 'writeAddress',
+      operationName: '地址写入（写地址）',
+      cmdType: 'a0',                         // afn 的命令类型
+      cmdCode: '18',                         // fn 的命令码
+      protocolId: protocolId,
+      maxRetries: context.maxRetries,
+      expectedLength: protocol.deviceActionResponseMessageLength['writeAddress'],
+      expectedLength2: protocol.deviceActionResponseMessageLength2['writeAddress'],
+      timeout: context.timeout,
+      validateResponse: () => protocol.validateResponse.writeAddress(context.leftGenerateAddress, context.receivedData.globalReceivedOneData),
+      preprocess: () => {
+      },
+      isInfraredDevice: protocol.isInfraredDevice,
+      isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.writeAddress,
+    }, 'cj88')
+    if (writeAddressResult) {
+      context.createLeftSpanMessage('生产入库失败,请重新写地址', 'red');
+      await playErrorAudio(context)
+      return true
+    }
+    context.createLeftSpanMessage('生产入库失败,请重新写地址', 'red');
+    //打印不合格的标签
+    context.printWarehouseEntryFailedLabel()
+    return true
   }
 }
 
@@ -593,7 +632,7 @@ export async function vacProduceDeviceRegister(context,type) {
     customer: null, // 定制厂家
   };
 
-  let insertResult = await insertNBValueProduce(productionData);
+  let insertResult = await insertNBValueProduce(context,productionData);
   if (insertResult) {
     await context.uploadMes(context.leftGenerateAddress, 1, '成功')
     context.createSpanMessage('生产入库成功', 'green')
@@ -629,7 +668,7 @@ export async function productionNBLibraryRegistration(context,type) {
     valveDN: context.configDetail.nominalCaliber //WAC330HE口径
   };
 
-  let insertResult = await insertNBValueProduce(productionData);
+  let insertResult = await insertNBValueProduce(context,productionData);
   if (insertResult) {
     context.createLeftSpanMessage('生产入库成功', 'grey');
     await context.uploadMes(context.leftGenerateAddress, 1, '成功')

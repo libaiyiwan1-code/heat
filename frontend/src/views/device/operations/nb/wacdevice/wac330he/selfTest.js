@@ -149,14 +149,14 @@ export const selfTest = async (context, protocolId, type) => {
     await context.uploadMes(context.leftGenerateAddress, 0, '热表进回温温差过大,回温：', +Number(context.readMeterOutTemperature).toFixed(2) + ' 进温：' + Number(context.readMeterInTemperature).toFixed(2))
     context.leftBadProductQuantity += 1
     //热表温度验证失败也退出检定
-    await doMeterReturnVerificationStatus(context, protocolId, type)
+    await doMeterReturnVerificationStatus(context, protocolId, type,protocol)
     await playErrorAudio(context)
     return notPass
   }
 
 
   //热表温度验证成功退出检定
-  let result = await doMeterReturnVerificationStatus(context, protocolId, type)
+  let result = await doMeterReturnVerificationStatus(context, protocolId, type,protocol)
   if (result){
     return result
   }
@@ -182,7 +182,7 @@ export const selfTest = async (context, protocolId, type) => {
 }
 
 
-export const doMeterReturnVerificationStatus = async (context, protocolId, type) => {
+export const doMeterReturnVerificationStatus = async (context, protocolId, type,protocol) => {
   let meterReturnVerificationStatusResult = await serialPortOperation(context, {
     actionType: 'selfTest',
     operationName: '热表退出检定',

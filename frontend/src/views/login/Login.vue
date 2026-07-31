@@ -126,8 +126,8 @@ export default {
       ip: ip,
       layout: 'horizontal',
       dataForm: {
-        username: 'YP-0',
-        password: '0',
+        username: undefined,
+        password: undefined,
         macAddr: undefined,
         // selectWorkNumber:'SJ250516003/JG002',
         selectWorkNumber: undefined,
@@ -246,18 +246,7 @@ export default {
     async init() {
       this.currentWindowsId = await ipc.invoke(ipcApiRoute.getWCid, this.currentWindowName);
     },
-    async printTest() {
-      let param = {
-        deviceName: 'Argox CP-3140L PPLB',
-        address: '12345678',
-        date: '生产日期：2025.08',
-        craftsmanCaliber: 'DN25',
-        commonTraffic: '3.5m³/h',
-        flowRange: '(0.07-7)m³/h',
-        listDoubleRowLabels: '否',
-      }
-      await ipc.invoke(ipcApiRoute.printAddressSingleRowLabelWAC330HE, param);
-    },
+
     async login() {
       try {
         const {username, password, selectWorkNumber, macAddr} = this.dataForm;

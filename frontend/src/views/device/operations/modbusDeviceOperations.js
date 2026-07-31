@@ -134,7 +134,7 @@ export const doPowerInspection = async (context,protocolId, type) => {
   const executeFunctionList = {
     'CPT100': CPT100.verify,
     'CPT100-10A': CPT100.verify,
-    'BDC100': BDC100.verify,
+    'BDC100&C17': BDC100.verify,
   };
   const produceModel = context.configForm.produceModel;
   const executeFunction = executeFunctionList[produceModel];
@@ -153,6 +153,42 @@ export const doPowerInspection = async (context,protocolId, type) => {
   // 2 秒后切换为成功状态
   setTimeout(() => {
     context.buttonWaiting('powerInspection');
+  }, 2000);
+
+  await playSuccessAudio(context);
+};
+
+
+export const doPowerCalibration = async (context,protocolId, type) => {
+  context.messageClean();
+  if (!checkPort(context, 'one')) {
+    await playErrorAudio(context);
+    return;
+  }
+  if (!checkPort(context, 'voltmeter')) {
+    await playErrorAudio(context);
+    return;
+  }
+  const executeFunctionList = {
+    'BDC100&C17': BDC100.calibration,
+  };
+  const produceModel = context.configForm.produceModel;
+  const executeFunction = executeFunctionList[produceModel];
+  if (executeFunction && await executeFunction(context,protocolId, type)) {
+    context.leftWorkPrompt = '校准电压失败'
+    context.buttonError('powerCalibration')
+    await playErrorAudio(context);
+    setTimeout(() => {
+      context.buttonWaiting('powerCalibration');
+    }, 2000);
+    return;
+  }
+  context.leftWorkPrompt = `校准电压成功`;
+  context.buttonSuccess('powerCalibration');
+  context.buttonEnable()
+  // 2 秒后切换为成功状态
+  setTimeout(() => {
+    context.buttonWaiting('powerCalibration');
   }, 2000);
 
   await playSuccessAudio(context);

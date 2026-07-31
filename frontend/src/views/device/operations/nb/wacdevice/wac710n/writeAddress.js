@@ -1,8 +1,7 @@
 import {badRecordUpload, serialPortOperation} from "@/views/device/action/deviceAction";
 import {protocolIDMap} from "@/views/device/enum/enum";
-import {playErrorAudio, playSuccessAudio} from "@/utils/audioUtils";
-import {generateAddressByNB, nbDeviceRegister, checkIMEIByTerminal, generateAddressByLORA} from "@/utils/serviceUtils";
-import {getIdByMacAddrNB} from "@/components/global/productdb";
+import {playErrorAudio} from "@/utils/audioUtils";
+import {checkIMEIByTerminal, generateAddressByNB} from "@/utils/serviceUtils";
 
 export async function writeAddress(protocolId, type, context) {
   const model = context.configForm.produceModel;

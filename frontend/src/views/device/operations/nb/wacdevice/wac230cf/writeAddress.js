@@ -1,11 +1,16 @@
 import {badRecordUpload, serialPortOperation} from "@/views/device/action/deviceAction";
 import {protocolIDMap} from "@/views/device/enum/enum";
 import {playErrorAudio} from "@/utils/audioUtils";
-import {checkIMEIByTerminal} from "@/utils/serviceUtils";
+import {checkIMEIByTerminal, generateAddressByNB} from "@/utils/serviceUtils";
 
 export async function writeAddress(protocolId, type, context) {
   const model = context.configForm.produceModel;
   const protocol = protocolIDMap[model];
+  let notPass = await generateAddressByNB(context)
+  if (notPass) {
+    await playErrorAudio(context)
+    return true
+  }
   let readSelfTestStatusResult = await serialPortOperation(context, {
     actionType: 'writeAddress',
     operationName: '地址写入（读自检状态）',

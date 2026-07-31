@@ -39,7 +39,7 @@ export async function writeAddress(protocolId, type, context) {
   }
 
   //退出热表检定状态。
-  let result = await doMeterReturnVerificationStatus(context, protocolId, type)
+  let result = await doMeterReturnVerificationStatus(context, protocolId, type,protocol)
   if (result) {
     await playErrorAudio(context)
     return true
@@ -72,7 +72,7 @@ export async function writeAddress(protocolId, type, context) {
     await badRecordUpload(context, '回温温度误差过大', +context.readMeterOutTemperature, 'writeAddress')
     await context.uploadMes(context.leftGenerateAddress, 0, '回温温度误差过大:' + context.readMeterOutTemperature)
     context.leftBadProductQuantity += 1
-    await doMeterReturnVerificationStatus(context, protocolId, type)
+    await doMeterReturnVerificationStatus(context, protocolId, type,protocol)
     await playErrorAudio(context)
     return true
   }
@@ -82,7 +82,7 @@ export async function writeAddress(protocolId, type, context) {
     await badRecordUpload(context, '进温温度误差过大', +context.readMeterInTemperature, 'writeAddress')
     await context.uploadMes(context.leftGenerateAddress, 0, '进温温度误差过大:' + context.readMeterInTemperature)
     context.leftBadProductQuantity += 1
-    await doMeterReturnVerificationStatus(context, protocolId, type)
+    await doMeterReturnVerificationStatus(context, protocolId, type,protocol)
     await playErrorAudio(context)
     return true
   }

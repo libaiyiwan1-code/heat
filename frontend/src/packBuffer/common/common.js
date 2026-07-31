@@ -3,10 +3,10 @@ import {
   arrayBuffer2Hex,
   calculateCSByte,
   floatToHexBuffer,
-  hex2arrayBuffer,
+  hex2arrayBuffer, hexToFloat,
   mergeArrayBuffer
 } from "@/packBuffer/common/comUtil";
-
+const Log = require("ee-core/log");
 export function packSingleStartHead(protocolID) {
   return createBuffer(2, [0x68, protocolID]);
 }
@@ -593,7 +593,7 @@ export function modbusPackDataDomains(afn, fn, context) {
 
 
 export function cj88PackDataDomains(afn, fn, protocolID, context) {
-  console.log('afn, fn ', afn, fn )
+  console.log('afn, fn ', afn, fn)
   let arrayBuffer = null;
 
   switch (afn) {
@@ -601,10 +601,10 @@ export function cj88PackDataDomains(afn, fn, protocolID, context) {
       switch (fn) {
         case '18':
           let originalAddressBuffer = Buffer.from(addressCover(context.leftReadAddress))
-          let bodyBuffer = createBuffer(5, [  0x15, 0x0a, 0xa0, 0x18, 0x01])
+          let bodyBuffer = createBuffer(5, [0x15, 0x0a, 0xa0, 0x18, 0x01])
           let newAddressBuffer = Buffer.from(addressCover(context.leftGenerateAddress))
-          let vendorCodeBuffer=createBuffer(3, [0x00, 0x00, 0x00])
-          arrayBuffer = mergeArrayBuffer(originalAddressBuffer,vendorCodeBuffer, bodyBuffer, newAddressBuffer,vendorCodeBuffer)
+          let vendorCodeBuffer = createBuffer(3, [0x00, 0x00, 0x00])
+          arrayBuffer = mergeArrayBuffer(originalAddressBuffer, vendorCodeBuffer, bodyBuffer, newAddressBuffer, vendorCodeBuffer)
           break;
 
       }
@@ -671,6 +671,14 @@ export function cj88PackDataDomains(afn, fn, protocolID, context) {
       switch (fn) {
         case '0a':
           arrayBuffer = createBuffer(5, [0x03, 0x03, 0x81, 0x0a, 0x00]);
+          break;
+      }
+      return mergeArrayBuffer(packBroadcastSevenMacAddr(), arrayBuffer);
+    }
+    case '90': {
+      switch (fn) {
+        case '20':
+          arrayBuffer = createBuffer(5, [0x01, 0x03, 0x90, 0x20, 0x00]);
           break;
       }
       return mergeArrayBuffer(packBroadcastSevenMacAddr(), arrayBuffer);
@@ -874,10 +882,28 @@ export function nbPackDataDomains(afn, fn, protocolID, context) {
           arrayBuffer = createBuffer(4, [0x0c, 0xff, 0x11, 0x00]);
           break;
         case '12-fail':
-          arrayBuffer = createBuffer(5, [0x0c, 0xff, 0x12, 0x00,0x00]);
+          arrayBuffer = createBuffer(5, [0x0c, 0xff, 0x12, 0x00, 0x00]);
           break;
         case '12-success':
-          arrayBuffer = createBuffer(5, [0x0c, 0xff, 0x12, 0x00,0x01]);
+          arrayBuffer = createBuffer(5, [0x0c, 0xff, 0x12, 0x00, 0x01]);
+          break;
+        case '24':
+          let calibrationError = context.calibrationError
+          let floatBuffer = new ArrayBuffer(4);
+          let view = new DataView(floatBuffer);
+          view.setFloat32(0, calibrationError, true);
+          let floatArray = Array.from(new Uint8Array(floatBuffer));
+          arrayBuffer = createBuffer(8, [0x0c, 0xff, 0x18, 0x00 , ...floatArray]);
+          Log.info('0c-24:',arrayBuffer)
+          break;
+        case '24-0':
+          let calibrationZeroError = 0
+          let floatZeroBuffer = new ArrayBuffer(4);
+          let viewZero = new DataView(floatZeroBuffer);
+          viewZero.setFloat32(0, calibrationZeroError, true);
+          let floatZeroArray = Array.from(new Uint8Array(floatZeroBuffer));
+          arrayBuffer = createBuffer(8, [0x0c, 0xff, 0x18, 0x00 , ...floatZeroArray]);
+          Log.info('0c-24-zero:',arrayBuffer)
           break;
         default:
         // Log.error("packages: afn[{}] match fail", afn);

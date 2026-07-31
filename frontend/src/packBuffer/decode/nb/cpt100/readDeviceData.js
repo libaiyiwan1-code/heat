@@ -16,7 +16,7 @@ export function readDeviceData(context, responseMessage) {
     power = dataView.getUint32(38, true).toString(16).padStart(8, '0')
   }
   console.log('CPT100读功率:', hexToFloat(power))
-  context.createLeftSpanMessage('CPT100读功率:' +  Number(hexToFloat(power)).toFixed(2) + 'W', 'grey')
+  context.createLeftSpanMessage('设备读功率:' +  Number(hexToFloat(power)).toFixed(2) + 'W', 'grey')
   context.deviceReadPower = hexToFloat(power)
   return notPass
 }

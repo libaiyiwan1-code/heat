@@ -41,11 +41,16 @@
                                &&this.configForm.produceModel!=='NBT400'
                                &&this.configForm.produceModel!=='NTR300'
                                &&this.configForm.produceModel!=='CPT100'
-                               &&this.configForm.produceModel!=='BDC100'
+                               &&this.configForm.produceModel!=='BDC100&C17'
                                &&this.configForm.produceModel!=='CPT100-10A'
                                &&this.configForm.produceModel!=='WAC330N'
                                &&this.configForm.produceModel!=='VAC005C'
                                &&this.configForm.produceModel!=='WAC300NY'
+                               &&this.configForm.produceModel!=='CAT200P'
+                                &&this.configForm.produceModel!=='CAT200'
+                                  &&this.configForm.produceModel!=='CAT400'
+                                    &&this.configForm.produceModel!=='CAT400S'
+                                    &&this.configForm.produceModel!=='WAC230CF'
 ">
                     <a-select
                       v-model:value="this.configForm.pressureProbes"
@@ -104,9 +109,15 @@
                              &&this.configForm.produceModel!=='NBT400'
                              &&this.configForm.produceModel!=='NTR300'
                              &&this.configForm.produceModel!=='CPT100'
-                             &&this.configForm.produceModel!=='BDC100'
+                             &&this.configForm.produceModel!=='BDC100&C17'
                              &&this.configForm.produceModel!=='CPT100-10A'
                              &&this.configForm.produceModel!=='WAC330N'
+                              &&this.configForm.produceModel!=='CAT200P'
+                              &&this.configForm.produceModel!=='CAT200'
+                              &&this.configForm.produceModel!=='CAT400'
+                               &&this.configForm.produceModel!=='CAT400S'
+                               &&this.configForm.produceModel!=='WAC230CF'
+
 
 
 ">
@@ -132,9 +143,14 @@
                                &&this.configForm.produceModel!=='NBT400'
                                &&this.configForm.produceModel!=='NTR300'
                                 &&this.configForm.produceModel!=='CPT100'
-                                &&this.configForm.produceModel!=='BDC100'
+                                &&this.configForm.produceModel!=='BDC100&C17'
                              &&this.configForm.produceModel!=='CPT100-10A'
                                      &&this.configForm.produceModel!=='WAC330N'
+                                      &&this.configForm.produceModel!=='CAT200P'
+                                       &&this.configForm.produceModel!=='CAT200'
+                                         &&this.configForm.produceModel!=='CAT400'
+                                           &&this.configForm.produceModel!=='CAT400S'
+                                           &&this.configForm.produceModel!=='WAC230CF'
 ">
                     <a-select
                       v-model:value="this.configForm.screenDisplay"
@@ -244,7 +260,7 @@
                                v-if="
                                this.configForm.produceModel === 'CPT100-10A'||
                                this.configForm.produceModel === 'CPT100'||
-                               this.configForm.produceModel === 'BDC100'
+                               this.configForm.produceModel === 'BDC100&C17'
 "
                   >
                     <div style="display: flex; align-items: center;margin-left: 15px">
@@ -283,7 +299,7 @@
                                v-show="
                                this.isNBDevice===true &&
                                this.configForm.produceModel!=='CPT100'&&
-                               this.configForm.produceModel!=='BDC100'&&
+                               this.configForm.produceModel!=='BDC100&C17'&&
                                this.configForm.produceModel!=='CPT100-10A'&&
                                this.configForm.temperatureProbes!=='无探头'||
                                this.configForm.produceModel==='WAC330HE'
@@ -677,9 +693,15 @@
                        &&this.configForm.produceModel!=='NBT400'
                        &&this.configForm.produceModel!=='NTR300'
                         &&this.configForm.produceModel!=='CPT100'
-                        &&this.configForm.produceModel!=='BDC100'
+                        &&this.configForm.produceModel!=='BDC100&C17'
                              &&this.configForm.produceModel!=='CPT100-10A'
                                        &&this.configForm.produceModel!=='WAC330N'
+                                       &&this.configForm.produceModel!=='CAT200P'
+                                       &&this.configForm.produceModel!=='CAT200'
+                                       &&this.configForm.produceModel!=='CAT200'
+                                         &&this.configForm.produceModel!=='CAT400'
+                                         &&this.configForm.produceModel!=='CAT400S'
+                                         &&this.configForm.produceModel!=='WAC230CF'
 ">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">测温类型:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{
@@ -714,10 +736,15 @@
                         &&this.configForm.produceModel!=='NBT400'
                         &&this.configForm.produceModel!=='NTR300'
                          &&this.configForm.produceModel!=='CPT100'
-                         &&this.configForm.produceModel!=='BDC100'
+                         &&this.configForm.produceModel!=='BDC100&C17'
                              &&this.configForm.produceModel!=='CPT100-10A'
                                        &&this.configForm.produceModel!=='WAC330N'
                                            &&this.configForm.produceModel!=='WAC300NY'
+                                            &&this.configForm.produceModel!=='CAT200P'
+                                            &&this.configForm.produceModel!=='CAT200'
+                                             &&this.configForm.produceModel!=='CAT400'
+                                             &&this.configForm.produceModel!=='CAT400S'
+                                             &&this.configForm.produceModel!=='WAC230CF'
 ">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">压力探头:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{
@@ -731,10 +758,14 @@
                         &&this.configForm.produceModel!=='NBT400'
                         &&this.configForm.produceModel!=='NTR300'
                          &&this.configForm.produceModel!=='CPT100'
-                         &&this.configForm.produceModel!=='BDC100'
+                         &&this.configForm.produceModel!=='BDC100&C17'
                              &&this.configForm.produceModel!=='CPT100-10A'
                                        &&this.configForm.produceModel!=='WAC330N'
-
+                                        &&this.configForm.produceModel!=='CAT200P'
+                                        &&this.configForm.produceModel!=='CAT200'
+                                          &&this.configForm.produceModel!=='CAT400'
+                                          &&this.configForm.produceModel!=='CAT400S'
+                                          &&this.configForm.produceModel!=='WAC230CF'
 ">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">屏幕显示:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.screenDisplay }}</span>
@@ -750,9 +781,14 @@
                   this.configForm.produceModel!=='NBT400'&&
                   this.configForm.produceModel!=='NTR300'
                    &&this.configForm.produceModel!=='CPT100'
-                   &&this.configForm.produceModel!=='BDC100'
+                   &&this.configForm.produceModel!=='BDC100&C17'
                              &&this.configForm.produceModel!=='CPT100-10A'
                                        &&this.configForm.produceModel!=='WAC330N'
+                                        &&this.configForm.produceModel!=='CAT200P'
+                                        &&this.configForm.produceModel!=='CAT200'
+                                          &&this.configForm.produceModel!=='CAT400'
+                                          &&this.configForm.produceModel!=='CAT400S'
+                                          &&this.configForm.produceModel!=='WAC230CF'
 ">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">温度误差:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{
@@ -796,7 +832,7 @@
                   <div class="hlm-card-configInfo-body-info-line"
                        v-show="
                        this.configDetail.printLabel==='CPT100-10A'||
-                       this.configDetail.printLabel==='BDC100'||
+                       this.configDetail.printLabel==='BDC100&C17'||
                        this.configDetail.printLabel==='CPT100'
 
 ">
@@ -818,9 +854,13 @@
                        this.configForm.produceModel!=='NBT400'&&
                        this.configForm.produceModel!=='NTR300'
  &&this.configForm.produceModel!=='CPT100'
- &&this.configForm.produceModel!=='BDC100'
+ &&this.configForm.produceModel!=='BDC100&C17'
                              &&this.configForm.produceModel!=='CPT100-10A'
                                        &&this.configForm.produceModel!=='WAC330N'
+                                        &&this.configForm.produceModel!=='CAT200P'
+                                        &&this.configForm.produceModel!=='CAT200'
+                                        &&this.configForm.produceModel!=='CAT400'
+                                        &&this.configForm.produceModel!=='CAT400S'
 ">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">温度标定:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.temperature }}</span>
@@ -1166,13 +1206,14 @@
             :footer="null"
             :closable="true"
             @cancel="closeModal"
-            width="20vw"
-            height="10vh"
+            width="10vw"
+            height="5vh"
+            :style="{ marginTop: '-40vh',marginLeft:'-25vw' }"
             centered
           >
             <img
               :src="selectedImage"
-              style="width: 100%; height: auto; object-fit: contain; max-height: 80vh;"
+              style="width: 100%; height: auto; object-fit: contain; max-height: 40vh;"
             />
           </a-modal>
           <!--        <a-card
@@ -1307,7 +1348,7 @@
                    v-if="this.configDetail.printLabel==='PTC100-4-20MA'||
                    this.configDetail.printLabel==='PTC100-RS485'||
                    this.configDetail.printLabel==='CPT100'||
-                   this.configDetail.printLabel==='BDC100'||
+                   this.configDetail.printLabel==='BDC100&C17'||
                   this.configDetail.printLabel==='CPT100-10A'
 ">
                 <a-form-item>
@@ -1682,8 +1723,21 @@
               </a-button>
               <a-button type="primary" block
                         v-if="
+                         this.configForm.produceModel==='BDC100&C17'
+                    "
+                        @click="powerCalibration(protocolIDMap[this.configForm.produceModel].protocolId,'one')"
+                        :disabled="nbButtonDisabledStatus.powerCalibration"
+                        :style="{
+                           backgroundColor: nbButtonColor.powerCalibration
+                        }"
+                        class="hlm-nb-business-start-button-style"
+              >
+                校准
+              </a-button>
+              <a-button type="primary" block
+                        v-if="
                         this.configForm.produceModel==='CPT100'
-                        ||this.configForm.produceModel==='BDC100'
+                        ||this.configForm.produceModel==='BDC100&C17'
                         ||this.configForm.produceModel==='CPT100-10A'"
                         @click="powerInspection(protocolIDMap[this.configForm.produceModel].protocolId,'one')"
                         :disabled="nbButtonDisabledStatus.powerInspection"
@@ -1694,6 +1748,7 @@
               >
                 检验
               </a-button>
+
               <a-button type="primary" block
                         v-if="this.configForm.produceModel==='AEC100'"
                         @click="this.current4To20mADemarcate(protocolIDMap[this.configForm.produceModel].protocolId,'one')"
@@ -1748,6 +1803,7 @@
                       this.configDetail.printLabel==='WAC300NY'||
                       this.configDetail.printLabel==='CAT400'||
                       this.configDetail.printLabel==='CAT200'||
+                      this.configDetail.printLabel==='CAT200P'||
                       this.configDetail.printLabel==='CAT400S' ||
                       this.configDetail.printLabel==='CTW100'||
                       this.configDetail.printLabel==='WAC100N'||
@@ -1797,6 +1853,7 @@
                       this.configDetail.printLabel==='WAC300NY'||
                       this.configDetail.printLabel==='CAT400'||
                       this.configDetail.printLabel==='CAT200'||
+                      this.configDetail.printLabel==='CAT200P'||
                       this.configDetail.printLabel==='CAT400S'||
                       this.configDetail.printLabel==='CTW100'||
                       this.configDetail.printLabel==='WAC300NS'||
@@ -1827,6 +1884,7 @@
                       this.configDetail.printLabel==='WAC610N'||
                       this.configDetail.printLabel==='NBT100-AC'||
                       this.configDetail.printLabel==='CAT200'||
+                      this.configDetail.printLabel==='CAT200P'||
                       this.configDetail.printLabel==='NTC100'||
                       this.configDetail.printLabel==='NBT400-AC'||
                       this.configDetail.printLabel==='NTR200'||
@@ -1902,6 +1960,7 @@
                       this.configDetail.printLabel==='WAC300NY'||
                       this.configDetail.printLabel==='CAT400'||
                       this.configDetail.printLabel==='CAT200'||
+                      this.configDetail.printLabel==='CAT200P'||
                       this.configDetail.printLabel==='CAT400S'||
                       this.configDetail.printLabel==='NTR300C'||
                       this.configDetail.printLabel==='PTC100-4-20MA'||
@@ -1935,6 +1994,7 @@
                       this.configDetail.printLabel==='WAC610N'||
                       this.configDetail.printLabel==='NBT100-AC'||
                       this.configDetail.printLabel==='CAT200'||
+                      this.configDetail.printLabel==='CAT200P'||
                       this.configDetail.printLabel==='NTC100'||
                       this.configDetail.printLabel==='NBT400-AC'||
                       this.configDetail.printLabel==='NTR200'||
@@ -1947,7 +2007,8 @@
                       this.configDetail.printLabel==='WAC300C'||
                       this.configDetail.printLabel==='WAC330N'||
                       this.configDetail.printLabel==='WAC710C'||
-                      this.configDetail.printLabel==='WAC400N'
+                      this.configDetail.printLabel==='WAC400N'||
+                      this.configDetail.printLabel==='WAC230CF'
 
 
 "
@@ -2651,7 +2712,7 @@ import {protocolIDMap} from "@/views/device/enum/enum";
 import {
   doAwaken,
   doExitSelfTest,
-  doPrintLabel, doPrintLabelTODO,
+  doPrintLabel, doPrintLabelTODO, doPrintWarehouseEntryFailedLabel,
   doQuadraticVerification,
   doReadSelfTestStatus,
   doScanCodeVerification,
@@ -2686,7 +2747,7 @@ import {
   doReadTemperature,
   doSingleChannelCalibration,
   doDoubleChannelCalibration,
-  doCurrent4To20mADemarcate, doPowerInspection
+  doCurrent4To20mADemarcate, doPowerInspection, doPowerCalibration
 } from "@/views/device/operations/modbusDeviceOperations";
 
 const Log = require("ee-core/log");
@@ -2803,9 +2864,9 @@ export default {
       selectLabelPaperSize: '40x20',
       labelWidth: 40,
       labelHeight: 19,
-      labelMargin: 1,
+      labelMargin: 3,
       lableMarginLeft: 14,
-      secondColumnFontSize: 3.3,
+      secondColumnFontSize: 3.6,
       listDoubleRowLabels: '是',
       currentSourceList: ['有', '无'],
       selectDoubleRowLabels: ['是', '否'],
@@ -2915,7 +2976,7 @@ export default {
       url: 'http://192.168.0.159:82/bdaFile/preview?objectKey=',
       imageWidth: null, // 存储图片宽度
       imageHeight: null, // 存储图片高度
-      defaultKey: '1696479583662030849',
+      defaultKey: 'd263b4e930456a247ebfc4b089964544',
       mainImage: 'http://192.168.0.159:82/bdaFile/preview?objectKey=',
       // mainImages: [
       //   {url: 'http://192.168.0.159:82/bdaFile/preview?objectKey=1696475299650256897', flag: true}
@@ -3270,6 +3331,7 @@ export default {
         'NBC200C',
         'NBT200',
         'CAT200',
+        'CAT200P',
         'NTC100',
         'NBT400',
         'NBT400-AC',
@@ -3302,7 +3364,7 @@ export default {
         'LPC130E-Cat1',
         'LPC130B-Cat1',
         'CPT100',
-        'BDC100',
+        'BDC100&C17',
         'CPT100-10A',
         'VPT100',
         'AEC100',
@@ -3347,6 +3409,7 @@ export default {
       deviceBatteryVoltage: undefined,//设备电池电压
       deviceReadPower: undefined,///CPT100-10A 读功率
       voltmeterReadPower: undefined,//电流表读取功率
+      calibrationError:undefined,//DBC100 设置的功率误差
     };
   },
   /*移除监听器 */
@@ -3440,8 +3503,18 @@ export default {
 
       /** 三级产品名称列表
        * PTC100-4-20MA
-       *
+       * EB-4U是485 用9600 无 校验
+       * EB-M是 M-BS 用2400 偶 校验
        * */
+
+      //TODO
+      if (model.includes('EB-4U')){
+        this.portAttributes.selectedCheckDigit='无'
+        this.portAttributes.selectedBadRate = 9600
+      }else if (model.includes('EB-M')){
+        this.portAttributes.selectedBadRate = 2400
+        this.portAttributes.selectedCheckDigit='偶校验'
+      }
       let productNamingConventionsList = model.split('-');
       // let productModel = productNamingConventionsList[0];
       // this.configForm.produceModel = productNamingConventionsList[0];
@@ -3520,6 +3593,7 @@ export default {
         this.configForm.produceModel === 'WAC230CF' ||
         this.configForm.produceModel === 'WAC300CD' ||
         this.configForm.produceModel === 'BeaconM' ||
+        this.configForm.produceModel === 'WAC300LH' ||
         this.configForm.produceModel === 'WAC730C' ||
         this.configForm.produceModel === 'WAC330HE' ||
         this.configForm.produceModel === 'NTP100C' ||
@@ -3535,9 +3609,10 @@ export default {
         this.configForm.produceModel === 'WAC300NY' ||
         this.configForm.produceModel === 'CAT400' ||
         this.configForm.produceModel === 'CAT200' ||
+        this.configForm.produceModel === 'CAT200P' ||
         this.configForm.produceModel === 'CAT400S' ||
         this.configForm.produceModel === 'CPT100' ||
-        this.configForm.produceModel === 'BDC100' ||
+        this.configForm.produceModel === 'BDC100&C17' ||
         this.configForm.produceModel === 'VPT100' ||
         this.configForm.produceModel === 'NTR300C' ||
         this.configForm.produceModel === 'PTC100-4-20MA' ||
@@ -3578,6 +3653,7 @@ export default {
         this.configForm.produceModel === 'WAC610N' ||
         this.configForm.produceModel === 'NBT100-AC' ||
         this.configForm.produceModel === 'CAT200' ||
+        this.configForm.produceModel === 'CAT200P' ||
         this.configForm.produceModel === 'NTC100' ||
         this.configForm.produceModel === 'NBT400-AC' ||
         this.configForm.produceModel === 'NTR200' ||
@@ -3620,6 +3696,7 @@ export default {
       } else {
         this.createLeftSpanMessage('此工单生产产品型号：' + productModel + '缺少显示屏配置,请手动配置', 'red');
       }
+
 
 
       if (productNamingConventionsList.length >= 3 &&
@@ -3780,8 +3857,14 @@ export default {
         await this.wireDeviceConfigInput()
       }
     }
+    //2026年7月24日15:23:36  李柏毅  初始化个别标签定制化标签
+    if(this.configForm.produceModel==='WAC710CD'){
+      if (this.configForm.temperatureProbes === '回温探头' && this.configForm.pressureProbes !== '压差') {
+        this.configForm.customizePrintLabel = '37003.02'
+        this.configDetail.customizePrintLabel  = this.configForm.customizePrintLabel
 
-
+      }
+    }
     //研发人员手动选择型号
     console.log(this.routerParam.produceMachine)
     if (this.routerParam.produceMachine === 1
@@ -3982,9 +4065,9 @@ export default {
         this.imageDesc = '40mm x 20mm 标签纸预览图'
         this.labelHeight = 19
         this.labelWidth = 40
-        this.labelMargin = 1
+        this.labelMargin = 3
         this.lableMarginLeft = 14
-        this.secondColumnFontSize = 3.3
+        this.secondColumnFontSize = 3.6
       } else if (this.selectLabelPaperSize === '30x12') {
         this.imageDesc = '30mm x 12mm 标签纸预览图'
         this.labelHeight = 11
@@ -4068,21 +4151,7 @@ export default {
       console.log(`图片尺寸: ${this.imageWidth}x${this.imageHeight} 像素`);
     }
     ,
-    async logWrite() {
-      // for (let i = 0; i < 10; i++) {
-      //   this.createLeftSpanMessage('测试日志写入' + i, 'green')
-      //   // this.createRightSpanMessage('测试日志写入'+i,'green')
-      // }
-      const params = {
-        deviceName: this.defaultDeviceName,
-        address: '12345678',
-        message: '版本匹配失败',
-      };
-      await ipc.send(ipcApiRoute.printErrorMessage, params)
 
-
-    }
-    ,
     handleProduceModelChange(value) {
       const excludeList = ['VAC00', 'VAC10', 'VAC20', 'VAC30', 'VAC40', 'VAC50'];
 
@@ -5050,7 +5119,7 @@ export default {
       console.log('图片尺寸：', this.imageWidth, this.imageHeight)
       // 1. 容器尺寸（基于设计稿 1920x1080 的 vw/vh 比例）
       const containerWidthVw = (640 / 1920 * 100);  // 容器宽度：33.333vw
-      const containerHeightVh = (320 / 1080 * 100); // 容器高度：33.333vh
+      const containerHeightVh = (319 / 1080 * 100); // 容器高度：33.333vh
 
       // 2. 将图片原始像素尺寸转换为 vw/vh（基于当前视口）
       const viewportWidth = window.innerWidth;  // 当前视口宽度（px）
@@ -5127,12 +5196,20 @@ export default {
     ,
     escapeHTML(str) {
       return str.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, "").replace(/'/g, "'");
-    }
-    ,
+    },
     async printLabel(flag, protocolId, type) {
       if (this.routerParam.produceMachine === 0) {
         //生产机器才打印标签
         await doPrintLabel(this, flag, protocolId, type)
+      }
+    },
+    /**
+     * 打印生产入库失败标签
+     */
+    async printWarehouseEntryFailedLabel() {
+      if (this.routerParam.produceMachine === 0) {
+        //生产机器才打印标签
+        await doPrintWarehouseEntryFailedLabel(this)
       }
     },
     async printLabel2(flag, protocolId, type) {
@@ -5214,6 +5291,7 @@ export default {
       this.configDetail.lableMarginLeft = this.lableMarginLeft
       this.configDetail.secondColumnFontSize = this.secondColumnFontSize
       this.configDetail.whetherDoubleRowPrinting = this.listDoubleRowLabels
+      this.configDetail.paperSize = this.selectLabelPaperSize
 
 
       // if (this.selectLabelPaperSize === '40mm*20mm') {
@@ -5343,6 +5421,7 @@ export default {
           this.configForm.produceModel === 'WAC230CF' ||
           this.configForm.produceModel === 'WAC300CD' ||
           this.configForm.produceModel === 'BeaconM' ||
+          this.configForm.produceModel === 'WAC300LH' ||
           this.configForm.produceModel === 'WAC730C' ||
           this.configForm.produceModel === 'WAC330HE' ||
           this.configForm.produceModel === 'NTP100C' ||
@@ -5358,9 +5437,10 @@ export default {
           this.configForm.produceModel === 'WAC300NY' ||
           this.configForm.produceModel === 'CAT400' ||
           this.configForm.produceModel === 'CAT200' ||
+          this.configForm.produceModel === 'CAT200P' ||
           this.configForm.produceModel === 'CAT400S' ||
           this.configForm.produceModel === 'CPT100' ||
-          this.configForm.produceModel === 'BDC100' ||
+          this.configForm.produceModel === 'BDC100&C17' ||
           this.configForm.produceModel === 'VPT100' ||
           this.configForm.produceModel === 'NTR300C' ||
           this.configForm.produceModel === 'CTW100' ||
@@ -5394,6 +5474,7 @@ export default {
           this.configForm.produceModel === 'WAC610N' ||
           this.configForm.produceModel === 'NBT100-AC' ||
           this.configForm.produceModel === 'CAT200' ||
+          this.configForm.produceModel === 'CAT200P' ||
           this.configForm.produceModel === 'NTC100' ||
           this.configForm.produceModel === 'NBT400-AC' ||
           this.configForm.produceModel === 'NTR200' ||
@@ -5448,7 +5529,7 @@ export default {
 
         if (this.configForm.produceModel === 'CPT100-10A' ||
           this.configForm.produceModel === 'CPT100'||
-          this.configForm.produceModel === 'BDC100'
+          this.configForm.produceModel === 'BDC100&C17'
         ) {
           this.configDetail.power_error = this.configForm.power_error
         }
@@ -5462,6 +5543,7 @@ export default {
           this.configForm.produceModel === 'WAC230CF' ||
           this.configForm.produceModel === 'WAC300CD' ||
           this.configForm.produceModel === 'BeaconM' ||
+          this.configForm.produceModel === 'WAC300LH' ||
           this.configForm.produceModel === 'WAC730C' ||
           this.configForm.produceModel === 'WAC330HE' ||
           this.configForm.produceModel === 'NTP100C' ||
@@ -5478,9 +5560,10 @@ export default {
           this.configForm.produceModel === 'WAC300NY' ||
           this.configForm.produceModel === 'CAT400' ||
           this.configForm.produceModel === 'CAT200' ||
+          this.configForm.produceModel === 'CAT200P' ||
           this.configForm.produceModel === 'CAT400S' ||
           this.configForm.produceModel === 'CPT100' ||
-          this.configForm.produceModel === 'BDC100' ||
+          this.configForm.produceModel === 'BDC100&C17' ||
           this.configForm.produceModel === 'VPT100' ||
           this.configForm.produceModel === 'NTR300C' ||
           this.configForm.produceModel === 'CTW100' ||
@@ -5514,6 +5597,7 @@ export default {
           this.configForm.produceModel === 'WAC610N' ||
           this.configForm.produceModel === 'NBT100-AC' ||
           this.configForm.produceModel === 'CAT200' ||
+          this.configForm.produceModel === 'CAT200P' ||
           this.configForm.produceModel === 'NTC100' ||
           this.configForm.produceModel === 'NBT400-AC' ||
           this.configForm.produceModel === 'NTR200' ||
@@ -5606,6 +5690,7 @@ export default {
       this.nbButtonDisabledStatus.onePointSixMpaDemarcate = true
       this.nbButtonDisabledStatus.deviceInspection = true
       this.nbButtonDisabledStatus.powerInspection = true
+      this.nbButtonDisabledStatus.powerCalibration= true
       this.nbButtonDisabledStatus.readSelfTestStatus = true
       this.nbButtonDisabledStatus.singleChannelCalibration = true
       this.nbButtonDisabledStatus.doubleChannelCalibration = true
@@ -5625,6 +5710,7 @@ export default {
       this.nbButtonDisabledStatus.onePointSixMpaDemarcate = false
       this.nbButtonDisabledStatus.deviceInspection = false
       this.nbButtonDisabledStatus.powerInspection = false
+      this.nbButtonDisabledStatus.powerCalibration = false
       this.nbButtonDisabledStatus.readSelfTestStatus = false
       this.nbButtonDisabledStatus.singleChannelCalibration = false
       this.nbButtonDisabledStatus.doubleChannelCalibration = false
@@ -5802,7 +5888,7 @@ export default {
       let parity = protocolIDMap[this.configForm.produceModel].portAttribute.parity
       let dataBits = protocolIDMap[this.configForm.produceModel].portAttribute.dataBits
       let baudRate = this.portAttributes.selectedBadRate
-      let stopBits = this.portAttributes.selectedCheckDigit
+      let stopBits = 1
 
 
       if (!this.isNBDevice) {
@@ -5835,6 +5921,9 @@ export default {
     },
     async powerInspection(protocolId, type) {
       await doPowerInspection(this, protocolId, type)
+    },
+    async powerCalibration(protocolId, type) {
+      await doPowerCalibration(this, protocolId, type)
     },
     async readSelfTestStatus(protocolId, type) {
       await doReadSelfTestStatus(this, protocolId, type)

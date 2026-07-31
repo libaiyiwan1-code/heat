@@ -4,10 +4,13 @@ const mysql = require('mysql');
 const pool = mysql.createPool({
   connectionLimit: 10, // 连接池最大连接数
   host: '114.115.179.61',
+  // host: '10.255.255.1',
   user: 'valve_mbus',
   password: 'qdhlm',
   database: 'valve_produce',
-  port: 3306
+  port: 3306,
+  connectTimeout: 8000, // 8秒连接超时：获取连接超过5秒直接报错
+  timeout: 10000        // 10秒查询超时：执行SQL超过10秒直接报错
 });
 
 export function getVacvalveproduceByMacAddr(macaddr) {
@@ -103,36 +106,47 @@ export function getIdByMacAddrVACProduce(macaddr) {
   });
 }
 
-export function getIdByMacAddrLORAProduce(macaddr) {
-  return new Promise((resolve, reject) => {
-    // 从连接池中获取连接
+export function getIdByMacAddrLORAProduce(context, macaddr) {
+  return new Promise((resolve) => {
+    // 从连接池获取连接（若超过 8 秒未获取到连接，驱动会自动抛出 err）
+    // 1. 临时创建一个错误的“沙盒连接池”来模拟网络不好
+    // const mockBadPool = mysql.createPool({
+    //   host: '10.255.255.1', //  模拟断网
+    //   user: 'valve_mbus',
+    //   password: 'qdhlm',
+    //   database: 'valve_produce',
+    //   connectTimeout: 9000 // 5秒超时
+    // });
     pool.getConnection((err, connection) => {
       if (err) {
-        console.log(err)
-        reject(err);
-        return;
+        console.error('捕获到生产库连接错误：', err.message);
+        context.createLeftSpanMessage('生产库网络连接超时 写地址流程失败', 'red')
+        return resolve(false);
       }
 
-      // 执行查询
+      // 执行查询（若执行超过 10 秒，驱动会自动抛出 error）
       connection.query(
         `SELECT id
          FROM arc_loravalveproduce
          WHERE macaddr = ?`,
         [macaddr],
         (error, results) => {
-          // 释放连接
+          // 务必释放连接
           connection.release();
+
           if (error) {
-            reject(error);
-          } else {
-            resolve(results);
+            console.error('捕获到 SQL 执行错误：', error.message);
+            context.createLeftSpanMessage('数据库响应超时 写地址流程失败', 'red');
+            return resolve(false);
           }
+
+          // 查询成功，返回结果
+          resolve(results);
         }
       );
     });
   });
 }
-
 
 
 export function getIdByUsername(username) {
@@ -611,75 +625,173 @@ export function findMacAddr() {
     });
   });
 }
+//TODO 增加重试前恢复
+// export function insertNBValueProduce(context,data) {
+//   return new Promise(async (resolve, reject) => {
+//
+//     // 1. 临时创建一个错误的“沙盒连接池”来模拟网络不好
+//     // const mockBadPool = mysql.createPool({
+//     //   host: '10.255.255.1', //  模拟断网
+//     //   user: 'valve_mbus',
+//     //   password: 'qdhlm',
+//     //   database: 'valve_produce',
+//     //   connectTimeout: 5000 // 5秒超时
+//     // });
+//
+//     // 从连接池中获取连接
+//     pool.getConnection((err, connection) => {
+//
+//       if (err) {
+//         // 当 5 秒超时触发时，这里会准时打印错误提示！
+//         console.log("捕获到连接错误：", err.message);
+//         context.createLeftSpanMessage('生产库网络连接超时，请检查网络设置','red')
+//         resolve(false);
+//       }
+//
+//       // 执行插入
+//       connection.query(
+//         `INSERT INTO arc_nbvalveproduce (userid, customerid, valveModel, valveVersion, protocolid,
+//                                          IMEI, netprovider, macaddr, produceDate, iccid, description, status,
+//                                          customer, expireDate, TempProbeAddr, PressProbe, TorqueNM, valveDN)
+//          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+//         [data.userid, data.customerid, data.valveModel, data.valveVersion,
+//           data.protocolid, data.IMEI, data.netprovider, data.macaddr,
+//           data.produceDate, data.iccid, data.description, data.status,
+//           data.customer, data.expireDate, data.TempProbeAddr, data.PressProbe, data.TorqueNM, data.valveDN],
+//         (error, results) => {
+//           // 释放连接
+//           connection.release();
+//           if (error) {
+//             // 当 10 秒超时触发时，这里会准时捕获到错误
+//             console.error("【测试提示】捕获到 SQL 执行错误:", error.message); // 错误信息通常包含 'PROTOCOL_SEQUENCE_TIMEOUT' 或 'timeout'
+//             // 提示前端
+//             context.createLeftSpanMessage('数据库响应超时，写入失败！', 'red');
+//             resolve(false);
+//           } else {
+//             resolve(results);
+//           }
+//         }
+//       );
+//     });
+//   });
+// }
 
-export function insertNBValueProduce(data) {
-  return new Promise((resolve, reject) => {
-    // 从连接池中获取连接
-    pool.getConnection((err, connection) => {
-      if (err) {
-        console.log(err);
-        reject(err);
-        return;
-      }
 
-      // 执行插入
-      connection.query(
-        `INSERT INTO arc_nbvalveproduce (userid, customerid, valveModel, valveVersion, protocolid,
-                                         IMEI, netprovider, macaddr, produceDate, iccid, description, status,
-                                         customer, expireDate, TempProbeAddr,PressProbe,TorqueNM,valveDN)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)`,
-        [data.userid, data.customerid, data.valveModel, data.valveVersion,
-          data.protocolid, data.IMEI, data.netprovider, data.macaddr,
-          data.produceDate, data.iccid, data.description, data.status,
-          data.customer, data.expireDate, data.TempProbeAddr,data.PressProbe,data.TorqueNM,data.valveDN],
-        (error, results) => {
-          // 释放连接
-          connection.release();
-          if (error) {
-            reject(error);
-          } else {
+
+export function insertNBValueProduce(context, data) {
+  // 定义最大重试次数为 1 次
+  const maxRetries = 1;
+    // 1. 临时创建一个错误的“沙盒连接池”来模拟网络不好
+    // const mockBadPool = mysql.createPool({
+    //   host: '10.255.255.1', //  模拟断网
+    //   user: 'valve_mbus',
+    //   password: 'qdhlm',
+    //   database: 'valve_produce',
+    //   connectTimeout: 9000 // 5秒超时
+    // });
+  // 抽离核心执行逻辑，便于递归或循环重试
+  const executeInsert = (attempt) => {
+    return new Promise((resolve) => {
+      // 从连接池中获取连接
+      pool.getConnection((err, connection) => {
+        if (err) {
+          console.error(`[第 ${attempt} 次尝试] 捕获到连接错误：`, err.message);
+
+          // 如果还可以重试，则进行重试
+          if (attempt < maxRetries) {
+            context.createLeftSpanMessage(`生产库连接超时，正在进行第 ${attempt + 1} 次重试...`, 'orange');
+            return resolve(executeInsert(attempt + 1));
+          }
+
+          // 超过最大重试次数
+          context.createLeftSpanMessage('生产库网络连接超时 写地址流程失败', 'red');
+          return resolve(false);
+        }
+
+        // 执行插入 SQL
+        connection.query(
+          `INSERT INTO arc_nbvalveproduce (userid, customerid, valveModel, valveVersion, protocolid,
+                                           IMEI, netprovider, macaddr, produceDate, iccid, description, status,
+                                           customer, expireDate, TempProbeAddr, PressProbe, TorqueNM, valveDN)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [data.userid, data.customerid, data.valveModel, data.valveVersion,
+            data.protocolid, data.IMEI, data.netprovider, data.macaddr,
+            data.produceDate, data.iccid, data.description, data.status,
+            data.customer, data.expireDate, data.TempProbeAddr, data.PressProbe, data.TorqueNM, data.valveDN],
+          (error, results) => {
+            // 务必释放连接
+            connection.release();
+
+            if (error) {
+              console.error(`[第 ${attempt} 次尝试] 捕获到 SQL 执行错误:`, error.message);
+
+              // SQL 执行超时或失败，且可以重试
+              if (attempt < maxRetries) {
+                context.createLeftSpanMessage(`数据库响应超时，正在进行第 ${attempt + 1} 次重试...`, 'orange');
+                return resolve(executeInsert(attempt + 1));
+              }
+
+              // 超过最大重试次数
+              context.createLeftSpanMessage('数据库响应超时 写地址流程失败', 'red');
+              return resolve(false);
+            }
+
+            // 执行成功
             resolve(results);
           }
-        }
-      );
+        );
+      });
     });
-  });
-}
+  };
 
-export function insertLORAValueProduce(data) {
-  return new Promise((resolve, reject) => {
-    // 从连接池中获取连接
+  // 从第 0 次尝试开始执行（0 代表首次执行，1 代表第 1 次重试）
+  return executeInsert(0);
+}
+export function insertLORAValueProduce(context, data) {
+  return new Promise((resolve) => {
+    // 从连接池获取连接（若超过 8 秒未获取到连接，驱动会自动抛出 err）
+    // 1. 临时创建一个错误的“沙盒连接池”来模拟网络不好
+    // const mockBadPool = mysql.createPool({
+    //   host: '10.255.255.1', //  模拟断网
+    //   user: 'valve_mbus',
+    //   password: 'qdhlm',
+    //   database: 'valve_produce',
+    //   connectTimeout: 9000 // 5秒超时
+    // });
     pool.getConnection((err, connection) => {
       if (err) {
-        console.log(err);
-        reject(err);
-        return;
+        console.error('捕获到生产库连接错误：', err.message);
+        context.createLeftSpanMessage('生产库网络连接超时 写地址流程失败', 'red');
+        return resolve(false);
       }
 
-      // 执行插入
+      // 执行插入 SQL（若执行超过 10 秒，驱动会自动抛出 error）
       connection.query(
         `INSERT INTO arc_loravalveproduce (userid, customerid, valveModel, valveVersion, protocolid,
-                                          netprovider, macaddr, produceDate,  description, status,
-                                         customer, expireDate, TempProbeAddr,PressProbe,TorqueNM,valveDN)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`,
+                                           netprovider, macaddr, produceDate, description, status,
+                                           customer, expireDate, TempProbeAddr, PressProbe, TorqueNM, valveDN)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [data.userid, data.customerid, data.valveModel, data.valveVersion,
-          data.protocolid,  data.netprovider, data.macaddr,
-          data.produceDate,   data.description, data.status,
-          data.customer, data.expireDate, data.TempProbeAddr,data.PressProbe,data.TorqueNM,data.valveDN],
+          data.protocolid, data.netprovider, data.macaddr,
+          data.produceDate, data.description, data.status,
+          data.customer, data.expireDate, data.TempProbeAddr, data.PressProbe, data.TorqueNM, data.valveDN],
         (error, results) => {
-          // 释放连接
+          // 务必释放连接
           connection.release();
+
           if (error) {
-            reject(error);
-          } else {
-            resolve(results);
+            console.error('捕获到 SQL 执行错误：', error.message);
+            context.createLeftSpanMessage('数据库响应超时 写地址流程失败', 'red');
+            return resolve(false);
           }
+
+          // 执行成功，返回结果
+          resolve(results);
         }
       );
     });
   });
 }
-
 export function insertCollectorProduce(data) {
   return new Promise((resolve, reject) => {
     // 从连接池中获取连接
@@ -852,16 +964,25 @@ export function countProductNBDeviceQuantityCountByUserId(userId, date) {
 }
 
 
-export function countProductLORADeviceQuantityCountByUserId(userId, date) {
-  return new Promise((resolve, reject) => {
-    // 从连接池中获取连接
+export function countProductLORADeviceQuantityCountByUserId(context, userId, date) {
+  return new Promise((resolve) => {
+    // 从连接池获取连接（若超过 8 秒未获取到连接，驱动会自动抛出 err）
+    // 1. 临时创建一个错误的“沙盒连接池”来模拟网络不好
+    // const mockBadPool = mysql.createPool({
+    //   host: '10.255.255.1', //  模拟断网
+    //   user: 'valve_mbus',
+    //   password: 'qdhlm',
+    //   database: 'valve_produce',
+    //   connectTimeout: 9000 // 5秒超时
+    // });
     pool.getConnection((err, connection) => {
       if (err) {
-        console.log(err)
-        reject(err);
-        return;
+        console.error('捕获到生产库连接错误：', err.message);
+        context.createLeftSpanMessage('生产库网络连接超时 请重新写地址', 'red');
+        return resolve(false);
       }
-      // 执行查询 对每条记录取出 macaddr 字段的 后3位字符，
+
+      // 执行查询（若执行超过 10 秒，驱动会自动抛出 error）
       connection.query(
         `SELECT SUBSTRING(macaddr, - 3) AS quantity
          FROM arc_loravalveproduce
@@ -870,17 +991,22 @@ export function countProductLORADeviceQuantityCountByUserId(userId, date) {
          ORDER BY macaddr DESC LIMIT 1;`,
         [userId, date],
         (error, results) => {
-          // 释放连接
+          // 务必释放连接
           connection.release();
+
           if (error) {
-            reject(error);
-          } else {
-            // 将第一个结果的quantity转换为数字类型
-            if (results.length > 0) {
-              results[0].quantity = parseInt(results[0].quantity, 10);
-            }
-            resolve(results);
+            console.error('捕获到 SQL 执行错误：', error.message);
+            context.createLeftSpanMessage('数据库响应超时 请重新写地址', 'red');
+            return resolve(false);
           }
+
+          // 将第一个结果的 quantity 转换为数字类型
+          if (results.length > 0) {
+            results[0].quantity = parseInt(results[0].quantity, 10);
+          }
+
+          // 查询成功，返回结果
+          resolve(results);
         }
       );
     });

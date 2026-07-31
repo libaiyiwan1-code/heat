@@ -14,8 +14,8 @@ export const selfTest = async (context, protocolId, type) => {
     cmdCode: 'f0',
     protocolId,
     maxRetries: context.maxRetries,
-    expectedLength: protocol.deviceActionResponseMessageLength.inquireSelfTest,
-    expectedLength2: protocol.deviceActionResponseMessageLength2.inquireSelfTest,
+    expectedLength: protocol.deviceActionResponseMessageLength['inquireSelfTest'],
+    expectedLength2: protocol.deviceActionResponseMessageLength2['inquireSelfTest'],
     timeout: context.timeout,
     validateResponse: () =>
       protocol.validateResponse.inquireSelfTest(
@@ -39,10 +39,11 @@ export const selfTest = async (context, protocolId, type) => {
     cmdCode: 'f2',
     protocolId,
     maxRetries: context.maxRetries,
-    expectedLength: protocol.deviceActionResponseMessageLength.selfTest,
-    expectedLength2: protocol.deviceActionResponseMessageLength2.selfTest,
+    expectedLength: protocol.deviceActionResponseMessageLength['selfTest'],
+    expectedLength2: protocol.deviceActionResponseMessageLength2['selfTest'],
     timeout: context.timeout,
-    validateResponse: () => true,
+    validateResponse: () => {
+    },
     isInfraredDevice: protocol.isInfraredDevice,
     isTransparentTransmissionProtocol:
     protocol.isDeviceActionTransparentTransmissionProtocol.selfTest,
