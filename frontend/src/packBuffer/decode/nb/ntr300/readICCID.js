@@ -10,7 +10,7 @@ export function readICCID(context,responseMessage) {
     dataView.getUint8(16) !== 0x68 ||
     dataView.getUint8(19) !== 0x68 ||
     dataView.getUint8(20) !== 0x80 ||
-    dataView.getUint8(21) !== 0x56 ||
+    dataView.getUint8(21) !== 0x4a ||
     dataView.getUint8(26) !== 0x05 ||
     dataView.getUint8(28) !== 0x08
   if (!notPass) {

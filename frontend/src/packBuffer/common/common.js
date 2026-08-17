@@ -6,7 +6,9 @@ import {
   hex2arrayBuffer, hexToFloat,
   mergeArrayBuffer
 } from "@/packBuffer/common/comUtil";
+
 const Log = require("ee-core/log");
+
 export function packSingleStartHead(protocolID) {
   return createBuffer(2, [0x68, protocolID]);
 }
@@ -491,6 +493,25 @@ export function modbusUTM100CPT100PackDataDomains(afn, fn, context) {
 export function modbusPackDataDomains(afn, fn, context) {
   let arrayBuffer = null;
   switch (afn) {
+    case 'f0': {
+      switch (fn) {
+        case '01':
+          arrayBuffer = createBuffer(4, [0xf0, 0xff, 0x01, 0x00]);
+          break;
+        case '02':
+          //0x00 默认普通自检
+          arrayBuffer = createBuffer(5, [0xf0, 0xff, 0x02, 0x00, 0x00]);
+          break;
+        case '1e':
+          arrayBuffer = createBuffer(4, [0xf0, 0xff, 0x1e, 0x00]);
+          break;
+        case '14':
+          arrayBuffer = createBuffer(4, [0xf0, 0xff, 0x14, 0x00]);
+          break;
+        default:
+      }
+    }
+      return mergeArrayBuffer(arrayBuffer);
     case '01':
       switch (fn) {
         //电压表读功率
@@ -763,18 +784,19 @@ export function nbPackDataDomains(afn, fn, protocolID, context) {
           arrayBuffer = mergeArrayBuffer(arrayBuffer, hex2arrayBuffer(context.leftGenerateAddress))
           break;
         case '23':
-          let selectTemperatureProbes = context.configDetail.selectTemperatureProbes
-          let selectTemperatureProbesBuffer
-          if (selectTemperatureProbes === '无探头') {
-            selectTemperatureProbesBuffer = createBuffer(1, [0x03])
-          } else if (selectTemperatureProbes === '有环境温度探头') {
-            selectTemperatureProbesBuffer = createBuffer(1, [0x02])
-          } else if (selectTemperatureProbes === '有管道温度探头') {
-            selectTemperatureProbesBuffer = createBuffer(1, [0x01])
-          } else if (selectTemperatureProbes === '双探头') {
-            selectTemperatureProbesBuffer = createBuffer(1, [0x00])
+
+          let temperatureProbe = context.configDetail.temperatureProbe
+          let temperatureProbeBuffer
+          if (temperatureProbe === '无探头') {
+            temperatureProbeBuffer = createBuffer(1, [0x03])
+          } else if (temperatureProbe === '进温探头') {
+            temperatureProbeBuffer = createBuffer(1, [0x02])
+          } else if (temperatureProbe === '回温探头') {
+            temperatureProbeBuffer = createBuffer(1, [0x01])
+          } else if (temperatureProbe === '双探头') {
+            temperatureProbeBuffer = createBuffer(1, [0x00])
           } else {
-            selectTemperatureProbesBuffer = createBuffer(1, [0x03])
+            temperatureProbeBuffer = createBuffer(1, [0x03])
           }
           let selectLevelProbes = context.configDetail.selectLevelProbes
           let selectLevelProbesBuffer
@@ -786,7 +808,7 @@ export function nbPackDataDomains(afn, fn, protocolID, context) {
             selectLevelProbesBuffer = createBuffer(1, [0x01])
           }
           arrayBuffer = createBuffer(4, [0x03, 0xff, 0x23, 0x00]);
-          arrayBuffer = mergeArrayBuffer(arrayBuffer, selectTemperatureProbesBuffer, selectLevelProbesBuffer)
+          arrayBuffer = mergeArrayBuffer(arrayBuffer, temperatureProbeBuffer, selectLevelProbesBuffer)
           break;
         case 'fc':
           // 0x00：带进回温探头
@@ -893,8 +915,8 @@ export function nbPackDataDomains(afn, fn, protocolID, context) {
           let view = new DataView(floatBuffer);
           view.setFloat32(0, calibrationError, true);
           let floatArray = Array.from(new Uint8Array(floatBuffer));
-          arrayBuffer = createBuffer(8, [0x0c, 0xff, 0x18, 0x00 , ...floatArray]);
-          Log.info('0c-24:',arrayBuffer)
+          arrayBuffer = createBuffer(8, [0x0c, 0xff, 0x18, 0x00, ...floatArray]);
+          Log.info('0c-24:', arrayBuffer)
           break;
         case '24-0':
           let calibrationZeroError = 0
@@ -902,8 +924,8 @@ export function nbPackDataDomains(afn, fn, protocolID, context) {
           let viewZero = new DataView(floatZeroBuffer);
           viewZero.setFloat32(0, calibrationZeroError, true);
           let floatZeroArray = Array.from(new Uint8Array(floatZeroBuffer));
-          arrayBuffer = createBuffer(8, [0x0c, 0xff, 0x18, 0x00 , ...floatZeroArray]);
-          Log.info('0c-24-zero:',arrayBuffer)
+          arrayBuffer = createBuffer(8, [0x0c, 0xff, 0x18, 0x00, ...floatZeroArray]);
+          Log.info('0c-24-zero:', arrayBuffer)
           break;
         default:
         // Log.error("packages: afn[{}] match fail", afn);

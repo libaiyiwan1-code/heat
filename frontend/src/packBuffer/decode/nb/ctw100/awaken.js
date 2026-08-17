@@ -5,7 +5,7 @@ export function awaken(responseMessage) {
   let dataView = new DataView(messageBuffer)
   return dataView.getUint8(16) !== 0X68 ||
     dataView.getUint8(19) !== 0X68 ||
-    dataView.getUint8(20) !== 0X40 ||
+    dataView.getUint8(20) !== 0X80 ||
     dataView.getUint8(21) !== 0X8C ||
     dataView.getUint8(26) !== 0X00 ||
     dataView.getUint8(28) !== 0X01

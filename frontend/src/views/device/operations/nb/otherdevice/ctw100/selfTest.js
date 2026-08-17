@@ -20,7 +20,7 @@ export const selfTest = async (context, protocolId, type) => {
     },
     isInfraredDevice: protocol.isInfraredDevice,
     isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.inquireSelfTest,
-  }, type ,'UTM100-NB')
+  }, type )
   if (inquireFail) {
     await playErrorAudio(context)
     return true
@@ -42,7 +42,7 @@ export const selfTest = async (context, protocolId, type) => {
     },
     isInfraredDevice: protocol.isInfraredDevice,
     isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.writeConfig,
-  }, type ,'UTM100-NB')
+  }, type )
   if (writeConfigResult) {
     await playErrorAudio(context)
     return true
@@ -61,13 +61,12 @@ export const selfTest = async (context, protocolId, type) => {
     expectedLength2: protocol.deviceActionResponseMessageLength2['selfTest'],
     timeout: context.timeout,
     validateResponse: () => {
-      return false
     },
     preprocess: () => {
     },
     isInfraredDevice: protocol.isInfraredDevice,
     isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.selfTest,
-  }, type,'UTM100-NB' )
+  }, type)
   return false
 
 }

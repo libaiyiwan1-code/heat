@@ -531,7 +531,7 @@ export async function nbDeviceRegister(context, type, notPass) {
       TempProbeAddr: context.configDetail.temperatureProbe, //温度探头
       PressProbe: context.configDetail.pressureProbes, //压力探头
       TorqueNM: context.torque,//扭矩
-      valveDN: null //WAC330HE口径
+      valveDN: context.configDetail.nominalCaliber //WAC330HE口径
     };
 
     let insertResult = await insertNBValueProduce(context,productionData);

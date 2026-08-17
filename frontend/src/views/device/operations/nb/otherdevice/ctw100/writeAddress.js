@@ -11,6 +11,89 @@ export async function writeAddress(protocolId, type, context) {
     await playErrorAudio(context)
     return true
   }
+
+  let readDataResult = await serialPortOperation(context, {
+    actionType: 'readData',
+    operationName: '读数据',
+    cmdType: '0c',                         // afn 的命令类型
+    cmdCode: '0a',                         // fn 的命令码
+    protocolId: protocolId,
+    maxRetries: context.maxRetries,
+    expectedLength: protocol.deviceActionResponseMessageLength['readData'],
+    expectedLength2: protocol.deviceActionResponseMessageLength2['readData'],
+    timeout: 6500,
+    validateResponse: () => protocol.validateResponse.readData(context, context.receivedData.globalReceivedOneData),
+    preprocess: () => {
+    },
+    isInfraredDevice: protocol.isInfraredDevice,
+    isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.readData,
+  }, type)
+  if (readDataResult) {
+    await playErrorAudio(context)
+    return true
+  }
+
+
+  console.log('选择的探头：', context.configDetail.temperatureProbe)
+  console.log('回水温度：', context.readOutTemperature)
+  console.log('进水温度：', context.readInTemperature)
+  console.log('温度误差：', context.configDetail.temperatureDiff)
+  let baseTemperature = 50
+  if (context.configDetail.temperatureProbe === '回温探头') {
+    if (Math.abs(baseTemperature - Number(context.readOutTemperature)) > context.configDetail.temperatureDiff) {
+      context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败,回温:' + context.readOutTemperature, 'red');
+      context.leftGenerateAddress = ''
+      notPass = true
+      context.buttonEnable();
+      context.buttonError('scanCode')
+      await playErrorAudio(context)
+      setTimeout(() => {
+        context.buttonWaiting('scanCode');
+      }, 2000);
+      return notPass
+    }
+    console.log(context.readInTemperature)
+  } else if (context.configDetail.temperatureProbe === '进温探头') {
+    if (Math.abs(baseTemperature - Number(context.readInTemperature)) > context.configDetail.temperatureDiff) {
+      context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败,进温:' + context.readInTemperature, 'red');
+      context.leftGenerateAddress = ''
+      notPass = true
+      context.buttonEnable();
+      context.buttonError('scanCode')
+      await playErrorAudio(context)
+      setTimeout(() => {
+        context.buttonWaiting('scanCode');
+      }, 2000);
+    }
+  } else if (context.configDetail.temperatureProbe === '双探头') {
+    if (Math.abs(baseTemperature - Number(context.readOutTemperature)) > context.configDetail.temperatureDiff) {
+      context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败。,回温:' + context.readOutTemperature, 'red');
+      context.leftGenerateAddress = ''
+      notPass = true
+      context.buttonEnable();
+      context.buttonError('scanCode')
+      await playErrorAudio(context)
+      setTimeout(() => {
+        context.buttonWaiting('scanCode');
+      }, 2000);
+    }
+    if (Math.abs(baseTemperature - Number(context.readInTemperature)) > context.configDetail.temperatureDiff) {
+      context.createLeftSpanMessage('地址：' + context.leftGenerateAddress + '  验证温度失败,进温:' + context.readInTemperature, 'red');
+      context.leftGenerateAddress = ''
+      notPass = true
+      context.buttonEnable();
+      context.buttonError('scanCode')
+      await playErrorAudio(context)
+      setTimeout(() => {
+        context.buttonWaiting('scanCode');
+      }, 2000);
+    }
+  }
+  if (notPass) {
+    await playErrorAudio(context)
+    return true
+  }
+
   let readSelfTestStatusResult = await serialPortOperation(context, {
     actionType: 'writeAddress',
     operationName: '地址写入（读自检状态）',
@@ -26,7 +109,7 @@ export async function writeAddress(protocolId, type, context) {
     },
     isInfraredDevice: protocol.isInfraredDevice,
     isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.readSelfTestStatus,
-  }, type)
+  }, type  )
   if (readSelfTestStatusResult) {
     await playErrorAudio(context)
     return true
@@ -55,7 +138,7 @@ export async function writeAddress(protocolId, type, context) {
     },
     isInfraredDevice: protocol.isInfraredDevice,
     isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.readIMEI,
-  }, type)
+  }, type  )
   if (readIMEIResult) {
     await playErrorAudio(context)
     return true
@@ -81,7 +164,7 @@ export async function writeAddress(protocolId, type, context) {
     },
     isInfraredDevice: protocol.isInfraredDevice,
     isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.readICCID,
-  }, type)
+  }, type  )
   if (readICCIDResult) {
     await playErrorAudio(context)
     return true
@@ -103,7 +186,7 @@ export async function writeAddress(protocolId, type, context) {
     },
     isInfraredDevice: protocol.isInfraredDevice,
     isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.writeAddress,
-  }, type)
+  }, type  )
   if (writeAddressResult) {
     await playErrorAudio(context)
     return true

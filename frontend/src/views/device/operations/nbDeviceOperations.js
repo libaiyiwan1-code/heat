@@ -24,6 +24,7 @@ import * as VAC710 from './nb/wacdevice/vac710'
 import * as WAC710N from './nb/wacdevice/wac710n'
 import * as WAC730N from './nb/wacdevice/wac730n'
 import * as WAC300LH from './nb/wacdevice/wac300lh'
+import * as WAC330CE from './nb/wacdevice/wac330ce'
 import * as WAC330HE from './nb/wacdevice/wac330he'
 import * as WAC730C from './nb/wacdevice/wac730c'
 import * as WAC300CD from './nb/wacdevice/wac300cd'
@@ -66,7 +67,7 @@ const Log = require('ee-core/log');
 
 
 export const doSelfTest = async (context, protocolId, type) => {
-  console.log(protocolId,type)
+  console.log(protocolId, type)
   context.messageClean();
   if (!checkPort(context, type)) {
     await playErrorAudio(context);
@@ -82,6 +83,7 @@ export const doSelfTest = async (context, protocolId, type) => {
     'WAC300NH': WAC300NH.selfTest,
     'WAC300NY': WAC300NY.selfTest,
     'WAC330HE': WAC330HE.selfTest,
+    'WAC330CE': WAC330CE.selfTest,
     'LPC230': LPC230.selfTest,
     'LPC230E': LPC230E.selfTest,
     'LPC210': LPC210.selfTest,
@@ -161,6 +163,7 @@ export async function doWriteAddress(context, protocolId, type) {
     'WAC300NH': WAC300NH.writeAddress,
     'WAC300NY': WAC300NY.writeAddress,
     'WAC330HE': WAC330HE.writeAddress,
+    'WAC330CE': WAC330CE.writeAddress,
     'LPC230': LPC230.writeAddress,
     'LPC230E': LPC230E.writeAddress,
     'LPC210': LPC210.writeAddress,
@@ -199,7 +202,6 @@ export async function doWriteAddress(context, protocolId, type) {
     'BDC100&C17': BDC100.writeAddress,
 
 
-
   };
   const produceModel = context.configForm.produceModel;
   const writeAddressFunction = writeAddressStrategies[produceModel];
@@ -212,7 +214,7 @@ export async function doWriteAddress(context, protocolId, type) {
     return;
   }
 
-  if (context.configDetail.printLabel === 'WAC330HE') {
+  if (context.configDetail.printLabel === 'WAC330HE' || context.configDetail.printLabel === 'WAC330CE') {
     // 表阀一体 区分联网方式 有线不注册平台、无线注册平台
     if (context.configDetail.communication === '有线') {
       await productionNBLibraryRegistration(context)
@@ -223,7 +225,6 @@ export async function doWriteAddress(context, protocolId, type) {
         context.buttonWaiting('writeAddress');
       }, 2000);
     } else {
-      await productionNBLibraryRegistration(context)
       await nbDeviceRegister(context);
       context.leftWorkPrompt = `地址写入成功`;
 
@@ -247,7 +248,7 @@ export async function doWriteAddress(context, protocolId, type) {
         break;
       case 'WAC300LH':
         // LORA 入库
-        notPass= await productionLORALibraryRegistration(context, type);
+        notPass = await productionLORALibraryRegistration(context, type);
         break;
       case 'VAC005C':
         // 卡阀一体
@@ -257,11 +258,11 @@ export async function doWriteAddress(context, protocolId, type) {
       case 'LPC230E':
       case 'AEC100':
         // 采集器
-       notPass= await productionCollectorLibraryRegistration(context, type);
+        notPass = await productionCollectorLibraryRegistration(context, type);
         break;
       default:
         // NB 设备
-        notPass= await nbDeviceRegister(context, type, notPass);
+        notPass = await nbDeviceRegister(context, type, notPass);
     }
     if (notPass) {
       context.leftWorkPrompt = `地址写入失败`;
@@ -343,6 +344,7 @@ export const doExitSelfTest = async (context, protocolId, type) => {
     'WAC300NH': WAC300NH.exitSelfTest,
     'WAC300NY': WAC300NY.exitSelfTest,
     'WAC330HE': WAC330HE.exitSelfTest,
+    'WAC330CE': WAC330CE.exitSelfTest,
     'WAC730C': WAC730C.exitSelfTest,
     'CAT400': CAT400.exitSelfTest,
     'CAT200': CAT200.exitSelfTest,
@@ -363,6 +365,7 @@ export const doExitSelfTest = async (context, protocolId, type) => {
     'WAC710N': WAC710N.exitSelfTest,
     'WAC730N': WAC730N.exitSelfTest,
     'BeaconM': BEACONM.exitSelfTest,
+    'CTW100': CTW100.exitSelfTest,
   };
   const produceModel = context.configForm.produceModel;
   const returnSelfTestFunction = returnSelfTestStrategies[produceModel];
@@ -425,12 +428,18 @@ export async function doScanCodeVerification(context, protocolId, type) {
     if (
       context.configDetail.printLabel === 'WAC300NS' || context.configDetail.printLabel === 'WAC400NS' ||
       context.configDetail.printLabel === 'VAC710S' || context.configDetail.printLabel === 'WAC300C' ||
-      context.configDetail.printLabel === 'WAC710C' || context.configDetail.printLabel === 'VAC710'||
-      context.configDetail.printLabel==='WAC710N'
+      context.configDetail.printLabel === 'WAC710C' || context.configDetail.printLabel === 'VAC710' ||
+      context.configDetail.printLabel === 'WAC710N' || context.configDetail.printLabel === 'WAC300N'||
+      context.configDetail.printLabel==='CTW100'
     ) {
       let cmdCode = '20'
+      let cmdType = '90'
       if (context.configDetail.printLabel === 'WAC400N') {
         cmdCode = '1f'
+      }
+      if (context.configDetail.printLabel === 'CTW100'){
+        cmdType='0c'
+        cmdCode='0a'
       }
       const model = context.configForm.produceModel;
       const protocol = protocolIDMap[model];
@@ -441,7 +450,7 @@ export async function doScanCodeVerification(context, protocolId, type) {
       let readDataResult = await serialPortOperation(context, {
         actionType: 'readData',
         operationName: '读数据',
-        cmdType: '90',                         // afn 的命令类型
+        cmdType: cmdType,                         // afn 的命令类型
         cmdCode: cmdCode,                         // fn 的命令码
         protocolId: protocolId,
         maxRetries: context.maxRetries,
@@ -614,7 +623,7 @@ export async function doScanCodeVerification(context, protocolId, type) {
       if (!await checkNetWork(context, protocolId, type)) {
         context.leftGoodProductQuantity += 1;
         context.leftGenerateAddress = ''; // 成功后清空地
-      }else{
+      } else {
         context.buttonError('scanCode')
         context.leftWorkPrompt = `扫码验证失败`;
         setTimeout(() => {
@@ -640,7 +649,7 @@ const checkAddress = async (context, protocolId, type) => {
   if (context.configDetail.printLabel === 'WAC230CF' || context.configDetail.printLabel === 'WAC710CD' ||
     context.configDetail.printLabel === 'WAC300CD' || context.configDetail.printLabel === 'NTP100C' ||
     context.configDetail.printLabel === 'CT1000' || context.configDetail.printLabel === 'ET01' ||
-    context.configDetail.printLabel === 'WAC330HE' || context.configDetail.printLabel === 'WAC730C' ||
+    context.configDetail.printLabel === 'WAC330HE' || context.configDetail.printLabel === 'WAC330CE' || context.configDetail.printLabel === 'WAC730C' ||
     context.configDetail.printLabel === 'LPC230' || context.configDetail.printLabel === 'LPC230E' ||
     context.configDetail.printLabel === 'AEC100' ||
     context.configDetail.printLabel === 'CAT400' ||
@@ -649,7 +658,7 @@ const checkAddress = async (context, protocolId, type) => {
     context.configDetail.printLabel === 'WAC100N' || context.configDetail.printLabel === 'WAC100NY' ||
     context.configDetail.printLabel === 'WAC300C' || context.configDetail.printLabel === 'NTR300' ||
     context.configDetail.printLabel === 'WAC710C' || context.configDetail.printLabel === 'WAC400N' ||
-    context.configDetail.printLabel === 'VAC710'||context.configDetail.printLabel==='WAC710N'||context.configDetail.printLabel==='BeaconM'
+    context.configDetail.printLabel === 'VAC710' || context.configDetail.printLabel === 'WAC710N' || context.configDetail.printLabel === 'BeaconM'
 
   ) {
     let readAddressResult = await serialPortOperation(context, {
@@ -767,7 +776,7 @@ const checkNetWork = async (context, protocolId, type) => {
   let notPass = true
   let data
   // 个别设备不验证联网
-  if(context.configDetail.printLabel === 'WAC710N'){
+  if (context.configDetail.printLabel === 'WAC710N') {
     return false
   }
   if (context.configDetail.printLabel === 'WAC230CF') {
@@ -777,26 +786,26 @@ const checkNetWork = async (context, protocolId, type) => {
     || context.configDetail.printLabel === 'WAC300NY'
     || context.configDetail.printLabel === 'WAC300N' || context.configDetail.printLabel === 'WAC300NS'
     || context.configDetail.printLabel === 'WAC400NS' || context.configDetail.printLabel === 'WAC400N'
-    ||context.configDetail.printLabel==='WAC300NY'||context.configDetail.printLabel==='WAC300NY'||context.configDetail.printLabel==='BeaconM'
+    || context.configDetail.printLabel === 'WAC300NY' || context.configDetail.printLabel === 'WAC300NY' || context.configDetail.printLabel === 'BeaconM' || context.configDetail.printLabel === 'WAC300N'
   ) {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_valve')
   } else if (
     context.configDetail.printLabel === 'NTP100C' || context.configDetail.printLabel === 'CT1000' || context.configDetail.printLabel === 'ET01' ||
-    context.configDetail.printLabel === 'CAT400' || context.configDetail.printLabel === 'CAT400S' || context.configDetail.printLabel === 'CTW100'||
-    context.configDetail.printLabel === 'CAT200'||context.configDetail.printLabel === 'CAT200P'
+    context.configDetail.printLabel === 'CAT400' || context.configDetail.printLabel === 'CAT400S' || context.configDetail.printLabel === 'CTW100' ||
+    context.configDetail.printLabel === 'CAT200' || context.configDetail.printLabel === 'CAT200P'
   ) {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_measure_point')
-  } else if (context.configDetail.printLabel === 'WAC330HE' || context.configDetail.printLabel === 'WAC730C') {
+  } else if (context.configDetail.printLabel === 'WAC330HE' || context.configDetail.printLabel === 'WAC330CE' || context.configDetail.printLabel === 'WAC730C') {
     data = await checkRecentlyUploadedData(context.leftGenerateAddress, 'col_terminal_data_meter_valve')
   }
 
-  if (data===undefined||data[0] === undefined || data [0] === null) {
+  if (data === undefined || data[0] === undefined || data [0] === null) {
     if (!context.uploadAddressList.includes(context.leftReadAddress)) {
       context.uploadAddressList.push(context.leftReadAddress)
       context.leftBadProductQuantity += 1;
     }
     await badRecordUpload(context, '扫码地址验证联网', '网络未上传', 'scanCode')
-    context.createLeftSpanMessage('扫码地址验证联网(网络未上传) ','red')
+    context.createLeftSpanMessage('扫码地址验证联网(网络未上传) ', 'red')
     await context.uploadMes(context.leftGenerateAddress, 0, '扫码地址验证联网(网络未上传) ')
     context.leftBadProductQuantity += 1
     context.leftGenerateAddress = ''
@@ -958,7 +967,7 @@ export const doPrintWarehouseEntryFailedLabel = async (context) => {
   if (context.configForm.produceModel === 'NTP100C' || context.configForm.produceModel === 'WAC710CD' || context.configForm.produceModel === 'WAC300CD'
     || context.configForm.produceModel === 'CT1000' || context.configForm.produceModel === 'WAC230CF' || context.configForm.produceModel === 'WAC300N'
     || context.configForm.produceModel === 'WAC300NH' || context.configForm.produceModel === 'WAC300NY' || context.configForm.produceModel === 'ET01'
-    || context.configForm.produceModel === 'WAC730C'||  context.configForm.produceModel === 'CAT200'||  context.configForm.produceModel === 'CAT200P'
+    || context.configForm.produceModel === 'WAC730C' || context.configForm.produceModel === 'CAT200' || context.configForm.produceModel === 'CAT200P'
     || context.configForm.produceModel === 'CAT400' || context.configForm.produceModel === 'CAT400S' || context.configForm.produceModel === 'CPT100'
     || context.configForm.produceModel === 'VPT100' || context.configForm.produceModel === 'CTW100' || context.configForm.produceModel === 'WAC300LH'
     || context.configForm.produceModel === 'LPC230' || context.configForm.produceModel === 'LPC230E' || context.configForm.produceModel === 'AEC100'
@@ -967,13 +976,11 @@ export const doPrintWarehouseEntryFailedLabel = async (context) => {
     || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400' || context.configForm.produceModel === 'WAC300C'
     || context.configForm.produceModel === 'NTR300' || context.configForm.produceModel === 'CPT100-10A'
     || context.configForm.produceModel === 'WAC330N' || context.configForm.produceModel === 'WAC400N'
-    || context.configForm.produceModel === 'VAC710'||context.configForm.produceModel === 'WAC710N'||context.configForm.produceModel === 'BDC100&C17'
+    || context.configForm.produceModel === 'VAC710' || context.configForm.produceModel === 'WAC710N' || context.configForm.produceModel === 'BDC100&C17'
   ) {
     await ipc.send(ipcApiRoute.productionWarehousingFailurePrint, params)
   }
 }
-
-
 
 
 /**
@@ -1002,8 +1009,7 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
       context.configForm.produceModel !== 'LPC230E' &&
       context.configForm.produceModel !== 'LPC210' &&
       context.configForm.produceModel !== 'LPC210E' &&
-      context.configForm.produceModel !== 'WAC230CF'&&
-      context.configForm.produceModel!=='VAC005C'
+      context.configForm.produceModel !== 'VAC005C'
     ) {
       let readAddressResult = await serialPortOperation(context, {
         actionType: 'labelPrint',
@@ -1144,7 +1150,7 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
   if (context.configForm.produceModel === 'NTP100C' || context.configForm.produceModel === 'WAC710CD' || context.configForm.produceModel === 'WAC300CD'
     || context.configForm.produceModel === 'CT1000' || context.configForm.produceModel === 'WAC230CF' || context.configForm.produceModel === 'WAC300N'
     || context.configForm.produceModel === 'WAC300NH' || context.configForm.produceModel === 'WAC300NY' || context.configForm.produceModel === 'ET01'
-    || context.configForm.produceModel === 'WAC730C'||  context.configForm.produceModel === 'CAT200'||  context.configForm.produceModel === 'CAT200P'
+    || context.configForm.produceModel === 'WAC730C' || context.configForm.produceModel === 'CAT200' || context.configForm.produceModel === 'CAT200P'
     || context.configForm.produceModel === 'CAT400' || context.configForm.produceModel === 'CAT400S' || context.configForm.produceModel === 'CPT100'
     || context.configForm.produceModel === 'VPT100' || context.configForm.produceModel === 'CTW100' || context.configForm.produceModel === 'WAC300LH'
     || context.configForm.produceModel === 'LPC230' || context.configForm.produceModel === 'LPC230E' || context.configForm.produceModel === 'AEC100'
@@ -1153,10 +1159,10 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
     || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400' || context.configForm.produceModel === 'WAC300C'
     || context.configForm.produceModel === 'NTR300' || context.configForm.produceModel === 'CPT100-10A'
     || context.configForm.produceModel === 'WAC330N' || context.configForm.produceModel === 'WAC400N'
-    || context.configForm.produceModel === 'VAC710'||context.configForm.produceModel === 'WAC710N'||context.configForm.produceModel === 'BDC100&C17'
+    || context.configForm.produceModel === 'VAC710' || context.configForm.produceModel === 'WAC710N' || context.configForm.produceModel === 'BDC100&C17'
   ) {
     await ipc.send(ipcApiRoute.doPrintTest, params)
-  } else if (context.configForm.produceModel === 'WAC330HE') {
+  } else if (context.configForm.produceModel === 'WAC330HE' || context.configForm.produceModel === 'WAC330CE') {
     let commonTraffic;
     let flowRange;
     if (context.configDetail.nominalCaliber === 'DN15') {
@@ -1234,8 +1240,8 @@ export const doPrintLabelTODO = async (context, flag, protocolId, type) => {
   const params = {
     deviceName: context.defaultDeviceName,
     address: printAddress,
-    model: 'WAC230CF',
-    configModel: 'WAC230CF',
+    model: 'WAC330CE',
+    configModel: 'WAC330CE',
     listDoubleRowLabels: context.listDoubleRowLabels,
     width: context.configDetail.labelWith,
     margin: context.configDetail.labelMargin,
@@ -1243,75 +1249,22 @@ export const doPrintLabelTODO = async (context, flag, protocolId, type) => {
     secondColumnFontSize: context.configDetail.secondColumnFontSize,
     height: context.configDetail.labelHeight,
     isDouble: context.configDetail.whetherDoubleRowPrinting === '是',
+    craftsmanCaliber: 'DN20',
+    commonTraffic: '2.5m³/h',
+    flowRange: '(0.05-5)m³/h',
   };
 
   if (context.configForm.produceModel === 'NTP100C' || context.configForm.produceModel === 'WAC710CD' || context.configForm.produceModel === 'WAC300CD'
     || context.configForm.produceModel === 'CT1000' || context.configForm.produceModel === 'WAC230CF' || context.configForm.produceModel === 'WAC300N'
     || context.configForm.produceModel === 'WAC300NH' || context.configForm.produceModel === 'WAC300NY' || context.configForm.produceModel === 'ET01' || context.configForm.produceModel === 'WAC730C'
-    || context.configForm.produceModel === 'CAT400' || context.configForm.produceModel === 'CAT200'||
+    || context.configForm.produceModel === 'CAT400' || context.configForm.produceModel === 'CAT200' ||
     context.configForm.produceModel === 'CAT400S' || context.configForm.produceModel === 'CPT100'
     || context.configForm.produceModel === 'VPT100' || context.configForm.produceModel === 'CTW100' || context.configForm.produceModel === 'WAC300LH'
     || context.configForm.produceModel === 'LPC230' || context.configForm.produceModel === 'LPC230E' || context.configForm.produceModel === 'AEC100'
     || context.configForm.produceModel === 'WAC710C' || context.configForm.produceModel === 'WAC300NS' || context.configForm.produceModel === 'WAC400NS'
     || context.configForm.produceModel === 'VAC005C' || context.configForm.produceModel === 'VAC710S' || context.configForm.produceModel === 'RFT200-CAT1'
-    || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400'
+    || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400'||context.configForm.produceModel === 'WAC330HE' || context.configForm.produceModel === 'WAC330CE'
   ) {
-    await ipc.send(ipcApiRoute.doPrintTest, params)
-  } else if (context.configForm.produceModel === 'WAC330HE') {
-    let commonTraffic;
-    let flowRange;
-    if (context.configDetail.nominalCaliber === 'DN15') {
-      commonTraffic = '1.5m³/h';
-      flowRange = '(0.03-3)m³/h';
-    } else if (context.configDetail.nominalCaliber === 'DN20') {
-      commonTraffic = '2.5m³/h';
-      flowRange = '(0.05-5)m³/h';
-    } else if (context.configDetail.nominalCaliber === 'DN25') {
-      commonTraffic = '3.5m³/h';
-      flowRange = '(0.07-7)m³/h';
-    } else if (context.configDetail.nominalCaliber === 'DN32') {
-      commonTraffic = '6m³/h';
-      flowRange = '(0.12-12)m³/h';
-    } else if (context.configDetail.nominalCaliber === 'DN40') {
-      commonTraffic = '10m³/h';
-      flowRange = '(0.2-20)m³/h';
-    } else if (context.configDetail.nominalCaliber === 'DN50') {
-      commonTraffic = '15m³/h';
-      flowRange = '(0.3-30)m³/h';
-    } else if (context.configDetail.nominalCaliber === 'DN65') {
-      commonTraffic = '25m³/h';
-      flowRange = '(0.5-50)m³/h';
-    } else if (context.configDetail.nominalCaliber === 'DN80') {
-      commonTraffic = '40m³/h';
-      flowRange = '(0.8-80)m³/h';
-    } else if (context.configDetail.nominalCaliber === 'DN100') {
-      commonTraffic = '60m³/h';
-      flowRange = '(1.2-120)m³/h';
-    } else if (context.configDetail.nominalCaliber === 'DN125') {
-      commonTraffic = '100m³/h';
-      flowRange = '(2-200)m³/h';
-    } else if (context.configDetail.nominalCaliber === 'DN150') {
-      commonTraffic = '150m³/h';
-      flowRange = '(3-300)m³/h';
-    } else if (context.configDetail.nominalCaliber === 'DN200') {
-      commonTraffic = '250m³/h';
-      flowRange = '(5-500)m³/h';
-    }
-    let params = {
-      craftsmanCaliber: context.configDetail.nominalCaliber,
-      commonTraffic: commonTraffic,
-      flowRange: flowRange,
-      deviceName: context.defaultDeviceName,
-      address: printAddress,
-      model: context.configDetail.customizePrintLabel,
-      listDoubleRowLabels: context.listDoubleRowLabels,
-      width: context.configDetail.labelWith,
-      margin: context.configDetail.labelMargin,
-      marginLeft: context.configDetail.lableMarginLeft,
-      secondColumnFontSize: context.configDetail.secondColumnFontSize,
-      height: context.configDetail.labelHeight,
-      isDouble: context.configDetail.whetherDoubleRowPrinting === '是',
-    }
     await ipc.send(ipcApiRoute.doPrintTest, params)
   }
 

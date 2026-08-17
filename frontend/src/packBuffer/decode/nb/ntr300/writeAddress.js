@@ -7,7 +7,7 @@ export function writeAddress(valveAddress, responseMessage) {
   let notPass = dataView.getUint8(21) !== 0x68
     || dataView.getUint8(24) !== 0x68 ||
     dataView.getUint8(25) !== 0x80 ||
-    dataView.getUint8(26) !== 0x56 ||
+    dataView.getUint8(26) !== 0x4a ||
     dataView.getUint8(31) !== 0x00 ||
     dataView.getUint8(33) !== 0x01
   if (!notPass) {

@@ -97,6 +97,13 @@ export function decodeCheckLevelProbes(responseMessage) {
 
 }
 
+export function decodeCheckInternalTemperatureNotPass(responseMessage) {
+  let messageBuffer = hex2arrayBuffer(responseMessage);
+  let dataView = new DataView(messageBuffer)
+  return dataView.getUint8(67)!== 0x01&&dataView.getUint8(67)!==0x02
+
+}
+
 
 export function decodeGetProductName(responseMessage) {
   let model = '';
@@ -129,9 +136,10 @@ export function readSelfTestStatus(context, responseMessage) {
   let inTemperatureSensorNotPass = decodeCheckInTemperatureSensor(context.receivedData.globalReceivedOneData)     //             进温传感器
   let outTemperatureSensorNotPass = decodeCheckOutTemperatureSensor(context.receivedData.globalReceivedOneData)     //             回温传感器
   let liquidLevelNotPass = decodeCheckLiquidLevel(context.receivedData.globalReceivedOneData)     //             液位
-  let ambientTemperatureProbeNotPass = decodeCheckAmbientTemperatureProbe(context.receivedData.globalReceivedOneData)     //环境温度探头是否匹配
-  let pipeTemperatureProbesNotPass = decodeCheckPipeTemperatureProbes(context.receivedData.globalReceivedOneData)     //             管道温度探头是否匹配
+  let ambientTemperatureProbeNotPass = decodeCheckAmbientTemperatureProbe(context.receivedData.globalReceivedOneData)     //进温探头是否匹配
+  let pipeTemperatureProbesNotPass = decodeCheckPipeTemperatureProbes(context.receivedData.globalReceivedOneData)     //             回温探头是否匹配
   let levelProbesNotPass = decodeCheckLevelProbes(context.receivedData.globalReceivedOneData)     //             液位温度探头是否匹配
+  let internalTemperatureNotPass = decodeCheckInternalTemperatureNotPass(context.receivedData.globalReceivedOneData)     //             内部温度是否正常
 
   if (selfTestCompletedNotPass) {
     context.createLeftSpanMessage('未进行过自检', 'grey');
@@ -182,21 +190,26 @@ export function readSelfTestStatus(context, responseMessage) {
   }
 
   if (ambientTemperatureProbeNotPass) {
-    context.createLeftSpanMessage('环境温度探头与实物不匹配', 'grey');
-    Log.error('环境温度探头与实物不匹配 不正常');
-    console.log('环境温度探头与实物不匹配 不正常');
+    context.createLeftSpanMessage('进温探头与实物不匹配', 'grey');
+    Log.error('进温探头与实物不匹配 不正常');
+    console.log('进温探头与实物不匹配 不正常');
   }
 
   if (pipeTemperatureProbesNotPass) {
-    context.createLeftSpanMessage('管道温度探头与实物不匹配 不正常', 'grey');
-    Log.error('管道温度探头与实物不匹配 不正常');
-    console.log('管道温度探头与实物不匹配 不正常');
+    context.createLeftSpanMessage('回温探头与实物不匹配 ', 'grey');
+    Log.error('回温探头与实物不匹配 不正常');
+    console.log('回温探头与实物不匹配 不正常');
   }
 
   if (levelProbesNotPass) {
-    context.createLeftSpanMessage('液位探头与实物不匹配 不正常', 'grey');
+    context.createLeftSpanMessage('液位探头与实物不匹配 ', 'grey');
     Log.error('液位探头与实物不匹配 不正常');
     console.log('液位探头与实物不匹配 不正常');
+  }
+  if (internalTemperatureNotPass) {
+    context.createLeftSpanMessage('内部温度 不正常', 'grey');
+    Log.error('内部温度 不正常');
+    console.log('内部温度 不正常');
   }
 
   if (baseCheck || selfTestCompletedNotPass ||
@@ -209,7 +222,8 @@ export function readSelfTestStatus(context, responseMessage) {
     liquidLevelNotPass ||
     ambientTemperatureProbeNotPass ||
     pipeTemperatureProbesNotPass ||
-    levelProbesNotPass
+    levelProbesNotPass||
+    internalTemperatureNotPass
   ) {
     context.createLeftSpanMessage('自检不通过', 'grey');
     console.error('自检不通过');

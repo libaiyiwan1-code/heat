@@ -9,5 +9,5 @@ export function exitSelfTest(responseMessage) {
     dataView.getUint8(21) !== 0X4A ||
     dataView.getUint8(26) !== 0XF0 ||
     dataView.getUint8(27) !== 0XFF||
-    dataView.getUint8(28) !== 0X01
+    dataView.getUint8(28) !== 0X14
 }

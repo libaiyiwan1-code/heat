@@ -36,6 +36,7 @@
                                v-if="this.configForm.produceModel!=='东元热表'
                                &&this.configForm.produceModel!=='NBT200'
                                &&this.configForm.produceModel!=='WAC330HE'
+                               &&this.configForm.produceModel!=='WAC330CE'
                                &&this.configForm.produceModel!=='AEC100'
                                &&this.configForm.produceModel!=='CTW100'
                                &&this.configForm.produceModel!=='NBT400'
@@ -47,10 +48,10 @@
                                &&this.configForm.produceModel!=='VAC005C'
                                &&this.configForm.produceModel!=='WAC300NY'
                                &&this.configForm.produceModel!=='CAT200P'
-                                &&this.configForm.produceModel!=='CAT200'
-                                  &&this.configForm.produceModel!=='CAT400'
-                                    &&this.configForm.produceModel!=='CAT400S'
-                                    &&this.configForm.produceModel!=='WAC230CF'
+                               &&this.configForm.produceModel!=='CAT200'
+                               &&this.configForm.produceModel!=='CAT400'
+                               &&this.configForm.produceModel!=='CAT400S'
+                               &&this.configForm.produceModel!=='WAC230CF'
 ">
                     <a-select
                       v-model:value="this.configForm.pressureProbes"
@@ -66,17 +67,34 @@
                       </a-select-option>
                     </a-select>
                   </a-form-item>
-                  <a-form-item label="温度探头" v-show="this.isNBDevice===true"
-                               v-if="this.configForm.produceModel==='CTW100'
+
+
+                  <a-form-item label="测温类型" v-show="this.isNBDevice===true"
+                               v-if="this.configForm.produceModel!=='东元热表'
+                               &&this.configForm.produceModel!=='NBT200'
+                               &&this.configForm.produceModel!=='WAC330HE'
+                               &&this.configForm.produceModel!=='WAC330CE'
+                               &&this.configForm.produceModel!=='AEC100'
+                               &&this.configForm.produceModel!=='NBT400'
+                               &&this.configForm.produceModel!=='NTR300'
+                               &&this.configForm.produceModel!=='CPT100'
+                               &&this.configForm.produceModel!=='BDC100&C17'
+                               &&this.configForm.produceModel!=='CPT100-10A'
+                               &&this.configForm.produceModel!=='WAC330N'
+                               &&this.configForm.produceModel!=='CAT200P'
+                               &&this.configForm.produceModel!=='CAT200'
+                               &&this.configForm.produceModel!=='CAT400'
+                               &&this.configForm.produceModel!=='CAT400S'
+                               &&this.configForm.produceModel!=='WAC230CF'
 ">
                     <a-select
-                      v-model:value="this.configForm.selectTemperatureProbes"
+                      v-model:value="this.configForm.temperatureProbes"
                       style="width: 7vw; margin-left: 3vw"
                       placeholder="需手动录入"
                       @change="changePrintModel()"
                     >
                       <a-select-option
-                        v-for="item in this.temperatureProbes2List"
+                        v-for="item in this.temperatureProbesList"
                         :value="item"
                       >
                         {{ item }}
@@ -94,41 +112,6 @@
                     >
                       <a-select-option
                         v-for="item in this.levelProbesList"
-                        :value="item"
-                      >
-                        {{ item }}
-                      </a-select-option>
-                    </a-select>
-                  </a-form-item>
-                  <a-form-item label="测温类型" v-show="this.isNBDevice===true"
-                               v-if="this.configForm.produceModel!=='东元热表'
-                               &&this.configForm.produceModel!=='NBT200'
-                               &&this.configForm.produceModel!=='WAC330HE'
-                               &&this.configForm.produceModel!=='AEC100'
-                               &&this.configForm.produceModel!=='CTW100'
-                             &&this.configForm.produceModel!=='NBT400'
-                             &&this.configForm.produceModel!=='NTR300'
-                             &&this.configForm.produceModel!=='CPT100'
-                             &&this.configForm.produceModel!=='BDC100&C17'
-                             &&this.configForm.produceModel!=='CPT100-10A'
-                             &&this.configForm.produceModel!=='WAC330N'
-                              &&this.configForm.produceModel!=='CAT200P'
-                              &&this.configForm.produceModel!=='CAT200'
-                              &&this.configForm.produceModel!=='CAT400'
-                               &&this.configForm.produceModel!=='CAT400S'
-                               &&this.configForm.produceModel!=='WAC230CF'
-
-
-
-">
-                    <a-select
-                      v-model:value="this.configForm.temperatureProbes"
-                      style="width: 7vw; margin-left: 3vw"
-                      placeholder="需手动录入"
-                      @change="changePrintModel()"
-                    >
-                      <a-select-option
-                        v-for="item in this.temperatureProbesList"
                         :value="item"
                       >
                         {{ item }}
@@ -302,7 +285,8 @@
                                this.configForm.produceModel!=='BDC100&C17'&&
                                this.configForm.produceModel!=='CPT100-10A'&&
                                this.configForm.temperatureProbes!=='无探头'||
-                               this.configForm.produceModel==='WAC330HE'
+                               this.configForm.produceModel==='WAC330HE'||
+                               this.configForm.produceModel==='WAC330CE'
                               "
                   >
                     <a-input-number
@@ -375,7 +359,7 @@
                     ></a-input>
                   </a-form-item>
                   <a-form-item label="通信方式" v-show="this.isNBDevice===true"
-                               v-if="this.configForm.produceModel==='WAC330HE'">
+                               v-if="this.configForm.produceModel==='WAC330HE'||this.configForm.produceModel==='WAC330CE'">
                     <a-select
                       v-model:value="this.configForm.communication"
                       style="width: 7vw; margin-left: 4.7vw"
@@ -390,7 +374,7 @@
                     </a-select>
                   </a-form-item>
                   <a-form-item label="公称口径" v-show="this.isNBDevice===true"
-                               v-if="this.configForm.produceModel==='WAC330HE'">
+                               v-if="this.configForm.produceModel==='WAC330HE'||this.configForm.produceModel==='WAC330CE'">
                     <a-select
                       v-model:value="this.configForm.nominalCaliber"
                       style="width: 7vw; margin-left: 4.7vw"
@@ -688,8 +672,8 @@
 ">
                   <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configForm.produceModel!=='WAC330HE'
+                       &&this.configForm.produceModel!=='WAC330CE'
                        &&this.configForm.produceModel!=='AEC100'
-                       &&this.configForm.produceModel!=='CTW100'
                        &&this.configForm.produceModel!=='NBT400'
                        &&this.configForm.produceModel!=='NTR300'
                         &&this.configForm.produceModel!=='CPT100'
@@ -710,15 +694,7 @@
                   </div>
 
 
-                  <div class="hlm-card-configInfo-body-info-line"
-                       v-if="this.configForm.produceModel==='CTW100'
 
-">
-                    <span class="label hlm-card-nb-configInfo-body-info-line-label">温度探头:</span>
-                    <span class="value hlm-card-configInfo-body-info-line-value" style="width: 130px">{{
-                        configDetail.selectTemperatureProbes
-                      }}</span>
-                  </div>
 
                   <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configForm.produceModel==='CTW100'
@@ -731,6 +707,7 @@
                   </div>
                   <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configForm.produceModel!=='WAC330HE'
+                       &&this.configForm.produceModel!=='WAC330CE'
                        &&this.configForm.produceModel!=='AEC100'
                         &&this.configForm.produceModel!=='CTW100'
                         &&this.configForm.produceModel!=='NBT400'
@@ -753,6 +730,7 @@
                   </div>
                   <div class="hlm-card-configInfo-body-info-line"
                        v-if="this.configForm.produceModel!=='WAC330HE'
+                       &&this.configForm.produceModel!=='WAC330CE'
                        &&this.configForm.produceModel!=='AEC100'
                         &&this.configForm.produceModel!=='CTW100'
                         &&this.configForm.produceModel!=='NBT400'
@@ -777,7 +755,6 @@
                   </div>
                   <div class="hlm-card-configInfo-body-info-line" v-if="
                   this.configDetail.printLabel!=='AEC100'&&
-                  this.configForm.produceModel!=='CTW100'&&
                   this.configForm.produceModel!=='NBT400'&&
                   this.configForm.produceModel!=='NTR300'
                    &&this.configForm.produceModel!=='CPT100'
@@ -886,7 +863,7 @@
                     <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.version }}</span>
                   </div>
                   <div class="hlm-card-configInfo-body-info-line"
-                       v-if="this.configDetail.printLabel!=='东元热表'&&this.configDetail.printLabel==='WAC330HE'">
+                       v-if="this.configDetail.printLabel!=='东元热表'&&this.configDetail.printLabel==='WAC330HE'&&this.configDetail.printLabel==='WAC330CE'">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">通信方式:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{
                         this.configDetail.communication
@@ -894,7 +871,7 @@
                   </div>
 
                   <div class="hlm-card-configInfo-body-info-line"
-                       v-if="this.configDetail.printLabel!=='东元热表'&&this.configDetail.printLabel==='WAC330HE'">
+                       v-if="this.configDetail.printLabel!=='东元热表'&&this.configDetail.printLabel==='WAC330HE'&&this.configDetail.printLabel==='WAC330CE'">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">公称口径:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{
                         this.configDetail.nominalCaliber
@@ -1798,7 +1775,9 @@
                       this.configDetail.printLabel==='CT1000' ||
                       this.configDetail.printLabel==='ET01' ||
                       this.configDetail.printLabel==='WAC300N'||
+                      this.configDetail.printLabel==='WAC300SC'||
                       this.configDetail.printLabel === 'WAC330HE'||
+                      this.configDetail.printLabel === 'WAC330CE'||
                       this.configDetail.printLabel==='WAC300NH'||
                       this.configDetail.printLabel==='WAC300NY'||
                       this.configDetail.printLabel==='CAT400'||
@@ -1848,7 +1827,9 @@
                       this.configDetail.printLabel === 'CT1000'||
                       this.configDetail.printLabel === 'ET01'||
                       this.configDetail.printLabel === 'WAC330HE'||
+                      this.configDetail.printLabel === 'WAC330CE'||
                       this.configDetail.printLabel==='WAC300N'||
+                      this.configDetail.printLabel==='WAC300SC'||
                       this.configDetail.printLabel==='WAC300NH'||
                       this.configDetail.printLabel==='WAC300NY'||
                       this.configDetail.printLabel==='CAT400'||
@@ -1927,21 +1908,21 @@
 
                 </a-button>
 
-<!--                                  <a-button type="primary" block-->
-<!--                                            v-show="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'"-->
-<!--                                            @click="printLabel2(-->
-<!--                                      false,-->
-<!--                                        protocolIDMap[this.configForm.produceModel].protocolId,'one'-->
-<!--                                        )"-->
-<!--                                            :disabled="nbButtonDisabledStatus.labelPrint"-->
-<!--                                            class="hlm-nb-not-important-business-start-button-style"-->
-<!--                                            :style="{-->
-<!--                                           color: nbButtonColor.labelPrint-->
-<!--                                        }"-->
-<!--                                  >-->
-<!--                                    标Q<br/>重D-->
+                <!--                                  <a-button type="primary" block-->
+                <!--                                            v-show="this.configForm.produceModel!=='东元热表'&&this.configForm.produceModel!=='NBT200'"-->
+                <!--                                            @click="printLabel2(-->
+                <!--                                      false,-->
+                <!--                                        protocolIDMap[this.configForm.produceModel].protocolId,'one'-->
+                <!--                                        )"-->
+                <!--                                            :disabled="nbButtonDisabledStatus.labelPrint"-->
+                <!--                                            class="hlm-nb-not-important-business-start-button-style"-->
+                <!--                                            :style="{-->
+                <!--                                           color: nbButtonColor.labelPrint-->
+                <!--                                        }"-->
+                <!--                                  >-->
+                <!--                                    标Q<br/>重D-->
 
-<!--                                  </a-button>-->
+                <!--                                  </a-button>-->
 
                 <a-button type="primary" block
                           v-if="
@@ -1955,7 +1936,9 @@
                       this.configDetail.printLabel === 'CT1000'||
                       this.configDetail.printLabel === 'ET01'||
                       this.configDetail.printLabel==='WAC300N'||
+                      this.configDetail.printLabel==='WAC300SC'||
                       this.configDetail.printLabel === 'WAC330HE'||
+                      this.configDetail.printLabel === 'WAC330CE'||
                       this.configDetail.printLabel==='WAC300NH'||
                       this.configDetail.printLabel==='WAC300NY'||
                       this.configDetail.printLabel==='CAT400'||
@@ -2855,7 +2838,7 @@ export default {
       levelProbesList: ['有液位探头', '无液位探头'],
       torquesList: ['25Nm', '50Nm'],
       vendorCodeList: ['0000000',],
-      labelPaperSizeList: ['30x12', '40x20', '50x12','28x15'],
+      labelPaperSizeList: ['30x12', '40x20', '50x12', '28x15'],
       customerList: ['青岛海龙马电子', '泉州七阳'],
       baudRateList: ['2400', '9600'],
       checkDigitList: ['偶校验', '无'],
@@ -2886,7 +2869,6 @@ export default {
         communication: undefined,
         nominalCaliber: undefined,
         pressureProbes: '无探头',
-        selectTemperatureProbes: '无探头', //CTW100 专用
         selectLevelProbes: '无液位探头', //CTW100 专用
         torques: '25Nm',
         currentSource: '无',
@@ -2936,7 +2918,6 @@ export default {
         communication: '无线',//通信方式
         nominalCaliber: undefined, //公称口径
         analogError: undefined,//模拟量误差
-        selectTemperatureProbes: '无探头', //CTW100 专用
         selectLevelProbes: '无探头', //CTW100 专用
         power_error: undefined,//功率误差 CPT100-10A 专用
       },
@@ -3280,6 +3261,7 @@ export default {
         'WAC300LH',
         'WAC303L',
         'WAC300N',
+        'WAC300SC',
         'WAC300NH',
         'WAC300NY',
         'WAC300NZ',
@@ -3292,6 +3274,7 @@ export default {
         'WAC300CS',
         'WAC330NE',
         'WAC330HE',
+        'WAC330CE',
         'WAC300CD',
         'BeaconM',
         'WAC400N',
@@ -3379,8 +3362,8 @@ export default {
       uploadMesList: [],
       badRecordCounter: 0, // 记录全局不良序号
       readMeterAddress: '',
-      readMeterInTemperature: undefined, //WAC330HE热表温度读取。
-      readMeterOutTemperature: undefined, //WAC330HE热表温度读取。
+      readMeterInTemperature: undefined, //WAC330HE、WAC330CE热表温度读取。
+      readMeterOutTemperature: undefined, //WAC330HE、WAC330CE热表温度读取。
       whetherVerificationState: false, //是否退出检定状态
       ammeterReadCurrentValue: undefined,//电流表读取电流
       currentSourceValue: undefined,//电流源
@@ -3409,7 +3392,7 @@ export default {
       deviceBatteryVoltage: undefined,//设备电池电压
       deviceReadPower: undefined,///CPT100-10A 读功率
       voltmeterReadPower: undefined,//电流表读取功率
-      calibrationError:undefined,//DBC100 设置的功率误差
+      calibrationError: undefined,//DBC100 设置的功率误差
     };
   },
   /*移除监听器 */
@@ -3508,12 +3491,12 @@ export default {
        * */
 
       //TODO
-      if (model.includes('EB-4U')){
-        this.portAttributes.selectedCheckDigit='无'
+      if (model.includes('EB-4U')) {
+        this.portAttributes.selectedCheckDigit = '无'
         this.portAttributes.selectedBadRate = 9600
-      }else if (model.includes('EB-M')){
+      } else if (model.includes('EB-M')) {
         this.portAttributes.selectedBadRate = 2400
-        this.portAttributes.selectedCheckDigit='偶校验'
+        this.portAttributes.selectedCheckDigit = '偶校验'
       }
       let productNamingConventionsList = model.split('-');
       // let productModel = productNamingConventionsList[0];
@@ -3596,6 +3579,7 @@ export default {
         this.configForm.produceModel === 'WAC300LH' ||
         this.configForm.produceModel === 'WAC730C' ||
         this.configForm.produceModel === 'WAC330HE' ||
+        this.configForm.produceModel === 'WAC330CE' ||
         this.configForm.produceModel === 'NTP100C' ||
         this.configForm.produceModel === 'LPC230' ||
         this.configForm.produceModel === 'LPC210' ||
@@ -3605,6 +3589,7 @@ export default {
         this.configForm.produceModel === 'CT1000' ||
         this.configForm.produceModel === 'ET01' ||
         this.configForm.produceModel === 'WAC300N' ||
+        this.configForm.produceModel === 'WAC300SC' ||
         this.configForm.produceModel === 'WAC300NH' ||
         this.configForm.produceModel === 'WAC300NY' ||
         this.configForm.produceModel === 'CAT400' ||
@@ -3696,7 +3681,6 @@ export default {
       } else {
         this.createLeftSpanMessage('此工单生产产品型号：' + productModel + '缺少显示屏配置,请手动配置', 'red');
       }
-
 
 
       if (productNamingConventionsList.length >= 3 &&
@@ -3858,10 +3842,10 @@ export default {
       }
     }
     //2026年7月24日15:23:36  李柏毅  初始化个别标签定制化标签
-    if(this.configForm.produceModel==='WAC710CD'){
+    if (this.configForm.produceModel === 'WAC710CD') {
       if (this.configForm.temperatureProbes === '回温探头' && this.configForm.pressureProbes !== '压差') {
         this.configForm.customizePrintLabel = '37003.02'
-        this.configDetail.customizePrintLabel  = this.configForm.customizePrintLabel
+        this.configDetail.customizePrintLabel = this.configForm.customizePrintLabel
 
       }
     }
@@ -4090,10 +4074,10 @@ export default {
         this.labelMargin = 8
         this.lableMarginLeft = 7
         this.secondColumnFontSize = 3.3
-      }else if  (this.selectLabelPaperSize === '28x15') {
+      } else if (this.selectLabelPaperSize === '28x15') {
         this.imageDesc = '28mm x 15mm 标签纸预览图'
         this.labelHeight = 11
-        this.listDoubleRowLabels='否'
+        this.listDoubleRowLabels = '否'
         this.labelWidth = 28
         this.labelMargin = 8
         this.lableMarginLeft = 12
@@ -4165,10 +4149,14 @@ export default {
         this.configForm.customizePrintLabel = 'ET01'
       } else if (value === 'WAC300N') {
         this.configForm.customizePrintLabel = 'WAC300N'
+      }else if (value === 'WAC300SC') {
+        this.configForm.customizePrintLabel = 'WAC300SC'
       } else if (value === 'WAC300NH') {
         this.configForm.customizePrintLabel = 'WAC300NH'
       } else if (value === 'WAC330HE') {
         this.configForm.customizePrintLabel = 'WAC330HE'
+      } else if (value === 'WAC330CE') {
+        this.configForm.customizePrintLabel = 'WAC330CE'
       } else if (value === 'LPC230') {
         this.configForm.customizePrintLabel = 'LPC230'
       } else if (value === 'LPC230E') {
@@ -5424,6 +5412,7 @@ export default {
           this.configForm.produceModel === 'WAC300LH' ||
           this.configForm.produceModel === 'WAC730C' ||
           this.configForm.produceModel === 'WAC330HE' ||
+          this.configForm.produceModel === 'WAC330CE' ||
           this.configForm.produceModel === 'NTP100C' ||
           this.configForm.produceModel === 'LPC210' ||
           this.configForm.produceModel === 'LPC210E' ||
@@ -5433,6 +5422,7 @@ export default {
           this.configForm.produceModel === 'CT1000' ||
           this.configForm.produceModel === 'ET01' ||
           this.configForm.produceModel === 'WAC300N' ||
+          this.configForm.produceModel === 'WAC300SC' ||
           this.configForm.produceModel === 'WAC300NH' ||
           this.configForm.produceModel === 'WAC300NY' ||
           this.configForm.produceModel === 'CAT400' ||
@@ -5496,15 +5486,15 @@ export default {
           this.rightProduceViewTitle = '不良记录'
         }
 
-        //无线配置
-        this.configDetail.selectTemperatureProbes = this.configForm.selectTemperatureProbes
         this.configDetail.selectLevelProbes = this.configForm.selectLevelProbes
         this.configDetail.temperatureProbe = this.configForm.temperatureProbes
         this.configDetail.version = this.configForm.version
         this.configDetail.temperature = this.configForm.temperature
         this.configDetail.processFocus = this.configForm.processFocus
         this.configDetail.pressureProbes = this.configForm.pressureProbes
-        if (this.configForm.produceModel === 'WAC330HE') {
+
+        //2026 8/6 固定需求WAC330HE WAC330CE 固定写无探头
+        if (this.configForm.produceModel === 'WAC330HE' || this.configForm.produceModel === 'WAC330CE') {
           this.configDetail.temperatureProbe = '无探头'
           this.configDetail.pressureProbes = '无探头'
         }
@@ -5512,7 +5502,7 @@ export default {
         this.configDetail.printLabel = this.configForm.produceModel
         this.configDetail.customizePrintLabel = this.configForm.customizePrintLabel
 
-        if (this.configForm.produceModel === 'WAC330HE') {
+        if (this.configForm.produceModel === 'WAC330HE' || this.configForm.produceModel === 'WAC330CE') {
           this.configDetail.communication = this.configForm.communication
           this.configDetail.nominalCaliber = this.configForm.nominalCaliber
         }
@@ -5528,7 +5518,7 @@ export default {
         }
 
         if (this.configForm.produceModel === 'CPT100-10A' ||
-          this.configForm.produceModel === 'CPT100'||
+          this.configForm.produceModel === 'CPT100' ||
           this.configForm.produceModel === 'BDC100&C17'
         ) {
           this.configDetail.power_error = this.configForm.power_error
@@ -5546,6 +5536,7 @@ export default {
           this.configForm.produceModel === 'WAC300LH' ||
           this.configForm.produceModel === 'WAC730C' ||
           this.configForm.produceModel === 'WAC330HE' ||
+          this.configForm.produceModel === 'WAC330CE' ||
           this.configForm.produceModel === 'NTP100C' ||
           this.configForm.produceModel === 'LPC210' ||
           this.configForm.produceModel === 'LPC210E' ||
@@ -5556,6 +5547,7 @@ export default {
           this.configForm.produceModel === 'CT1000' ||
           this.configForm.produceModel === 'ET01' ||
           this.configForm.produceModel === 'WAC300N' ||
+          this.configForm.produceModel === 'WAC300SC' ||
           this.configForm.produceModel === 'WAC300NH' ||
           this.configForm.produceModel === 'WAC300NY' ||
           this.configForm.produceModel === 'CAT400' ||
@@ -5690,7 +5682,7 @@ export default {
       this.nbButtonDisabledStatus.onePointSixMpaDemarcate = true
       this.nbButtonDisabledStatus.deviceInspection = true
       this.nbButtonDisabledStatus.powerInspection = true
-      this.nbButtonDisabledStatus.powerCalibration= true
+      this.nbButtonDisabledStatus.powerCalibration = true
       this.nbButtonDisabledStatus.readSelfTestStatus = true
       this.nbButtonDisabledStatus.singleChannelCalibration = true
       this.nbButtonDisabledStatus.doubleChannelCalibration = true

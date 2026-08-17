@@ -158,7 +158,7 @@ class HardwareController extends Controller {
         } = config;
         Log.info('config:', config)
 
-        if (configModel === 'WAC330HE') {
+        if (configModel === 'WAC330HE'||configModel === 'WAC330CE') {
             //50*12 单排
             // 生成单个标签 HTML
             const generateLabel = () => `
@@ -224,6 +224,7 @@ class HardwareController extends Controller {
     .barcode-container {
         text-align: center;
         margin-right: 2mm;
+        margin-top: -7mm;
     }
     .barcode-container  {
         width: 20mm;
@@ -446,7 +447,7 @@ class HardwareController extends Controller {
             || configModel === 'WAC300NH' || configModel === 'ET01' || configModel === 'WAC730C' ||
             configModel === 'CAT400' || configModel === 'CAT400S' || configModel === 'WAC710C' || configModel === 'WAC300C'
             || configModel === 'WAC330N' || configModel === 'WAC400N' || configModel === 'VAC710' || configModel === 'WAC710N' ||
-            configModel === 'WAC300NY' || configModel === 'WAC730N' || configModel === 'WAC300LH'
+            configModel === 'WAC300NY' || configModel === 'WAC730N' || configModel === 'WAC300LH'||configModel==='WAC300N'
         ) {
             // 40*20 双排
             // 生成单个标签 HTML
