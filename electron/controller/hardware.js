@@ -59,7 +59,7 @@ class HardwareController extends Controller {
             || configModel === 'WAC300NH' || configModel === 'ET01' || configModel === 'WAC730C' ||
             configModel === 'CAT400' || configModel === 'CAT400S' || configModel === 'WAC710C' || configModel === 'WAC300C'
             || configModel === 'WAC330N' || configModel === 'WAC400N' || configModel === 'VAC710' || configModel === 'WAC710N' ||
-            configModel === 'WAC300NY' || configModel === 'WAC730N' || configModel === 'WAC300LH'
+            configModel === 'WAC300NY' || configModel === 'WAC730N' || configModel === 'WAC300LH'||configModel==='PTC100-CAT1'
         ) {
             // 40*20 双排
             // 生成单个标签 HTML
@@ -154,11 +154,127 @@ class HardwareController extends Controller {
             heightMM,
             marginMM,
             marginLeftMM,
-            secondColumnFontSize
+            secondColumnFontSize,
+            netprovider
         } = config;
         Log.info('config:', config)
+   if(configModel === 'WAC100N'){
+       Log.info('打印')
+       if (netprovider===1){
+           model='型号: '+model+' 电信'
+       }else if (netprovider===2){
+           model='型号: '+model+' 移动'
+       }else{
+           model='型号: '+model+' 电信'
+       }
+       const date = `${'日期: '+new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}-${new Date().getDate().toString().padStart(2, '0')}`;
+       //date 格式：2026-08-14
+       //50*12 双排
+       // 生成单个标签 HTML
+       const generateLabel = () => `
+        <div class="label">
+            <div class="barcode-container">
+                <img style="height:5mm;width:19mm" src="data:image/png;base64,${png.toString('base64')}" />
+                <div style="font-size: 2.8mm;font-weight: bold;">${address}</div>
+             
+            </div>
+            <div class="param-container">       
+                <div class="param-row">
+                    
+                    <span style="margin-top: 2mm" class="label-value">${model}</span> 
+                </div>
+                
+                <div class="param-row">
+                 
+                    <span class="label-value">${date}</span>
+                </div>
+            </div>
+        </div>
+    `;
 
-        if (configModel === 'WAC330HE'||configModel === 'WAC330CE') {
+       // 双排标签
+       const labelsHTML = listDoubleRowLabels
+           ? generateLabel() + generateLabel()
+           : generateLabel();
+
+       // 返回完整 HTML
+       htmlStr = `
+<html>
+<head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Microsoft YaHei', sans-serif;
+        font-size: ${secondColumnFontSize}mm;
+    }
+
+    .container {
+        display: flex;
+        padding-left: ${marginLeftMM}mm;
+        gap: 3mm;
+        width: fit-content;
+        height: ${heightMM}mm;
+    }
+
+    .label {
+        width: ${widthMM}mm;
+        height: ${heightMM}mm;
+        margin-top: ${marginMM}mm;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    .barcode-container {
+        text-align: center;
+        margin-right: 2mm;
+        margin-top: -1.5mm;
+    }
+    .barcode-container  {
+        width: 20mm;
+        height: 3mm;
+        object-fit: contain;
+    }
+  
+    .text-date {
+        font-size: 2.2mm;
+        font-weight: bold;
+        margin-top: 0.5mm;
+    }
+
+    .param-container{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-top: 1mm;
+    }
+
+    .param-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1mm;
+    }
+ 
+    .label-value {
+        font-size: 2.6mm;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        ${labelsHTML}
+    </div>
+</body>
+</html>
+`;
+
+   }
+
+    else if (configModel === 'WAC330HE'||configModel === 'WAC330CE') {
             //50*12 单排
             // 生成单个标签 HTML
             const generateLabel = () => `
@@ -888,7 +1004,8 @@ class HardwareController extends Controller {
             commonTraffic: args.commonTraffic,
             flowRange: args.flowRange,
             craftsmanCaliber: args.craftsmanCaliber,
-            png: png
+            png: png,
+            netprovider:args.netprovider,
         }
         let content = this.getTemplate(config)
 

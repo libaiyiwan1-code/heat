@@ -1,0 +1,6 @@
+export {zeroMpaDemarcate} from './pressureCalibration'
+export {onePointSixMpaDemarcate} from './pressureCalibration'
+export {pressureTest} from './pressureTest'
+export {selfTest} from './selfTest'
+export {writeAddress} from './writeAddress'
+export {exitSelfTest} from './exitSelfTest'

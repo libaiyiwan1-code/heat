@@ -52,6 +52,8 @@
                                &&this.configForm.produceModel!=='CAT400'
                                &&this.configForm.produceModel!=='CAT400S'
                                &&this.configForm.produceModel!=='WAC230CF'
+                               &&this.configForm.produceModel!=='WAC300SC'
+                                 &&this.configForm.produceModel!=='PTC100-CAT1'
 ">
                     <a-select
                       v-model:value="this.configForm.pressureProbes"
@@ -86,6 +88,7 @@
                                &&this.configForm.produceModel!=='CAT400'
                                &&this.configForm.produceModel!=='CAT400S'
                                &&this.configForm.produceModel!=='WAC230CF'
+                                &&this.configForm.produceModel!=='PTC100-CAT1'
 ">
                     <a-select
                       v-model:value="this.configForm.temperatureProbes"
@@ -134,6 +137,7 @@
                                          &&this.configForm.produceModel!=='CAT400'
                                            &&this.configForm.produceModel!=='CAT400S'
                                            &&this.configForm.produceModel!=='WAC230CF'
+                                             &&this.configForm.produceModel!=='PTC100-CAT1'
 ">
                     <a-select
                       v-model:value="this.configForm.screenDisplay"
@@ -351,7 +355,9 @@
                     </a-input-number>
                   </a-form-item>
                   <a-form-item label="程序版本" v-show="this.isNBDevice===true"
-                               v-if="this.configForm.produceModel!=='东元热表'">
+                               v-if="this.configForm.produceModel!=='东元热表'
+
+">
                     <a-input
                       v-model:value="this.configForm.version"
                       style="width: 7vw; margin-left: 4.9vw"
@@ -686,14 +692,13 @@
                                          &&this.configForm.produceModel!=='CAT400'
                                          &&this.configForm.produceModel!=='CAT400S'
                                          &&this.configForm.produceModel!=='WAC230CF'
+                                         &&this.configForm.produceModel!=='PTC100-CAT1'
 ">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">测温类型:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{
                         configDetail.temperatureProbe
                       }}</span>
                   </div>
-
-
 
 
                   <div class="hlm-card-configInfo-body-info-line"
@@ -722,6 +727,8 @@
                                              &&this.configForm.produceModel!=='CAT400'
                                              &&this.configForm.produceModel!=='CAT400S'
                                              &&this.configForm.produceModel!=='WAC230CF'
+                                             &&this.configForm.produceModel!=='WAC300SC'
+                                             &&this.configForm.produceModel!=='PTC100-CAT1'
 ">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">压力探头:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{
@@ -744,6 +751,7 @@
                                           &&this.configForm.produceModel!=='CAT400'
                                           &&this.configForm.produceModel!=='CAT400S'
                                           &&this.configForm.produceModel!=='WAC230CF'
+                                          &&this.configForm.produceModel!=='PTC100-CAT1'
 ">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">屏幕显示:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.screenDisplay }}</span>
@@ -766,6 +774,7 @@
                                           &&this.configForm.produceModel!=='CAT400'
                                           &&this.configForm.produceModel!=='CAT400S'
                                           &&this.configForm.produceModel!=='WAC230CF'
+                                          &&this.configForm.produceModel!=='PTC100-CAT1'
 ">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">温度误差:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{
@@ -838,6 +847,7 @@
                                         &&this.configForm.produceModel!=='CAT200'
                                         &&this.configForm.produceModel!=='CAT400'
                                         &&this.configForm.produceModel!=='CAT400S'
+                                        &&this.configForm.produceModel!=='PTC100-CAT1'
 ">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">温度标定:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.temperature }}</span>
@@ -858,7 +868,8 @@
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">产品型号:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.printLabel }}</span>
                   </div>
-                  <div class="hlm-card-configInfo-body-info-line" v-if="this.configDetail.printLabel!=='东元热表'">
+                  <div class="hlm-card-configInfo-body-info-line"
+                       v-if="this.configDetail.printLabel!=='东元热表'">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">程序版本:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{ configDetail.version }}</span>
                   </div>
@@ -1152,30 +1163,12 @@
                 justify-content: center;
                 overflow: hidden;
            ">
-              <template v-if="mainImage">
-                <img
-                  :src="mainImage"
-                  :style="getImageStyle()"
-                  @click="openModal(mainImage)"
-                  @load="onImageLoad"
-                />
-              </template>
-              <template v-else>
-                <div style="
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px dashed grey;
-        color: grey;
-      ">
-                  未获取到照片
-                </div>
-              </template>
+              <img
+                :src="mainImage"
+                :style="getImageStyle()"
+                @click="openModal(mainImage)"
+                @load="onImageLoad"
+              />
             </div>
           </a-card>
           <a-modal
@@ -1589,19 +1582,26 @@
 
               <div>
                 <div
-                  v-if="this.configDetail.printLabel==='PTC100-4-20MA'||this.configDetail.printLabel==='PTC100-RS485' ">
+                  style="width: 52vw"
+                  v-if="this.configDetail.printLabel==='PTC100-4-20MA'
+                  ||this.configDetail.printLabel==='PTC100-RS485'
+                  ||this.configDetail.printLabel==='PTC100-CAT1'
+
+">
                   <a-button type="primary" block
-                            @click="zeroMpaDemarcate(protocolIDMap[this.configForm.produceModel].protocolId,'voltmeter')"
+                            @click="zeroMpaDemarcate('one')"
                             :disabled="nbButtonDisabledStatus.zeroMpaDemarcate"
                             :style="{
                            backgroundColor: nbButtonColor.zeroMpaDemarcate
                         }"
                             class="hlm-nb-business-start-button-style"
+
                   >
                     0Mpa标定
                   </a-button>
                   <a-button type="primary" block
-                            @click="onePointSixMpaDemarcate(protocolIDMap[this.configForm.produceModel].protocolId,'voltmeter')"
+
+                            @click="onePointSixMpaDemarcate('one')"
                             :disabled="nbButtonDisabledStatus.onePointSixMpaDemarcate"
                             :style="{
                            backgroundColor: nbButtonColor.onePointSixMpaDemarcate
@@ -1611,7 +1611,8 @@
                     1.6Mpa标定
                   </a-button>
                   <a-button type="primary" block
-                            @click="deviceInspection(protocolIDMap[this.configForm.produceModel].protocolId,'one')"
+
+                            @click="deviceInspection('one')"
                             :disabled="nbButtonDisabledStatus.deviceInspection"
                             :style="{
                            backgroundColor: nbButtonColor.deviceInspection
@@ -1621,9 +1622,8 @@
                     压力检验
                   </a-button>
 
-
                   <a-button type="primary" block
-                            @click="selfTest(protocolIDMap[this.configForm.produceModel].protocolId,'one')"
+                            @click="modBusSelfTest(protocolIDMap[this.configForm.produceModel].protocolId,'one')"
                             :disabled="nbButtonDisabledStatus.selfTest"
                             :style="{
                            backgroundColor: nbButtonColor.selfTest
@@ -1631,6 +1631,42 @@
                             class="hlm-nb-business-start-button-style"
                   >
                     自检发送
+                  </a-button>
+                  <a-button type="primary" block
+                            @click="modbusAddressWrite(protocolIDMap[this.configForm.produceModel].protocolId,'one')"
+                            :disabled="nbButtonDisabledStatus.writeAddress"
+                            :style="{
+                           backgroundColor: nbButtonColor.writeAddress
+                        }"
+                            class="hlm-nb-business-start-button-style"
+                  >
+                    地址写入
+                  </a-button>
+                  <a-button type="primary" block
+
+                            @click="modbusPrintLabel(
+                      false,
+                        protocolIDMap[this.configForm.produceModel].protocolId,'one'
+                        )"
+                            :disabled="nbButtonDisabledStatus.labelPrint"
+                            class="hlm-nb-not-important-business-start-button-style"
+                            :style="{
+                           color: nbButtonColor.labelPrint
+                        }"
+                            style="margin-left: 20px"
+                  >
+                    标签<br/>重打
+                  </a-button>
+                  <a-button type="primary" block
+                            @click="modbusBreakSelfTest(
+                        protocolIDMap[this.configForm.produceModel].protocolId,'one'
+                        )"
+                            :disabled="nbButtonDisabledStatus.breakSelfTest"
+                            class="hlm-nb-not-important-business-start-button-style"
+                            :style="{
+                           color: nbButtonColor.breakSelfTest
+                        }">
+                    退出<br/>自检
                   </a-button>
 
                 </div>
@@ -1688,6 +1724,7 @@
                         &&this.configForm.produceModel!=='NBT200'
                         &&this.configForm.produceModel!=='PTC100-4-20MA'
                         &&this.configDetail.printLabel!=='PTC100-RS485'
+                        &&this.configDetail.printLabel!=='PTC100-CAT1'
 "
                         @click="selfTest(protocolIDMap[this.configForm.produceModel].protocolId,'one')"
                         :disabled="nbButtonDisabledStatus.selfTest"
@@ -1742,6 +1779,8 @@
                         &&this.configForm.produceModel!=='NBT200'
                         &&this.configForm.produceModel!=='PTC100-4-20MA'
                         &&this.configDetail.printLabel!=='PTC100-RS485'
+                        &&this.configDetail.printLabel!=='PTC100-RS485'
+                        &&this.configDetail.printLabel!=='PTC100-CAT1'
 
 "
 
@@ -1875,8 +1914,7 @@
                       this.configDetail.printLabel==='VAT100'||
                       this.configDetail.printLabel==='NTP100'||
                       this.configDetail.printLabel==='WAC300C'||
-                      this.configDetail.printLabel==='WAC710C'||
-                      this.configDetail.printLabel==='WAC400N'
+                      this.configDetail.printLabel==='WAC710C'
 
 
                         )&&this.configDetail.communication==='无线'
@@ -2730,7 +2768,9 @@ import {
   doReadTemperature,
   doSingleChannelCalibration,
   doDoubleChannelCalibration,
-  doCurrent4To20mADemarcate, doPowerInspection, doPowerCalibration
+  doCurrent4To20mADemarcate, doPowerInspection,
+  doPowerCalibration, doModbusSelfTest, doModbusWriteAddress,doModbusExitSelfTest,
+  doModbusPrintLabel
 } from "@/views/device/operations/modbusDeviceOperations";
 
 const Log = require("ee-core/log");
@@ -2840,7 +2880,7 @@ export default {
       vendorCodeList: ['0000000',],
       labelPaperSizeList: ['30x12', '40x20', '50x12', '28x15'],
       customerList: ['青岛海龙马电子', '泉州七阳'],
-      baudRateList: ['2400', '9600'],
+      baudRateList: ['2400', '9600', '115200'],
       checkDigitList: ['偶校验', '无'],
       produceModelList: [],
       customizePrintLabelList: [],
@@ -3334,6 +3374,7 @@ export default {
         'PTC100-RF',
         'PTC100-4-20mA',
         'PTC100-RS485',
+        'PTC100-CAT1',
         'LPC300',
         'LPC100-NB',
         'LPC100-Cat1',
@@ -3384,8 +3425,8 @@ export default {
         '0/10V',
         '1/10V'
       ],
-      pressureGauge: undefined, //ptc100 压力表读压力
-      pressureDeviceValue: undefined, //ptc100 读压力
+      pressureGauge: undefined, //压力表读压力
+      pressureDeviceValue: undefined, //ptc100-cat1 读压力
       readCurrentMeterValue: undefined,//温度电流表读取电流
       readCurrentPressureMeterValue: undefined,//压力电流表读取压力
       deviceSignal: undefined,//设备信号
@@ -3497,6 +3538,9 @@ export default {
       } else if (model.includes('EB-M')) {
         this.portAttributes.selectedBadRate = 2400
         this.portAttributes.selectedCheckDigit = '偶校验'
+      } else if (model.includes('PTC100-CAT1')) {
+        this.portAttributes.selectedBadRate = 115200
+        this.portAttributes.selectedCheckDigit = '无'
       }
       let productNamingConventionsList = model.split('-');
       // let productModel = productNamingConventionsList[0];
@@ -3602,6 +3646,7 @@ export default {
         this.configForm.produceModel === 'NTR300C' ||
         this.configForm.produceModel === 'PTC100-4-20MA' ||
         this.configForm.produceModel === 'PTC100-RS485' ||
+        this.configForm.produceModel === 'PTC100-CAT1' ||
         this.configForm.produceModel === 'PTC100-RF' ||
         this.configForm.produceModel === 'CTW100' ||
         this.configForm.produceModel === 'WAC300NS' ||
@@ -3660,7 +3705,7 @@ export default {
         if (productNamingConventionsList.length >= 2 &&
           !(productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' || productModel === 'VAC710-JL' ||
             productModel === 'PTC100-RS485' || productModel === 'PTC100-4-20MA' || productModel === 'PTC100' ||
-            productModel === 'WAC300-LG' || productModel === 'NBT100-AC' || productModel === 'NBT400-AC'
+            productModel === 'WAC300-LG' || productModel === 'NBT100-AC' || productModel === 'NBT400-AC'||productModel==='PTC100-CAT1'
           )) {
           //第2级开始配置
           this.decodeConfigForm.secondLevelContainsD = productNamingConventionsList[1].includes('D');
@@ -3671,7 +3716,7 @@ export default {
         }
         if (productNamingConventionsList.length >= 3 &&
           (productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||
-            productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||
+            productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||productModel==='PTC100-CAT1'||
             productModel === 'RFT200-CAT1' || productModel === 'WAC300-LG' || productModel === 'VAC710-JL' ||
             productModel === 'NBT100-AC' || productModel === 'NBT400-AC' || productModel === 'CPT100-10A'
           )) {
@@ -3685,7 +3730,7 @@ export default {
 
       if (productNamingConventionsList.length >= 3 &&
         !(productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||
-          productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||
+          productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||productModel==='PTC100-CAT1'||
           productModel === 'RFT200-CAT1' || productModel === 'WAC300-LG' || productModel === 'VAC710-JL' ||
           productModel === 'NBT100-AC' || productModel === 'NBT400-AC'
         )) {
@@ -3714,7 +3759,7 @@ export default {
       }
       if (productNamingConventionsList.length >= 4 &&
         (productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||
-          productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||
+          productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||productModel==='PTC100-CAT1'||
           productModel === 'RFT200-CAT1' || productModel === 'WAC300-LG' ||
           productModel === 'VAC710-JL' || productModel === 'NBT100-AC' || productModel === 'NBT400-AC')) {
         //第3级开始配置
@@ -3733,7 +3778,7 @@ export default {
       if (productNamingConventionsList.length >= 9 &&
         !(productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||
           productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||
-          productModel === 'RFT200-CAT1' ||
+          productModel === 'RFT200-CAT1' ||productModel==='PTC100-CAT1'||
           productModel === 'WAC300-LG' || productModel === 'VAC710-JL' ||
           productModel === 'NBT100-AC' || productModel === 'NBT400-AC'
         )) {
@@ -3763,7 +3808,7 @@ export default {
 
       if (productNamingConventionsList.length >= 10 &&
         (productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||
-          productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||
+          productModel === 'PTC100-RS485' || productModel === 'PTC100-RF' ||productModel==='PTC100-CAT1'||
           productModel === 'RFT200-CAT1' || productModel === 'WAC300-LG' || productModel === 'VAC710-JL' ||
           productModel === 'NBT100-AC' || productModel === 'NBT400-AC')) {
         const ninthLevel = productNamingConventionsList[9];
@@ -4149,7 +4194,7 @@ export default {
         this.configForm.customizePrintLabel = 'ET01'
       } else if (value === 'WAC300N') {
         this.configForm.customizePrintLabel = 'WAC300N'
-      }else if (value === 'WAC300SC') {
+      } else if (value === 'WAC300SC') {
         this.configForm.customizePrintLabel = 'WAC300SC'
       } else if (value === 'WAC300NH') {
         this.configForm.customizePrintLabel = 'WAC300NH'
@@ -5128,11 +5173,14 @@ export default {
       const scaledHeightVh = imageHeightVh * scale;
       console.log('图片缩放后的尺寸：', scaledWidthVw, scaledHeightVh)
       return {
+        // marginLeft:'7.5vw',
         width: `${scaledWidthVw}vw`,  // 使用 vw 单位
         height: `${scaledHeightVh}vh`, // 使用 vh 单位
         display: 'block',
         maxWidth: `${containerWidthVw}vw`, // 限制不超过容器
-        maxHeight: `${containerHeightVh}vh`
+        maxHeight: `${containerHeightVh}vh`,
+        objectFit: 'contain', // 完整显示，保持比例
+        margin: 'auto',
       };
     }
     ,
@@ -5189,6 +5237,12 @@ export default {
       if (this.routerParam.produceMachine === 0) {
         //生产机器才打印标签
         await doPrintLabel(this, flag, protocolId, type)
+      }
+    },
+    async modbusPrintLabel(flag, protocolId, type) {
+      if (this.routerParam.produceMachine === 0) {
+        //生产机器才打印标签
+        await doModbusPrintLabel(this, flag, protocolId, type)
       }
     },
     /**
@@ -5476,7 +5530,8 @@ export default {
           this.configForm.produceModel === 'CPT100-10A' ||
           this.configForm.produceModel === 'NBT400' ||
           this.configForm.produceModel === 'WAC710C' ||
-          this.configForm.produceModel === 'VAC005C'
+          this.configForm.produceModel === 'VAC005C'||
+          this.configForm.produceModel === 'PTC100-CAT1'
         ) {
           this.leftProduceViewTitle = '测试验证'
           this.rightProduceViewTitle = '不良记录'
@@ -5601,7 +5656,8 @@ export default {
           this.configForm.produceModel === 'CPT100-10A' ||
           this.configForm.produceModel === 'NBT400' ||
           this.configForm.produceModel === 'WAC710C' ||
-          this.configForm.produceModel === 'VAC005C'
+          this.configForm.produceModel === 'VAC005C'||
+          this.configForm.produceModel === 'PTC100-CAT1'
 
         ) {
           console.log('this.configForm.produceModel:', this.configForm.produceModel)
@@ -5900,6 +5956,10 @@ export default {
       await doSelfTest(this, protocolId, type)
     },
 
+    async modBusSelfTest(protocolId, type) {
+      await doModbusSelfTest(this, type, protocolId)
+    },
+
 
     async zeroMpaDemarcate(type) {
       await doZeroMpaDemarcate(this, type)
@@ -5908,8 +5968,8 @@ export default {
     async onePointSixMpaDemarcate(type) {
       await doOnePointSixMpaDemarcate(this, type)
     },
-    async deviceInspection(protocolId, type) {
-      await doDeviceInspection(this, protocolId, type)
+    async deviceInspection(type) {
+      await doDeviceInspection(this, type)
     },
     async powerInspection(protocolId, type) {
       await doPowerInspection(this, protocolId, type)
@@ -5948,8 +6008,12 @@ export default {
     async addressWrite(protocolId, type) {
       await doWriteAddress(this, protocolId, type)
       this.buttonEnable()
-    }
-    ,
+    },
+
+    async modbusAddressWrite(protocolId, type) {
+      await doModbusWriteAddress(this, protocolId, type)
+      this.buttonEnable()
+    },
     async scanCodeVerification(protocolId, type) {
       await doScanCodeVerification(this, protocolId, type)
     }
@@ -6029,6 +6093,10 @@ export default {
 
     async breakSelfTest(protocolId, type) {
       await doExitSelfTest(this, protocolId, type)
+    }
+    ,
+    async modbusBreakSelfTest(protocolId, type) {
+      await doModbusExitSelfTest(this, protocolId, type)
     }
     ,
 
@@ -6477,7 +6545,7 @@ html, body {
 }
 
 .hlm-nb-business-start-button-style {
-  width: calc(120 / 1920 * 100vw);
+  width: calc(115 / 1920 * 100vw);
   height: calc(50 / 1080 * 100vh);
   border-color: #666666;
   background-color: #FF770F; /*强制覆盖 防止disabled 优先级过高*/
@@ -6557,7 +6625,7 @@ html, body {
 }
 
 .hlm-nb-log-container-style {
-  width: calc(860 / 1920 * 100vw);
+  width: calc(868 / 1930 * 100vw);
   height: calc(230 / 1080 * 100vh);
   margin-top: calc(20 / 1080 * 100vh);
   margin-left: calc(50 / 1920 * 100vw);
