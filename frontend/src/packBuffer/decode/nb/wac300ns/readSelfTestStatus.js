@@ -1,4 +1,5 @@
 import {getDataView, hex2arrayBuffer, hexToAscii, isStatusNotPass, report} from "@/packBuffer/common/comUtil";
+import {protocolIDMap} from "@/views/device/enum/enum";
 const SELF_TEST_CHECKS = [
   { offset: 87, msg: '未自检过' },
   { offset: 91, msg: 'EEP 不正常' },
@@ -48,7 +49,13 @@ export function readSelfTestStatus(context, responseMessage) {
   context.protocolId = getDeviceProtocolId(raw)
   context.version = decodeGetVersion(raw)
   context.netprovider = decodeGetNetProvider(raw)
-
+  if (context.netprovider === 1) { //电信
+    protocolIDMap[context.configForm.produceModel].model = 73
+    protocolIDMap[context.configForm.produceModel].joinMode = 8
+  } else if (context.netprovider === 2) { //移动
+    protocolIDMap[context.configForm.produceModel].model = 74
+    protocolIDMap[context.configForm.produceModel].joinMode = 2
+  }
   return false
 }
 export function decodeGetProductName(responseMessage) {

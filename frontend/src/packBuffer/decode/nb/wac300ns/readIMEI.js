@@ -13,7 +13,7 @@ export function readIMEI(context, responseMessage) {
     dataView.getUint8(26) !== 0x05 ||
     dataView.getUint8(28) !== 0x0B
   if (!notPass) {
-    let imei = decodeGetIMEI(responseMessage, false)
+    let imei = decodeGetIMEI(responseMessage, true)
     if (checkIMEI(imei)) {
       context.createLeftSpanMessage('IMEI不合法', 'red')
       notPass = true

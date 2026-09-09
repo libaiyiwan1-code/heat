@@ -486,7 +486,7 @@ class HardwareController extends Controller {
 `;
         } else if (
             configModel === 'LPC230' || configModel === 'LPC230E' || configModel === 'VPT100' || configModel === 'AEC100' || configModel === 'CTW100'
-            || configModel === 'WAC300NS' || configModel === 'WAC400NS' || configModel === 'VAC710S' || configModel === 'RFT200-CAT1' || configModel === 'RFT200' ||
+           || configModel === 'WAC400NS' || configModel === 'VAC710S' || configModel === 'RFT200-CAT1' || configModel === 'RFT200' ||
             configModel === 'NBT400' || configModel === 'NTR300' || configModel === 'CPT100' || configModel === 'CPT100-10A' || configModel === 'BDC100&C17'
         ) {
             //30*12 双排
@@ -559,19 +559,86 @@ class HardwareController extends Controller {
 `;
 
 
-        } else if (configModel === 'NTP100C' || configModel === 'WAC710CD' || configModel === 'WAC300CD'
+        }else if (
+       configModel ==='WAC300NS'
+   ) {
+       //20*10
+       const generateLabel = () => `
+       <div class="label">
+     <div>
+            <img style="width: 15mm; height: 3.5mm;" src="data:image/jpg;base64,${png.toString('base64')}">
+        </div>
+    <div>
+        <!-- 地址保持原来的居中和样式 -->
+        <p style="  font-weight: 500; margin-top: 0.1mm;">${address}</p>
+        
+    </div>
+</div>
+    `;
+
+       Log.info('listDoubleRowLabels:', listDoubleRowLabels)
+       // 双排标签
+       let labelsHTML = listDoubleRowLabels
+           ? generateLabel() + generateLabel()
+           : generateLabel();
+       Log.info(labelsHTML)
+       // 返回完整 HTML
+       htmlStr = `
+<html>
+<head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Microsoft YaHei', sans-serif;
+        font-size: ${secondColumnFontSize}mm;
+    }
+      
+        .label-parent{
+          width: ${Number(widthMM) + 2}mm;
+        }
+    .container {
+        display: flex;
+        padding-left: ${marginLeftMM}mm;
+        width: fit-content;
+        height: ${heightMM}mm;
+      
+    }
+
+       .label {
+        margin-top: ${marginMM}mm;
+        width: ${widthMM}mm;
+        height: ${heightMM}mm;
+        flex-direction: row;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+     
+</style>
+</head>
+<body>
+    <div class="container">
+        ${labelsHTML}
+    </div>
+</body>
+</html>
+`;
+
+
+   } else if (configModel === 'NTP100C' || configModel === 'WAC710CD' || configModel === 'WAC300CD'
             || configModel === 'WAC300NH' || configModel === 'ET01' || configModel === 'WAC730C' ||
             configModel === 'CAT400' || configModel === 'CAT400S' || configModel === 'WAC710C' || configModel === 'WAC300C'
             || configModel === 'WAC330N' || configModel === 'WAC400N' || configModel === 'VAC710' || configModel === 'WAC710N' ||
-            configModel === 'WAC300NY' || configModel === 'WAC730N' || configModel === 'WAC300LH'||configModel==='WAC300N'
+            configModel === 'WAC300NY' || configModel === 'WAC730N' || configModel === 'WAC300LH'||configModel==='WAC300N'||configModel==='PTC100-CAT1'
         ) {
             // 40*20 双排
             // 生成单个标签 HTML
             const generateLabel = () => `
        <div class="label">
-    <div class="barcode-container">
-        <img style="width: 26mm; height: 3.5mm;" src="data:image/jpg;base64,${png.toString('base64')}">
-    </div>
+        <div class="barcode-container">
+            <img style="width: 26mm; height: 3.5mm;" src="data:image/jpg;base64,${png.toString('base64')}">
+        </div>
     <div>
         <!-- 地址保持原来的居中和样式 -->
         <p style="line-height: 1.2; font-weight: 500; margin-top: 0.8mm;">${address}</p>

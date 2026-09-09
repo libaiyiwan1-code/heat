@@ -72,7 +72,7 @@ export function checkCollectorIMEIExist(imei) {
 
 export function checkRecentlyUploadedData(address, tableName) {
   return new Promise((resolve, reject) => {
-    const allowedTables = ['col_terminal_data_meter_valve', 'col_terminal_data_valve','col_terminal_data_measure_point'];
+    const allowedTables = ['col_terminal_data_meter_valve', 'col_terminal_data_valve','col_terminal_data_measure_point','col_terminal_data_card_valve'];
     if (!allowedTables.includes(tableName)) {
       reject(new Error('Invalid table name'));
       return;

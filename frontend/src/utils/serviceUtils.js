@@ -487,7 +487,7 @@ export async function generateAddressByVACProduce(context) {
 }
 
 
-export async function nbDeviceRegister(context, type, notPass) {
+export async function nbDeviceRegister(context, type, notPass,printLabel) {
   let registerResponse
   try {
     //http://124.70.68.52:20206
@@ -538,7 +538,12 @@ export async function nbDeviceRegister(context, type, notPass) {
     if (insertResult) {
       context.createLeftSpanMessage('生产入库成功', 'grey');
       await context.uploadMes(context.leftGenerateAddress, 1, '成功')
-      await context.printLabel(context, true, protocolIDMap[context.configForm.produceModel].protocolId, type)
+      if (printLabel==='PTC100-CAT1'){
+        await context.modbusPrintLabel( true, protocolIDMap[context.configForm.produceModel].protocolId, type)
+      }else{
+        await context.printLabel(context, true, protocolIDMap[context.configForm.produceModel].protocolId, type)
+
+      }
       return false;
     } else {
       await context.uploadMes(context.leftGenerateAddress, 0, '生产入库失败')

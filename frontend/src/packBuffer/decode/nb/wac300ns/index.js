@@ -6,3 +6,5 @@ export {readICCID} from './readICCID'
 export {writeAddress} from './writeAddress'
 export {exitSelfTest} from './exitSelfTest'
 export {readData} from './readData'
+export {awaken} from './awaken'
+

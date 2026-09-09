@@ -54,6 +54,7 @@
                                &&this.configForm.produceModel!=='WAC230CF'
                                &&this.configForm.produceModel!=='WAC300SC'
                                  &&this.configForm.produceModel!=='PTC100-CAT1'
+                                 &&this.configForm.produceModel!=='WAC300NS'
 ">
                     <a-select
                       v-model:value="this.configForm.pressureProbes"
@@ -729,6 +730,7 @@
                                              &&this.configForm.produceModel!=='WAC230CF'
                                              &&this.configForm.produceModel!=='WAC300SC'
                                              &&this.configForm.produceModel!=='PTC100-CAT1'
+                                             &&this.configForm.produceModel!=='WAC300NS'
 ">
                     <span class="label hlm-card-nb-configInfo-body-info-line-label">压力探头:</span>
                     <span class="value hlm-card-configInfo-body-info-line-value">{{
@@ -1834,7 +1836,8 @@
                       this.configDetail.printLabel==='WAC300CS'||
                       this.configDetail.printLabel==='WAC400N'||
                       this.configDetail.printLabel==='WAC730C'||
-                      this.configDetail.printLabel==='WAC730N'
+                      this.configDetail.printLabel==='WAC730N'||
+                      this.configDetail.printLabel==='WAC300NS'
 "
                         v-show="
                         this.configForm.produceModel!=='东元热表'
@@ -2878,7 +2881,7 @@ export default {
       levelProbesList: ['有液位探头', '无液位探头'],
       torquesList: ['25Nm', '50Nm'],
       vendorCodeList: ['0000000',],
-      labelPaperSizeList: ['30x12', '40x20', '50x12', '28x15'],
+      labelPaperSizeList: ['30x12', '40x20', '50x12', '28x15','20x10'],
       customerList: ['青岛海龙马电子', '泉州七阳'],
       baudRateList: ['2400', '9600', '115200'],
       checkDigitList: ['偶校验', '无'],
@@ -4127,6 +4130,14 @@ export default {
         this.labelMargin = 8
         this.lableMarginLeft = 12
         this.secondColumnFontSize = 5
+      }else if (this.selectLabelPaperSize === '20x10') {
+        this.imageDesc = '20mm x 10mm 标签纸预览图'
+        this.labelHeight = 8
+        this.listDoubleRowLabels = '否'
+        this.labelWidth = 20
+        this.labelMargin = 12
+        this.lableMarginLeft = 46
+        this.secondColumnFontSize = 3
       }
     },
     onSizeChange3012() {
@@ -4153,6 +4164,14 @@ export default {
         this.labelMargin = 8
         this.lableMarginLeft = 12
         this.secondColumnFontSize = 5
+      }
+      if (this.selectLabelPaperSize === '20*10' && this.listDoubleRowLabels === '否') {
+        this.imageDesc = '20mm x 10mm 标签纸预览图'
+        this.labelHeight = 9
+        this.labelWidth = 20
+        this.labelMargin = 5
+        this.lableMarginLeft = 12
+        this.secondColumnFontSize = 3
       }
     }
     ,

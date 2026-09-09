@@ -51,8 +51,10 @@ export function readSelfTestStatus(context, responseMessage) {
   context.netprovider = decodeGetNetProvider(raw)
   if (context.netprovider === 1) { //电信
     protocolIDMap[context.configForm.produceModel].model = 41
+    protocolIDMap[context.configForm.produceModel].joinMode = 8
   } else if (context.netprovider === 2) { //移动
     protocolIDMap[context.configForm.produceModel].model = 49
+    protocolIDMap[context.configForm.produceModel].joinMode = 2
   }
   return false
 }

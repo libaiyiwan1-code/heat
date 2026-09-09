@@ -2,11 +2,7 @@ import {
   cj88Execute,
   modbusExecute,
   nbExecute,
-  nbProtocolTypeIsModbusExecute,
-  nbProtocolTypeIsUTM100485ModBUSExecute,
-  nbProtocolTypeIsUTM100CPT100Execute,
-  nbProtocolTypeIsUTM100CPT100ModBUSExecute,
-  outlineExecute,
+  outlineExecute, utt100NBExecute,
   wireExecute
 } from "@/packBuffer/commander";
 import {arrayBuffer2Hex, checkSpontaneous, hex2arrayBuffer, mergeArrayBuffer} from "@/packBuffer/common/comUtil";
@@ -43,13 +39,20 @@ export const serialPortOperation = async (context, config, type, protocolType = 
       isTransparentTransmissionProtocol = false, // 是否为透传协议
       isWireDevice = false,
       withStartFrame = true, //是否包含起始帧
+      uplinkCommunicationTarget = {
+        baudRate: 2400,
+        method: 'MODBUS',
+        checkDigit: '偶校验',
+        includeUTM100Device: false
+      },
     } = config;
 
+    console.log(config.uplinkCommunicationTarget)
     context.buttonDisabled()
     let retries = 0;
     let notPass = true;
     let packBuffer
-    console.log('写入类型:', type)
+    console.log('type:', type, 'protocolType：', protocolType)
     if (!isWireDevice && type !== 'four' && type !== 'meter' && type !== 'currentSource' && type !== 'cj88' && (type === 'one' && protocolType === 'NB')) {
       //无线设备报文组包
       if (isTransparentTransmissionProtocol) {
@@ -58,13 +61,9 @@ export const serialPortOperation = async (context, config, type, protocolType = 
         packBuffer = nbExecute(cmdType, cmdCode, protocolId, context);
       }
     } else if (type === 'one' && protocolType === 'MODBUS') {
-      packBuffer = nbProtocolTypeIsModbusExecute(cmdType, cmdCode, context)
-    } else if (type === 'one' && protocolType === 'UTM100-CPT100-MODBUS') {
-      packBuffer = nbProtocolTypeIsUTM100CPT100ModBUSExecute(cmdType, cmdCode, context)
-    } else if (type === 'one' && protocolType === 'UTM100-485-MODBUS') {
-      packBuffer = nbProtocolTypeIsUTM100485ModBUSExecute(cmdType, cmdCode, context)
+      packBuffer = modbusExecute(cmdType, cmdCode, context, uplinkCommunicationTarget)
     } else if (type === 'one' && protocolType === 'UTM100-NB') {
-      packBuffer = nbProtocolTypeIsUTM100CPT100Execute(cmdType, cmdCode, context)
+      packBuffer = utt100NBExecute(cmdType, cmdCode, context, uplinkCommunicationTarget, protocolId)
     } else if (isWireDevice) {
       //有线设备报文组包
       packBuffer = wireExecute(cmdType, cmdCode, protocolId, context, type, withStartFrame)
@@ -76,10 +75,7 @@ export const serialPortOperation = async (context, config, type, protocolType = 
       packBuffer = packCurrentSource(cmdType, cmdCode, context)
     } else if (type === 'cj88') {
       packBuffer = cj88Execute(cmdType, cmdCode, protocolId, context)
-    } else if (type === 'voltmeter') {
-      packBuffer = modbusExecute(cmdType, cmdCode, context)
     }
-
     console.log(`[请求报文] ${operationName}`, arrayBuffer2Hex(packBuffer));
     Log.info(`[请求报文] ${operationName}`, arrayBuffer2Hex(packBuffer));
 

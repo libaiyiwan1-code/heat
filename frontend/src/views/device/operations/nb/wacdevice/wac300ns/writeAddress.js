@@ -6,6 +6,127 @@ import {checkIMEIByTerminal, generateAddressByNB} from "@/utils/serviceUtils";
 export async function writeAddress(protocolId, type, context) {
   const model = context.configForm.produceModel;
   const protocol = protocolIDMap[model];
+
+  let readDataResult = await serialPortOperation(context, {
+    actionType: 'readData',
+    operationName: '读数据',
+    cmdType: '90',                         // afn 的命令类型
+    cmdCode: '20',                         // fn 的命令码
+    protocolId: protocolId,
+    maxRetries: context.maxRetries,
+    expectedLength: protocol.deviceActionResponseMessageLength['readData'],
+    expectedLength2: protocol.deviceActionResponseMessageLength2['readData'],
+    timeout: 6500,
+    validateResponse: () => protocol.validateResponse.readData(context, context.receivedData.globalReceivedOneData),
+    preprocess: () => {
+    },
+    isInfraredDevice: protocol.isInfraredDevice,
+    isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.readData,
+  }, type)
+  if (readDataResult) {
+    await playErrorAudio(context)
+    return true
+  }
+
+
+  console.warn('温度探头：', context.configDetail.temperatureProbe)
+  console.warn('温度误差：', context.configDetail.temperatureDiff)
+  console.warn('回温：', context.readOutTemperature)
+  console.warn('进温：', context.readInTemperature)
+  if (context.configDetail.temperatureProbe === '回温探头') {
+    if (context.readInTemperature !== 99.99) {
+      context.createLeftSpanMessage('进温探头不匹配', 'red')
+      await context.uploadMes(context.leftGenerateAddress, 0, '进温探头不匹配')
+      context.leftBadProductQuantity += 1
+      await playErrorAudio(context)
+      return true
+    }
+    if (!(context.readOutTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
+      context.readOutTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
+      context.createLeftSpanMessage('回温温度误差过大' + context.readOutTemperature, 'red')
+      await badRecordUpload(context, '回温温度误差过大' , context.readOutTemperature, 'writeAddress')
+      await context.uploadMes(context.leftGenerateAddress, 0, '回温温度误差过大:' + context.readOutTemperature)
+      context.leftBadProductQuantity += 1
+      await playErrorAudio(context)
+      return true
+    }
+    context.createLeftSpanMessage('回温验证成功:' + context.readOutTemperature, 'grey')
+
+  } else if (context.configDetail.temperatureProbe === '进温探头') {
+    if (context.readOutTemperature !== 99.99) {
+      context.createLeftSpanMessage('回温探头不匹配', 'red')
+      await context.uploadMes(context.leftGenerateAddress, 0, '回温探头不匹配')
+      context.leftBadProductQuantity += 1
+      await playErrorAudio(context)
+      return true
+    }
+    //进温探头
+    if (!(context.readInTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
+      context.readInTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
+      context.createLeftSpanMessage('进温温度误差过大' + context.readInTemperature, 'red')
+      await badRecordUpload(context, '进温温度误差过大', context.readInTemperature, 'writeAddress')
+      await context.uploadMes(context.leftGenerateAddress, 0, '进温温度误差过大:' + context.readInTemperature)
+      context.leftBadProductQuantity += 1
+      await playErrorAudio(context)
+      return true
+    }
+    context.createLeftSpanMessage('进温验证成功:' + context.readInTemperature, 'grey')
+
+  } else if (context.configDetail.temperatureProbe === '双探头') {
+    if (context.readOutTemperature === 99.99) {
+      context.createLeftSpanMessage('回温探头不匹配', 'red')
+      await context.uploadMes(context.leftGenerateAddress, 0, '回温探头不匹配')
+      context.leftBadProductQuantity += 1
+      await playErrorAudio(context)
+      return true
+    }
+    console.log(context.readInTemperature === 99.99)
+    if (Number(context.readInTemperature) === 99.99) {
+      context.createLeftSpanMessage('进温探头不匹配', 'red')
+      await context.uploadMes(context.leftGenerateAddress, 0, '进温探头不匹配')
+      context.leftBadProductQuantity += 1
+      await playErrorAudio(context)
+      return true
+    }
+    //双探头
+    if (!(context.readOutTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
+      context.readOutTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
+      context.createLeftSpanMessage('回温温度误差过大' + context.readOutTemperature, 'red')
+      await badRecordUpload(context, '回温温度误差过大', +context.readOutTemperature, 'writeAddress')
+      await context.uploadMes(context.leftGenerateAddress, 0, '回温温度误差过大:' + context.readOutTemperature)
+      context.leftBadProductQuantity += 1
+      await playErrorAudio(context)
+      return true
+    }
+    context.createLeftSpanMessage('回温验证成功:' + context.readOutTemperature, 'grey')
+    if (!(context.readInTemperature >= context.configDetail.temperature - context.configDetail.temperatureDiff &&
+      context.readInTemperature <= context.configDetail.temperature + context.configDetail.temperatureDiff)) {
+      context.createLeftSpanMessage('进温温度误差过大' + context.readInTemperature, 'red')
+      await badRecordUpload(context, '进温温度误差过大', context.readInTemperature, 'writeAddress')
+      await context.uploadMes(context.leftGenerateAddress, 0, '进温温度误差过大:' + context.readInTemperature)
+      context.leftBadProductQuantity += 1
+      await playErrorAudio(context)
+      return true
+    }
+    context.createLeftSpanMessage('进温验证成功:' + context.readInTemperature, 'grey')
+  }else if (context.configDetail.temperatureProbe === '无探头'){
+    if (context.readOutTemperature !== 99.99) {
+      context.createLeftSpanMessage('回温探头不匹配', 'red')
+      await context.uploadMes(context.leftGenerateAddress, 0, '回温探头不匹配')
+      context.leftBadProductQuantity += 1
+      await playErrorAudio(context)
+      return true
+    }
+    if (context.readInTemperature !== 99.99) {
+      context.createLeftSpanMessage('进温探头不匹配', 'red')
+      await context.uploadMes(context.leftGenerateAddress, 0, '进温探头不匹配')
+      context.leftBadProductQuantity += 1
+      await playErrorAudio(context)
+      return true
+    }
+  }
+
+
   let notPass = await generateAddressByNB(context)
   if (notPass) {
     await playErrorAudio(context)

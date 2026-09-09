@@ -28,20 +28,20 @@ export const selfTest = async (context, protocolId, type) => {
 
 
   let writeTemperatureConfigFail = await serialPortOperation(context, {
-    actionType: 'writeTemperatureProbe',
+    actionType: 'writeTemperatureProbesConfig',
     operationName: '写温度探头配置',
     cmdType: 'ac',                         // afn 的命令类型
     cmdCode: '09',                         // fn 的命令码
     protocolId: protocolId,
     maxRetries: context.maxRetries,
-    expectedLength: protocol.deviceActionResponseMessageLength['writeTemperatureProbe'],
-    expectedLength2: protocol.deviceActionResponseMessageLength2['writeTemperatureProbe'],
+    expectedLength: protocol.deviceActionResponseMessageLength['writeTemperatureProbesConfig'],
+    expectedLength2: protocol.deviceActionResponseMessageLength2['writeTemperatureProbesConfig'],
     timeout: context.timeout,
-    validateResponse: () => protocol.validateResponse.writeTemperatureProbe(context.receivedData.globalReceivedOneData),
+    validateResponse: () => protocol.validateResponse.writeTemperatureProbesConfig(context.receivedData.globalReceivedOneData),
     preprocess: () => {
     },
     isInfraredDevice: protocol.isInfraredDevice,
-    isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.writeTemperatureProbe,
+    isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.writeTemperatureProbesConfig,
   }, type)
   if (writeTemperatureConfigFail) {
     await playErrorAudio(context)

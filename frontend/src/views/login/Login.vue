@@ -95,27 +95,24 @@
 
 <script>
 import {getUserByUserNameAndPassWork} from '@/components/global/mysqldb.js';
-import {message} from 'ant-design-vue';
+import {message, Modal} from 'ant-design-vue';
 import {ipc} from "@/utils/ipcRenderer";
 import {ipcApiRoute} from "@/api/main";
 import {
   findMacAddr,
+  findModelVersionSupport,
   getIdByUsername,
-  getLatestVersionByModel,
-  getCurrentVersionByModelAndVersion,
-  getListSupportedModels, findModelVersionSupport, hasAlternativeVersionForModel
+  hasAlternativeVersionForModel
 } from "@/components/global/productdb";
-import {getWorkConfigParam, getWorkDetail, login, queryWorkNosWithUnfinished} from "@/api/remote";
+import ip, {getWorkConfigParam, getWorkDetail, login, queryWorkNosWithUnfinished} from "@/api/remote";
 import {sm2} from 'sm-crypto';
+import CustomTitleBar from '../device/CustomTitleBar.vue';
+import {h} from 'vue';
+import {CheckCircleOutlined, CloseCircleOutlined, ExclamationCircleOutlined} from "@ant-design/icons-vue";
 
 const {logger} = require('ee-core/log');
-import CustomTitleBar from '../device/CustomTitleBar.vue';
-import ip from '@/api/remote';
 
 const Log = require('ee-core/log');
-import { Modal } from 'ant-design-vue';
-import { h } from 'vue';
-import {CheckCircleOutlined, CloseCircleOutlined, ExclamationCircleOutlined} from "@ant-design/icons-vue";
 
 export default {
   components: {
@@ -279,14 +276,14 @@ export default {
         let routePath
         // ===== 5. 版本校验 =====
         // productModel = 'WAC300NY' //TODO 测试用 待删除
-        if (this.routerParam.produceMachine===0){
-           routePath = await this.handleVersionCheck(productModel);
+        if (this.routerParam.produceMachine === 0) {
+          routePath = await this.handleVersionCheck(productModel);
           if (routePath !== null) {
             message.success('登录成功');
           }
-        }else{
+        } else {
           routePath = '#/device';
-           message.success('登录成功');
+          message.success('登录成功');
         }
         // ===== 6. 路由跳转 =====
         await this.openNewWindow(routePath, username, productModel);
@@ -316,8 +313,10 @@ export default {
         return null;
       }
 
-      const productModel = model.split('-')[0];
-
+      let productModel = model.split('-')[0];
+      if (model.includes('PTC100-CAT1')){
+        productModel='PTC100-CAT1'
+      }
       // const list = await getListSupportedModels();
       // const item = list.find(r => model.includes(r.model));
 
@@ -342,7 +341,7 @@ export default {
       this.routerParam.currentVersion = currentVersion
 
       //当前版本支持生产
-      const currentVersionInfo = await findModelVersionSupport(productModel,currentVersion);
+      const currentVersionInfo = await findModelVersionSupport(productModel, currentVersion);
       console.log('当前版本信息', currentVersionInfo)
       if (!currentVersionInfo) {
         //️ 没有查到当前版本的信息
@@ -357,20 +356,20 @@ export default {
       let hasAlternative = await hasAlternativeVersionForModel(productModel)
       if (!hasAlternative) {
         hasAlternative = 0
-      }else{
+      } else {
         hasAlternative = hasAlternative.count
       }
       console.log('是否有可替代版本数量', hasAlternative)
       const supported = isSupported === 0;
       const risk = hasRisk === 1;
       const hasAlt = hasAlternative > 0;
-     //  1. 支持 + 无风险 → 直接生产
+      //  1. 支持 + 无风险 → 直接生产
       if (supported && !risk) {
         // const ok = await this.confirmDialog(
         //   `当前版本:${currentVersion} 支持型号:${productModel}生产`,
         //   'success'
         // );
-        return   '#/device'
+        return '#/device'
       }
 
       //  2. 支持 + 有风险
@@ -390,7 +389,7 @@ export default {
         }
       }
 
-     //  3. 不支持
+      //  3. 不支持
       if (!supported) {
         if (hasAlt) {
           const ok = await this.confirmDialog(
@@ -406,7 +405,6 @@ export default {
           return null;
         }
       }
-
 
 
       //支持生产
@@ -468,16 +466,16 @@ export default {
         // 👉 不同类型区分（重点）
         switch (type) {
           case 'success':
-            icon = h(CheckCircleOutlined, { style: { color: '#52c41a' } });
+            icon = h(CheckCircleOutlined, {style: {color: '#52c41a'}});
             title = '验证成功';
             break;
           case 'warning':
-            icon = h(ExclamationCircleOutlined, { style: { color: '#faad14' } });
+            icon = h(ExclamationCircleOutlined, {style: {color: '#faad14'}});
             title = '风险提示';
             okType = 'primary';
             break;
           case 'error':
-            icon = h(CloseCircleOutlined, { style: { color: '#ff4d4f' } });
+            icon = h(CloseCircleOutlined, {style: {color: '#ff4d4f'}});
             title = '禁止操作';
             okType = 'danger';
             break;

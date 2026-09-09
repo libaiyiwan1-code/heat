@@ -43,7 +43,7 @@ export const verify = async (context, protocolId, type) => {
     },
     isInfraredDevice: protocol.isInfraredDevice,
     isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.readAmmeterPower,
-  }, 'voltmeter')
+  }, type,'MODBUS')
   if (readAmmeterPowerNotPass) {
     await playErrorAudio(context)
     notPass = true

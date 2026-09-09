@@ -252,266 +252,14 @@ export function packInlineDataDomains(afn, fn, protocolID, context) {
   }
 }
 
-/**
- * UTM100-485-MODBUS 组包
- *
- * */
-export function modbusUTM100485PackDataDomains(afn, fn, context) {
-  let arrayBuffer = null;
-  switch (afn) {
-    case '02':
-      switch (fn) {
-        //0Mpa标定
-        case '00':
-          arrayBuffer = createBuffer(12, [0x00, 0x06, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x50, 0x4d, 0x30, 0x31]);
-          break;
-      }
-      return mergeArrayBuffer(arrayBuffer);
-    case '03'://读指令
-      switch (fn) {
-        case 'readPressureGaugePressure':
-          arrayBuffer = createBuffer(6, [0x01, 0x03, 0x00, 0x16, 0x00, 0x02]);
-          break;
-      }
-      return mergeArrayBuffer(arrayBuffer);
-    case '06'://写指令
-      switch (fn) {
-        case 'onePointSixMpaDemarcate':
-          //压力转换写入PTC100 读取 压力*10^6.toString(16)
-          let hexPressure = (parseFloat(context.pressureGauge) * Math.pow(10, 6)).toString(16);
-          let bufferOne = createBuffer(5, [0x00, 0x06, 0x02, 0x02, 0x00])
-          let newPressureBuffer = hex2arrayBuffer(hexPressure)
-          let bufferTwo = createBuffer(4, [0x50, 0x4D, 0x30, 0x31])
-          arrayBuffer = mergeArrayBuffer(bufferOne, newPressureBuffer, bufferTwo)
-          break;
-        //设备输出4mA
-        case 'output-4mA':
-          arrayBuffer = createBuffer(6, [0x01, 0x06, 0x02, 0x10, 0X0F, 0xA0]);
-          break;
-        case 'output-20mA':
-          arrayBuffer = createBuffer(6, [0x01, 0x06, 0x02, 0x10, 0X4E, 0x20]);
-          break;
-        case 'output-12mA':
-          arrayBuffer = createBuffer(6, [0x01, 0x06, 0x02, 0x20, 0X2E, 0xE0]);
-          break;
-        //温度通道标定4mA
-        case 'temperatureChannelCalibrated4mA':
-          let readCurrentMeterValue = context.readCurrentMeterValue
-          let current = parseFloat(readCurrentMeterValue) * 1000
-          let currentBuffer = floatToHexBuffer(current, false)
-          let packBuffer = createBuffer(4, [0x01, 0x06, 0x02, 0x16]);
-          arrayBuffer = mergeArrayBuffer(packBuffer, currentBuffer)
-          break;
-        //温度通道标定20mA
-        case 'temperatureChannelCalibrated20mA':
-          let readCurrentMeterValue20mA = context.readCurrentMeterValue
-          let current20mA = parseFloat(readCurrentMeterValue20mA) * 1000
-          let currentBuffer20mA = floatToHexBuffer(current20mA, false)
-          let packBuffer20mA = createBuffer(4, [0x01, 0x06, 0x02, 0x18]);
-          arrayBuffer = mergeArrayBuffer(packBuffer20mA, currentBuffer20mA)
-          break;
-
-        //压力通道4mA标定
-        case 'pressureChannelCalibrated4mA':
-          let readPressureMeterValue4mA = context.readCurrentPressureMeterValue
-          let pressure4mA = parseFloat(readPressureMeterValue4mA) * 1000
-          let currentPressureBuffer4mA = floatToHexBuffer(pressure4mA, false)
-          let packBufferPressureMeter4mA = createBuffer(4, [0x01, 0x06, 0x02, 0x18]);
-          arrayBuffer = mergeArrayBuffer(packBufferPressureMeter4mA, currentPressureBuffer4mA)
-          break;
-        //压力通道20mA标定
-        case 'pressureChannelCalibrated20mA':
-          let readPressureMeterValue20mA = context.readCurrentPressureMeterValue
-          let pressure20mA = parseFloat(readPressureMeterValue20mA) * 1000
-          let currentPressureBuffer20mA = floatToHexBuffer(pressure20mA, false)
-          let packBufferPressureMeter20mA = createBuffer(4, [0x01, 0x06, 0x02, 0x14]);
-          arrayBuffer = mergeArrayBuffer(packBufferPressureMeter20mA, currentPressureBuffer20mA)
-          break;
-      }
-      return mergeArrayBuffer(arrayBuffer);
-    default:
-  }
-
-  return arrayBuffer;
-}
-
 
 /**
- * UTM100-NB组包
- *
- * */
-export function nbUTM100PackDataDomains(afn, fn, context) {
-  let arrayBuffer = null;
-  switch (afn) {
-    case 'f0':
-      switch (fn) {
-        case '01':
-          arrayBuffer = createBuffer(4, [0xf0, 0xff, 0x01, 0x00]);
-          break;
-        case '02':
-          //0x00 默认普通自检
-          arrayBuffer = createBuffer(5, [0xf0, 0xff, 0x02, 0x00, 0x00]);
-          break;
-        case '1e':
-          arrayBuffer = createBuffer(4, [0xf0, 0xff, 0x1e, 0x00]);
-          break;
-        case '14':
-          arrayBuffer = createBuffer(4, [0xf0, 0xff, 0x14, 0x00]);
-          break;
-        default:
-        // Log.error("packages: afn[{}] match fail", afn);
-      }
-      return mergeArrayBuffer(startBuffer, packInlineFourMacAddr(), arrayBuffer);
-    case '02':
-      switch (fn) {
-        //0Mpa标定
-        case '00':
-          arrayBuffer = createBuffer(12, [0x00, 0x06, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x50, 0x4d, 0x30, 0x31]);
-          break;
-      }
-      return mergeArrayBuffer(arrayBuffer);
-    case '03'://读指令
-      switch (fn) {
-        case 'readPressureGaugePressure':
-          arrayBuffer = createBuffer(6, [0x01, 0x03, 0x00, 0x16, 0x00, 0x02]);
-          break;
-      }
-      return mergeArrayBuffer(arrayBuffer);
-    case '06'://写指令
-      switch (fn) {
-        case 'onePointSixMpaDemarcate':
-          //压力转换写入PTC100 读取 压力*10^6.toString(16)
-          let hexPressure = (parseFloat(context.pressureGauge) * Math.pow(10, 6)).toString(16);
-          let bufferOne = createBuffer(5, [0x00, 0x06, 0x02, 0x02, 0x00])
-          let newPressureBuffer = hex2arrayBuffer(hexPressure)
-          let bufferTwo = createBuffer(4, [0x50, 0x4D, 0x30, 0x31])
-          arrayBuffer = mergeArrayBuffer(bufferOne, newPressureBuffer, bufferTwo)
-          break;
-        //设备输出4mA
-        case 'output-4mA':
-          arrayBuffer = createBuffer(6, [0x01, 0x06, 0x02, 0x10, 0X0F, 0xA0]);
-          break;
-        case 'output-20mA':
-          arrayBuffer = createBuffer(6, [0x01, 0x06, 0x02, 0x10, 0X4E, 0x20]);
-          break;
-        case 'output-12mA':
-          arrayBuffer = createBuffer(6, [0x01, 0x06, 0x02, 0x20, 0X2E, 0xE0]);
-          break;
-        //温度通道标定4mA
-        case 'temperatureChannelCalibrated4mA':
-          let readCurrentMeterValue = context.readCurrentMeterValue
-          let current = parseFloat(readCurrentMeterValue) * 1000
-          let currentBuffer = floatToHexBuffer(current, false)
-          let packBuffer = createBuffer(4, [0x01, 0x06, 0x02, 0x16]);
-          arrayBuffer = mergeArrayBuffer(packBuffer, currentBuffer)
-          break;
-        //温度通道标定20mA
-        case 'temperatureChannelCalibrated20mA':
-          let readCurrentMeterValue20mA = context.readCurrentMeterValue
-          let current20mA = parseFloat(readCurrentMeterValue20mA) * 1000
-          let currentBuffer20mA = floatToHexBuffer(current20mA, false)
-          let packBuffer20mA = createBuffer(4, [0x01, 0x06, 0x02, 0x18]);
-          arrayBuffer = mergeArrayBuffer(packBuffer20mA, currentBuffer20mA)
-          break;
-
-        //压力通道4mA标定
-        case 'pressureChannelCalibrated4mA':
-          let readPressureMeterValue4mA = context.readCurrentPressureMeterValue
-          let pressure4mA = parseFloat(readPressureMeterValue4mA) * 1000
-          let currentPressureBuffer4mA = floatToHexBuffer(pressure4mA, false)
-          let packBufferPressureMeter4mA = createBuffer(4, [0x01, 0x06, 0x02, 0x18]);
-          arrayBuffer = mergeArrayBuffer(packBufferPressureMeter4mA, currentPressureBuffer4mA)
-          break;
-        //压力通道20mA标定
-        case 'pressureChannelCalibrated20mA':
-          let readPressureMeterValue20mA = context.readCurrentPressureMeterValue
-          let pressure20mA = parseFloat(readPressureMeterValue20mA) * 1000
-          let currentPressureBuffer20mA = floatToHexBuffer(pressure20mA, false)
-          let packBufferPressureMeter20mA = createBuffer(4, [0x01, 0x06, 0x02, 0x14]);
-          arrayBuffer = mergeArrayBuffer(packBufferPressureMeter20mA, currentPressureBuffer20mA)
-          break;
-      }
-      return mergeArrayBuffer(arrayBuffer);
-    default:
-  }
-
-  return arrayBuffer;
-}
-
-
-/**
- * UTM100-CPT100-MODBUS 组包
- *
- * */
-export function modbusUTM100CPT100PackDataDomains(afn, fn, context) {
-  let arrayBuffer = null;
-  switch (afn) {
-    case '02':
-      switch (fn) {
-        //0Mpa标定
-        case '00':
-          arrayBuffer = createBuffer(12, [0x00, 0x06, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x50, 0x4d, 0x30, 0x31]);
-          break;
-      }
-      return mergeArrayBuffer(arrayBuffer);
-    case '04' ://读温度指令
-      switch (fn) {
-        case 'readTemperature':
-          arrayBuffer = createBuffer(9, [0x01, 0x04, 0x00, 0x01, 0x00, 0x04, 0xA0, 0x09, 0x01]);
-          break;
-        case 'readDevicePressure':
-          arrayBuffer = createBuffer(6, [0x01, 0x04, 0x00, 0x01, 0x00, 0x02]);
-          break;
-      }
-      return mergeArrayBuffer(arrayBuffer);
-    case '06'://写指令
-      switch (fn) {
-        case 'onePointSixMpaDemarcate':
-          //压力转换写入PTC100 读取 压力*10^6.toString(16)
-          let hexPressure = (parseFloat(context.pressureGauge) * Math.pow(10, 6)).toString(16);
-          let bufferOne = createBuffer(5, [0x00, 0x06, 0x02, 0x02, 0x00])
-          let newPressureBuffer = hex2arrayBuffer(hexPressure)
-          let bufferTwo = createBuffer(4, [0x50, 0x4D, 0x30, 0x31])
-          arrayBuffer = mergeArrayBuffer(bufferOne, newPressureBuffer, bufferTwo)
-          break;
-        case 'calibratedZeroMegapascals':
-          arrayBuffer = createBuffer(12, [0x00, 0x06, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x50, 0x4D, 0x30, 0x31]);
-          break;
-      }
-      return mergeArrayBuffer(arrayBuffer);
-    default:
-  }
-
-  return arrayBuffer;
-}
-
-
-/**
- * MODBUS组包
+ * UTM100-MODBUS 组包
  *
  * */
 export function modbusPackDataDomains(afn, fn, context) {
   let arrayBuffer = null;
   switch (afn) {
-    case 'f0': {
-      switch (fn) {
-        case '01':
-          arrayBuffer = createBuffer(4, [0xf0, 0xff, 0x01, 0x00]);
-          break;
-        case '02':
-          //0x00 默认普通自检
-          arrayBuffer = createBuffer(5, [0xf0, 0xff, 0x02, 0x00, 0x00]);
-          break;
-        case '1e':
-          arrayBuffer = createBuffer(4, [0xf0, 0xff, 0x1e, 0x00]);
-          break;
-        case '14':
-          arrayBuffer = createBuffer(4, [0xf0, 0xff, 0x14, 0x00]);
-          break;
-        default:
-      }
-    }
-      return mergeArrayBuffer(arrayBuffer);
     case '01':
       switch (fn) {
         //电压表读功率
@@ -520,6 +268,7 @@ export function modbusPackDataDomains(afn, fn, context) {
           break;
       }
       return mergeArrayBuffer(arrayBuffer);
+
     case '02':
       switch (fn) {
         //0Mpa标定
@@ -549,6 +298,9 @@ export function modbusPackDataDomains(afn, fn, context) {
         case 'readTemperature':
           arrayBuffer = createBuffer(9, [0x01, 0x04, 0x00, 0x01, 0x00, 0x04, 0xA0, 0x09, 0x01]);
           break;
+        case 'readDevicePressure':
+          arrayBuffer = createBuffer(6, [0x01, 0x04, 0x00, 0x01, 0x00, 0x02]);
+          break;
       }
       return mergeArrayBuffer(arrayBuffer);
     case '06'://写指令
@@ -560,6 +312,9 @@ export function modbusPackDataDomains(afn, fn, context) {
           let newPressureBuffer = hex2arrayBuffer(hexPressure)
           let bufferTwo = createBuffer(4, [0x50, 0x4D, 0x30, 0x31])
           arrayBuffer = mergeArrayBuffer(bufferOne, newPressureBuffer, bufferTwo)
+          break;
+        case 'calibratedZeroMegapascals':
+          arrayBuffer = createBuffer(12, [0x00, 0x06, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x50, 0x4D, 0x30, 0x31]);
           break;
         //设备输出4mA
         case 'output-4mA':
