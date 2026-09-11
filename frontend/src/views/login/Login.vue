@@ -325,7 +325,7 @@ export default {
       //   return null;
       // }
 
-      if (productModel === 'VAC200') {
+      if (productModel.includes('VAC20')||productModel.includes('VAC10')||productModel.includes('VAC30') ) {
         const res = await getWorkConfigParam(this.routerParam.token, workNumber);
         if (!res.data.data) {
           message.error('该工单未进行开工配置,请在MES先开工');

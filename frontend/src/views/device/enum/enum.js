@@ -6307,6 +6307,175 @@ export const protocolIDMap = {
       },
     },
   },
+  'VAC200SC': {
+    protocolCode: undefined,
+    model: undefined,
+    joinMode: undefined,
+    isInfraredDevice: false,
+    isWireDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'readWireDeviceAddress': false,
+      'writeUpperAndLowerTemperatureLimits': false,
+      'writePowerOffAndWirelessError': false,
+      'writeHeatingDate': false,
+      'writeProbesConfig': false,
+      'writeAllConfig': false,
+      'readVersion': false,
+      'factoryConditionFullyClose': false,
+      'factoryConditionFullyOpen': false,
+      'outTemperatureCalibration': false,
+      'inTemperatureCalibration': false,
+      'mainAndAuxiliaryValvesVerify': false,
+      'faceplateCommunication': false,
+      'creditCard': false,
+      'fullOpenCalibration': false,
+      'fullOffCalibration': false,
+      'writeAddress': false,
+      'badPrompt': false,
+    },
+    protocolId: 70, //hex:46
+    deviceActionResponseMessageLength: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    deviceActionResponseMessageLength2: {
+      'readWireDeviceAddress': 19,
+      'writeUpperAndLowerTemperatureLimits': 19,
+      'writePowerOffAndWirelessError': 19,
+      'writeHeatingDate': 19,
+      'writeProbesConfig': 19,
+      'writeAllConfig': 19,
+      'readVersion': 20,
+      'factoryConditionFullyClose': 21,
+      'factoryConditionFullyOpen': 21,
+      'outTemperatureCalibration': 19,
+      'inTemperatureCalibration': 19,
+      'faceplateCommunication': 55,
+      'separationAlarmVerify': 55,
+      'readValveState': 55,
+      'creditCard': 84,
+      'separationAlarm': 55,
+      'mainAndAuxiliaryValvesVerify': 58,
+      'fullOpenCalibration': 22,
+      'fullOffCalibration': 22,
+      'writeAddress': 19,
+      'badPrompt': 0,
+      'writeForcedTemperatureSetting': 19,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      readWireDeviceAddress: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readAddress(context, data, type, isInfraredDevice);
+      },
+      writeUpperAndLowerTemperatureLimits: (data) => {
+        return wireDeviceCommon.writeUpperAndLowerTemperatureLimits(data);
+      },
+      writePowerOffAndWirelessError: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writePowerOutagesAndWirelessAnomalies(data, isInfraredDevice);
+      },
+      writeHeatingDate: (data) => {
+        return wireDeviceCommon.writeHeatingPeriod(data);
+      },
+      writeProbesConfig: (data) => {
+        return wireDeviceCommon.writeProbeConfiguration(data);
+      },
+      writeAllConfig: (data, isInfraredDevice) => {
+        return wireDeviceCommon.writeAllConfigConfiguration(data, isInfraredDevice);
+      },
+      readVersion: (context, data, type, isInfraredDevice) => {
+        return wireDeviceCommon.readVersionVerify(context, data, type, isInfraredDevice);
+      },
+      factoryConditionFullyClose: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyClose(data);
+      },
+      factoryConditionFullyOpen: (data) => {
+        return wireDeviceCommon.writeFactoryConditionFullyOpen(data);
+      },
+      outTemperatureCalibration: (data) => {
+        return wireDeviceCommon.outTemperatureCalibration(data);
+      },
+      inTemperatureCalibration: (data) => {
+        return wireDeviceCommon.inTemperatureCalibration(data);
+      },
+      readInAndBackTemperatureVerify: (data, type, context) => {
+        return wireDeviceCommon.readInAndBackTemperatureVerify(data, type, context)
+      },
+
+      faceplateCommunication: (data) => {
+        return wireDeviceCommon.faceplateCommunication(data);
+      },
+      creditCard: (data) => {
+        return wireDeviceCommon.creditCardVerify(data);
+      },
+      separationAlarm: (data) => {
+        return wireDeviceCommon.separationAlarmVerify(data);
+      },
+      mainAndAuxiliaryValvesVerify: (data) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesVerify(data);
+      },
+      fullOpenCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationVerify(data, context, isInfraredDevice);
+      },
+      fullOffCalibration: (data, context, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationVerify(data, context, isInfraredDevice);
+      },
+      writeAddress: (type, data, context, isInfraredDevice) => {
+        return wireDeviceCommon.writeAddressVerify(type, data, context, isInfraredDevice);
+      },
+      writeForcedTemperatureSetting: (data, isInfraredDevice) => {
+        return wireDeviceCommon.forcedTemperatureSetting(data, isInfraredDevice);
+      }
+
+    },
+    preprocess: {
+      readValveState: (data, type, context) => {
+        return wireDeviceCommon.readValveState(data, type, context)
+      },
+      fullOffCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOffCalibrationState(data, context, type, isInfraredDevice)
+      },
+      fullOpenCalibrationState: (data, context, type, isInfraredDevice) => {
+        return wireDeviceCommon.fullOpenCalibrationState(data, context, type, isInfraredDevice)
+      },
+      panelDetectionLostNormalState: (context, data, type) => {
+        return wireDeviceCommon.detectPanelState(context, data, type)
+      },
+      creditCardState: (context, data, type) => {
+        return wireDeviceCommon.creditCardState(context, data, type)
+      },
+      separationAlarmState: (data, close, context, type) => {
+        return wireDeviceCommon.separationAlarmState(data, close, context, type)
+      },
+      mainAndAuxiliaryValvesState: (data, context, type) => {
+        return wireDeviceCommon.mainAndAuxiliaryValvesState(data, context, type)
+      },
+    },
+  },
   'VAC200P': {
     protocolCode: undefined,
     model: undefined,
