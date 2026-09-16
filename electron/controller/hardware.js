@@ -559,9 +559,7 @@ class HardwareController extends Controller {
 `;
 
 
-        }else if (
-       configModel ==='WAC300NS'
-   ) {
+        }else if (configModel ==='WAC300NS') {
        //20*10
        const generateLabel = () => `
        <div class="label">
@@ -609,6 +607,67 @@ class HardwareController extends Controller {
         margin-top: ${marginMM}mm;
         width: ${widthMM}mm;
         height: ${heightMM}mm;
+        flex-direction: row;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+     
+</style>
+</head>
+<body>
+    <div class="container">
+        ${labelsHTML}
+    </div>
+</body>
+</html>
+`;
+
+
+   }else if (configModel ==='VAC200SC') {
+       //20*10
+       const generateLabel = () => `
+       <div class="label">
+            <div>
+                <!-- 地址保持原来的居中和样式 -->
+                <p style="  font-weight: 500; margin-top: 0.1mm;">HDC-K252AC</p>
+                
+            </div>
+</div>
+    `;
+
+       Log.info('listDoubleRowLabels:', listDoubleRowLabels)
+       // 双排标签
+       let labelsHTML = listDoubleRowLabels
+           ? generateLabel() + generateLabel()
+           : generateLabel();
+       Log.info(labelsHTML)
+       // 返回完整 HTML
+       htmlStr = `
+<html>
+<head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Microsoft YaHei', sans-serif;
+        font-size: ${secondColumnFontSize}mm;
+    }
+      
+        .label-parent{
+          width: ${Number(widthMM) + 2}mm;
+        }
+    .container {
+        display: flex;
+        padding-left: ${marginLeftMM}mm;
+        width: fit-content;
+        height: ${heightMM}mm;
+      
+    }
+
+       .label {
+        margin-top: ${marginMM}mm;
+        width: ${widthMM}mm;
         flex-direction: row;
         box-sizing: border-box;
         text-align: center;

@@ -43,7 +43,7 @@ export const verify = async (context, protocolId, type) => {
     },
     isInfraredDevice: protocol.isInfraredDevice,
     isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.readAmmeterPower,
-  }, type,'MODBUS')
+  }, 'voltmeter','MODBUS')
   if (readAmmeterPowerNotPass) {
     await playErrorAudio(context)
     notPass = true
@@ -51,20 +51,30 @@ export const verify = async (context, protocolId, type) => {
 
   let getPower = context.deviceReadPower
   let power = context.voltmeterReadPower
+  let powerError = context.configDetail.power_error
   console.warn('电表功率', power)
   console.warn('设备功率', getPower)
   console.warn('功率绝对值', Math.abs((getPower - power)))
   console.warn('功率绝对值除数', Math.abs((getPower - power)) / power)
   console.warn('允许的功率误差', context.configDetail.power_error)
-  if (
-    ((Math.abs((getPower - power)) / power) * 100 > context.configDetail.power_error) || (power === 0 && getPower === 0)
-  ) {
-    context.createLeftSpanMessage('红外设备与电表功率超出误差限制,功率误差:' + ((Math.abs((getPower - power)) / power) * 100).toFixed(4) + '%', 'red')
+  if (power === 0 && getPower === 0) {
+    context.createLeftSpanMessage('电表与设备功率均为0，请确认设备是否正常启动', 'red')
     notPass = true
-  } else {
-    context.createLeftSpanMessage('红外设备与电表功率误合格,功率误差:' + ((Math.abs((getPower - power)) / power) * 100).toFixed(4) + '%', 'grey')
+  } else if (power === 0) {
+    context.createLeftSpanMessage('电表功率为0，请确认设备是否正常启动 功率误差:∞', 'red')
+    notPass = true
+  } else if (getPower===0){
+    context.createLeftSpanMessage('设备功率为0，请确认设备是否正常启动 功率误差:∞', 'red')
+    notPass = true
+  }else {
+    const errorPercent = (Math.abs(getPower - power) / power) * 100
+    if (errorPercent > powerError) {
+      context.createLeftSpanMessage('红外设备与电表功率超出误差限制,功率误差:' + errorPercent.toFixed(4) + '%', 'red')
+      notPass = true
+    } else {
+      context.createLeftSpanMessage('红外设备与电表功率误差合格,功率误差:' + errorPercent.toFixed(4) + '%', 'grey')
+    }
   }
-
   //标定成功或者失败的结果
   if (notPass) {
    let resultNotPass = await serialPortOperation(context, {

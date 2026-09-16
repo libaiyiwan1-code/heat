@@ -3120,7 +3120,7 @@ export default {
         proportionalAdjustment: '0',//定比例调节值
         heatingStartDate: '06-10',//供暖开始日期
         heatingEndDate: '06-09',//供暖结束日期
-        version: '10',//TODO 默认版本 研发需要提供一个默认版本
+        version: '1.1',//TODO 默认版本 研发需要提供一个默认版本
       },
       //有线阀门card 控制展示Disable
       wireValveCardFormShow: {
@@ -4476,7 +4476,7 @@ export default {
         this.wireValveCardForm.factoryOpening = '0';
         this.wireValveCardForm.adjustDeadZone = '2';
         this.wireValveCardForm.proportionalAdjustment = '1';
-        this.wireValveCardForm.version = '1.0';
+        this.wireValveCardForm.version = '1.1';
       }
 
 
@@ -5258,6 +5258,9 @@ export default {
         await doPrintLabel(this, flag, protocolId, type)
       }
     },
+    async printLabelTest(flag, protocolId, type) {
+      await doPrintLabelTODO(this, flag, protocolId, type)
+    },
     async modbusPrintLabel(flag, protocolId, type) {
       if (this.routerParam.produceMachine === 0) {
         //生产机器才打印标签
@@ -5877,24 +5880,44 @@ export default {
       //   isWireDevice: protocolIDMap[this.configForm.produceModel].isWireDevice,
       // }, type)
 
-      let address = ''
-      if (type === 'one') {
-        address = this.leftReadAddress
-      } else if (type === 'two') {
-        address = this.rightReadAddress
+
+      if (this.configForm.produceModel!=='VAC200SC'){
+        let address = ''
+        if (type === 'one') {
+          address = this.leftReadAddress
+        } else if (type === 'two') {
+          address = this.rightReadAddress
+        }
+        const params = {
+          deviceName: this.defaultDeviceName,
+          address: arrayBuffer2Hex(addressCover(address.substring(0, 8))),
+          message: '检  ' + this.routerParam.pwd,
+          isDouble: this.configDetail.whetherDoubleRowPrinting === '是',
+          width: this.configDetail.labelWith,
+          margin: this.configDetail.labelMargin,
+          marginLeft: this.configDetail.lableMarginLeft,
+          secondColumnFontSize: this.configDetail.secondColumnFontSize,
+          height: this.configDetail.labelHeight,
+        };
+        await ipc.send(ipcApiRoute.printSuccessSingleRowInspectLabel5012, params)
+      }else{
+        const params = {
+          deviceName: this.defaultDeviceName,
+          address: '11111111',//todo 没用
+          model: this.configForm.produceModel,
+          configModel: this.configForm.produceModel,
+          listDoubleRowLabels: this.listDoubleRowLabels,
+          width: this.configDetail.labelWith,
+          margin: this.configDetail.labelMargin,
+          marginLeft: this.configDetail.lableMarginLeft,
+          secondColumnFontSize: this.configDetail.secondColumnFontSize,
+          height: this.configDetail.labelHeight,
+          isDouble: this.configDetail.whetherDoubleRowPrinting === '是',
+          netprovider:this.netprovider,//1电信  2移动
+        };
+        await ipc.send(ipcApiRoute.doPrintTest, params)
       }
-      const params = {
-        deviceName: this.defaultDeviceName,
-        address: arrayBuffer2Hex(addressCover(address.substring(0, 8))),
-        message: '检  ' + this.routerParam.pwd,
-        isDouble: this.configDetail.whetherDoubleRowPrinting === '是',
-        width: this.configDetail.labelWith,
-        margin: this.configDetail.labelMargin,
-        marginLeft: this.configDetail.lableMarginLeft,
-        secondColumnFontSize: this.configDetail.secondColumnFontSize,
-        height: this.configDetail.labelHeight,
-      };
-      await ipc.send(ipcApiRoute.printSuccessSingleRowInspectLabel5012, params)
+
     }
     ,
     async wireDevicePrintLabelTODO(type) {

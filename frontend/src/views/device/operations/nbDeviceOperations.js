@@ -1255,8 +1255,8 @@ export const doPrintLabelTODO = async (context, flag, protocolId, type) => {
   const params = {
     deviceName: context.defaultDeviceName,
     address: printAddress,
-    model: 'WAC100',
-    configModel: 'WAC100N',
+    model: 'VAC200SC',
+    configModel: 'VAC200SC',
     listDoubleRowLabels: context.listDoubleRowLabels,
     width: context.configDetail.labelWith,
     margin: context.configDetail.labelMargin,
@@ -1279,7 +1279,8 @@ export const doPrintLabelTODO = async (context, flag, protocolId, type) => {
     || context.configForm.produceModel === 'LPC230' || context.configForm.produceModel === 'LPC230E' || context.configForm.produceModel === 'AEC100'
     || context.configForm.produceModel === 'WAC710C' || context.configForm.produceModel === 'WAC300NS' || context.configForm.produceModel === 'WAC400NS'
     || context.configForm.produceModel === 'VAC005C' || context.configForm.produceModel === 'VAC710S' || context.configForm.produceModel === 'RFT200-CAT1'
-    || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400'||context.configForm.produceModel === 'WAC330HE' || context.configForm.produceModel === 'WAC330CE'
+    || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400'
+    ||context.configForm.produceModel === 'WAC330HE' || context.configForm.produceModel === 'WAC330CE'||context.configForm.produceModel === 'WAC300SC'
   ) {
     await ipc.send(ipcApiRoute.doPrintTest, params)
   }

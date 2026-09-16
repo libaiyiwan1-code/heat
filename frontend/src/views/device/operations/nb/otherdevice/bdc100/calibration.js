@@ -67,7 +67,7 @@ export const calibration = async (context, protocolId, type) => {
     },
     isInfraredDevice: protocol.isInfraredDevice,
     isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.readAmmeterPower,
-  }, type,'MODBUS')
+  }, 'voltmeter','MODBUS')
   if (readAmmeterPowerNotPass) {
     await playErrorAudio(context)
     notPass = true

@@ -62,7 +62,10 @@ export const serialPortOperation = async (context, config, type, protocolType = 
       }
     } else if (type === 'one' && protocolType === 'MODBUS') {
       packBuffer = modbusExecute(cmdType, cmdCode, context, uplinkCommunicationTarget)
-    } else if (type === 'one' && protocolType === 'UTM100-NB') {
+    } else if (type === 'voltmeter' && protocolType === 'MODBUS') {
+      packBuffer = modbusExecute(cmdType, cmdCode, context, uplinkCommunicationTarget)
+    }
+    else if (type === 'one' && protocolType === 'UTM100-NB') {
       packBuffer = utt100NBExecute(cmdType, cmdCode, context, uplinkCommunicationTarget, protocolId)
     } else if (isWireDevice) {
       //有线设备报文组包

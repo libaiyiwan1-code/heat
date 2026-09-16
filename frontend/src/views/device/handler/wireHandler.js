@@ -333,10 +333,11 @@ export const executionProcess = async (type, protocolId, startOperation, context
               context.leftWorkPrompt = '贴检验标签，完成后生产下一个'
               context.wireDeviceButtonEnabled(type);
               await executeWithAddress(protocolId, type, context, isInfraredDevice, async (readAddress) => {
-                await context.uploadMes(arrayBuffer2Hex(addressCover(readAddress.slice(0, 8))), 1, '成功')
-                const params = {
-                   deviceName: context.defaultDeviceName,
-                   address: arrayBuffer2Hex(addressCover(valveAddress.substring(0, 8))),
+                if (context.configForm.produceModel!=='VAC200SC'){
+                  await context.uploadMes(arrayBuffer2Hex(addressCover(readAddress.slice(0, 8))), 1, '成功')
+                  const params = {
+                    deviceName: context.defaultDeviceName,
+                    address: arrayBuffer2Hex(addressCover(valveAddress.substring(0, 8))),
                     message: '检  ' + context.routerParam.pwd,
                     isDouble: context.configDetail.whetherDoubleRowPrinting==='是',
                     width: context.configDetail.labelWith,
@@ -345,7 +346,25 @@ export const executionProcess = async (type, protocolId, startOperation, context
                     secondColumnFontSize:context.configDetail.secondColumnFontSize,
                     height: context.configDetail.labelHeight,
                   }
-                await ipc.send(ipcApiRoute.printSuccessSingleRowInspectLabel5012, params)
+                  await ipc.send(ipcApiRoute.printSuccessSingleRowInspectLabel5012, params)
+                }else{
+                  await context.uploadMes(arrayBuffer2Hex(addressCover(readAddress.slice(0, 8))), 1, '成功')
+                  const params = {
+                    deviceName: context.defaultDeviceName,
+                    address: '11111111',//todo 没用
+                    model: context.configForm.produceModel,
+                    configModel: context.configForm.produceModel,
+                    listDoubleRowLabels: context.listDoubleRowLabels,
+                    width: context.configDetail.labelWith,
+                    margin: context.configDetail.labelMargin,
+                    marginLeft: context.configDetail.lableMarginLeft,
+                    secondColumnFontSize: context.configDetail.secondColumnFontSize,
+                    height: context.configDetail.labelHeight,
+                    isDouble: context.configDetail.whetherDoubleRowPrinting === '是',
+                    netprovider:context.netprovider,//1电信  2移动
+                  };
+                  await ipc.send(ipcApiRoute.doPrintTest, params)
+                }
               })
               context.autoLeftWorkExecute = true
               context.leftScanAddressMissionStop = false
@@ -364,6 +383,8 @@ export const executionProcess = async (type, protocolId, startOperation, context
               context.rightWorkPrompt = '贴检验标签，完成后生产下一个'
               context.wireDeviceButtonEnabled(type);
               await executeWithAddress(protocolId, type, context, isInfraredDevice, async (readAddress) => {
+
+
                 await context.uploadMes(arrayBuffer2Hex(addressCover(readAddress.slice(0, 8))), 1, '成功')
                 const params = {
                   deviceName: context.defaultDeviceName,
