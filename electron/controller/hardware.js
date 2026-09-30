@@ -138,6 +138,88 @@ class HardwareController extends Controller {
 
 
 
+    getCustomerTemplate(config) {
+        let htmlStr = ''
+        let {
+            model,
+            configModel,
+            listDoubleRowLabels,
+            widthMM,
+            heightMM,
+            marginMM,
+            marginLeftMM,
+            secondColumnFontSize,
+        } = config;
+        Log.info('config:', config)
+     if (configModel ==='WAC300NS') {
+            //20*10
+            const generateLabel = () => `
+       <div class="label">
+            <div>
+                <!-- 地址保持原来的居中和样式 -->
+               <p style="font-weight: 500; margin-top: 0.1mm;">${model}</p>
+                
+            </div>
+</div>
+    `;
+
+            Log.info('listDoubleRowLabels:', listDoubleRowLabels)
+            // 双排标签
+            let labelsHTML = listDoubleRowLabels
+                ? generateLabel() + generateLabel()
+                : generateLabel();
+            Log.info(labelsHTML)
+            // 返回完整 HTML
+            htmlStr = `
+<html>
+<head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Microsoft YaHei', sans-serif;
+        font-size: ${secondColumnFontSize}mm;
+    }
+      
+        .label-parent{
+          width: ${Number(widthMM) + 2}mm;
+        }
+    .container {
+        display: flex;
+        padding-left: ${marginLeftMM}mm;
+        width: fit-content;
+        height: ${heightMM}mm;
+      
+    }
+
+       .label {
+        margin-top: ${marginMM}mm;
+        width: ${widthMM}mm;
+        flex-direction: row;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+     
+</style>
+</head>
+<body>
+    <div class="container">
+        ${labelsHTML}
+    </div>
+</body>
+</html>
+`;
+
+
+        }
+        return htmlStr;
+    }
+
+
+
+
+
     getTemplate(config) {
         let htmlStr = ''
         let {
@@ -487,7 +569,8 @@ class HardwareController extends Controller {
         } else if (
             configModel === 'LPC230' || configModel === 'LPC230E' || configModel === 'VPT100' || configModel === 'AEC100' || configModel === 'CTW100'
            || configModel === 'WAC400NS' || configModel === 'VAC710S' || configModel === 'RFT200-CAT1' || configModel === 'RFT200' ||
-            configModel === 'NBT400' || configModel === 'NTR300' || configModel === 'CPT100' || configModel === 'CPT100-10A' || configModel === 'BDC100&C17'
+            configModel === 'NBT400' || configModel === 'NTR300' || configModel === 'NTR300RB' ||
+       configModel === 'CPT100' || configModel === 'CPT100-10A' || configModel === 'BDC100&C17'
         ) {
             //30*12 双排
             let generateLabel = () => `
@@ -564,7 +647,7 @@ class HardwareController extends Controller {
        const generateLabel = () => `
        <div class="label">
      <div>
-            <img style="width: 15mm; height: 3.5mm;" src="data:image/jpg;base64,${png.toString('base64')}">
+            <img style="width: 18mm; height:4mm;" src="data:image/jpg;base64,${png.toString('base64')}">
         </div>
     <div>
         <!-- 地址保持原来的居中和样式 -->
@@ -835,7 +918,7 @@ class HardwareController extends Controller {
 
 
         } else if (
-            configModel === 'CAT200'
+            configModel === 'CAT200'|| configModel === 'NBT200'
         ) {
             //28*15 单排
             let generateLabel = () => `
@@ -1167,21 +1250,22 @@ class HardwareController extends Controller {
     }
 
 
+
     /**
-     * 打印测试函数
+     * 目前只打印 30*12 只打印型号
+     *
      *
      * */
-    async doPrint(args) {
+    async printCustomerLabel(args) {
         const deviceName = args.defaultDeviceName;
-        const modal = args.modal;
-        let address = '12345678';
+        let address = args.address;
         const widthMM = args.width;   // 标签宽度
         const heightMM = args.height;  // 标签高度
         const marginMM = args.margin;   // 边距
         const marginLeftMM = args.marginLeft;   // 右移动距离
         const listDoubleRowLabels = args.isDouble; // 是否双排
         const secondColumnFontSize = args.secondColumnFontSize; // 字号
-
+        Log.info('args:', args)
         const opt = {
             title: 'printer window',
             x: 10,
@@ -1192,55 +1276,27 @@ class HardwareController extends Controller {
         };
         const name = 'window-printer';
         const printWindow = Addon.get('window').create(name, opt);
+        Log.info(address)
 
         // 页面内容
-        let content = `
-<html>
-<head>
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: 'Microsoft YaHei', sans-serif;
-        font-size: ${secondColumnFontSize}mm;
-    }
-    .container {
-      
-        display: flex;
-        padding-left: ${marginLeftMM}mm; /* 整体右移 */
-        gap: 6mm /* 双排标签间距 */
-        width: fit-content;               /* 自适应总宽 */
-        height: ${heightMM}mm;
-       
-    }
-    .label {
-     margin-top: ${marginMM}mm;
-        width: ${widthMM}mm;
-        height: ${heightMM}mm;
-        line-height: ${heightMM}mm;
-        text-align: center;
-    }  
-    .label+.label {
-        margin-left: 3mm;
-    }
-  
-</style>
-</head>
-<body>
-    <div class="container">
-        <div class="label">${address}</div>
-        ${listDoubleRowLabels ? `<div class="label">${address}</div>` : ''}
-    </div>
-</body>
-</html>
-`;
+        let config = {
+            widthMM: widthMM,
+            heightMM: heightMM,
+            marginMM: marginMM,
+            marginLeftMM: marginLeftMM,
+            listDoubleRowLabels: listDoubleRowLabels,
+            secondColumnFontSize: secondColumnFontSize,
+            model: args.model,
+            configModel: args.configModel,
+        }
+        let content = this.getCustomerTemplate(config)
 
         // 加载内容
         printWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(content)}`);
 
         // 将 mm 转换为微米（Electron pageSize 单位 µm）
         const pageSize = {
-            width: widthMM * 1000 * (listDoubleRowLabels ? 2 + 0.1 : 1), // 双排 + 额外边距
+            width: widthMM * 990 * (listDoubleRowLabels ? 2 : 1), // 双排 + 额外边距
             height: (heightMM) * 1000
         };
 
@@ -1251,18 +1307,20 @@ class HardwareController extends Controller {
                 deviceName: deviceName,
                 copies: 1,
                 landscape: false,
-                pageSize: pageSize,
-                margins: {marginType: 'none'},
-                scaleFactor: 100 // 原始大小打印
+                pageSize,
+                scaleFactor: 100, // 原始大小打印
+                margins: {
+                    marginType: 'none' // 禁用默认边距
+                }
             }, (success, failureReason) => {
                 console.log('打印状态:', success, failureReason);
+                // printWindow.openDevTools()
                 // printWindow.close();
             });
         });
 
         return true;
     }
-
 
 
     /**

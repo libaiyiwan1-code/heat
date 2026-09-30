@@ -59,8 +59,10 @@ import * as AEC100 from './nb/collector/aec100'
 import * as LPC230 from './nb/collector/lpc230'
 import * as LPC230E from './nb/collector/lpc230'
 import * as NBT400 from './nb/point/NBT400'
+import * as NBT200 from './nb/point/nbt200'
 import * as WAC300C from './nb/wacdevice/WAC300C'
 import * as NTR300 from './nb/point/ntr300'
+import * as NTR300RB from './nb/point/ntr300rb'
 import * as BEACONM from './nb/wacdevice/beaconm'
 import {selfTest} from "./nb/wacdevice/wac330n";
 
@@ -113,8 +115,10 @@ export const doSelfTest = async (context, protocolId, type) => {
     'WAC100N': WAC100N.selfTest,
     'WAC100NY': WAC100NY.selfTest,
     'NBT400': NBT400.selfTest,
+    'NBT200': NBT200.selfTest,
     'WAC300C': WAC300C.selfTest,
     'NTR300': NTR300.selfTest,
+    'NTR300RB': NTR300RB.selfTest,
     'WAC300N': WAC300N.selfTest,
     'WAC330N': WAC330N.selfTest,
     'WAC400N': WAC400N.selfTest,
@@ -192,8 +196,10 @@ export async function doWriteAddress(context, protocolId, type) {
     'WAC100N': WAC100N.writeAddress,
     'WAC100NY': WAC100NY.writeAddress,
     'NBT400': NBT400.writeAddress,
+    'NBT200': NBT200.writeAddress,
     'WAC300C': WAC300C.writeAddress,
     'NTR300': NTR300.writeAddress,
+    'NTR300RB': NTR300RB.writeAddress,
     'WAC300N': WAC300N.writeAddress,
     'WAC330N': WAC330N.writeAddress,
     'WAC400N': WAC400N.writeAddress,
@@ -359,8 +365,10 @@ export const doExitSelfTest = async (context, protocolId, type) => {
     'PTC100-RS485': PTC100RS485.exitSelfTest,
     'WAC300NS': WAC300NS.exitSelfTest,
     'NBT400': NBT400.exitSelfTest,
+    'NBT200': NBT200.exitSelfTest,
     'WAC300C': WAC300C.exitSelfTest,
     'NTR300': NTR300.exitSelfTest,
+    'NTR300RB': NTR300RB.exitSelfTest,
     'WAC330N': WAC330N.exitSelfTest,
     'WAC710C': WAC710C.exitSelfTest,
     'WAC400N': WAC400N.exitSelfTest,
@@ -637,6 +645,23 @@ console.log('context.leftGenerateAddress:',context.leftGenerateAddress)
         }, 2000);
         return
       }
+    }
+
+    if (context.configDetail.printLabel==='WAC300NS'){
+      const params = {
+        deviceName: context.defaultDeviceName,
+        model: context.configDetail.customizePrintLabel,
+        configModel: context.configDetail.printLabel,
+        listDoubleRowLabels: context.listDoubleRowLabels,
+        width: context.configDetail.labelWith,
+        margin: context.configDetail.labelMargin,
+        marginLeft: context.configDetail.lableMarginLeft,
+        secondColumnFontSize: context.configDetail.secondColumnFontSize,
+        height: context.configDetail.labelHeight,
+        isDouble: context.configDetail.whetherDoubleRowPrinting === '是',
+      };
+      //打印定制标签
+      await ipc.send(ipcApiRoute.printCustomerLabel, params)
     }
     context.leftWorkPrompt = `扫码验证成功`;
     await playSuccessAudio(context)
@@ -986,7 +1011,8 @@ export const doPrintWarehouseEntryFailedLabel = async (context) => {
     || context.configForm.produceModel === 'WAC710C' || context.configForm.produceModel === 'WAC300NS' || context.configForm.produceModel === 'WAC400NS'
     || context.configForm.produceModel === 'VAC005C' || context.configForm.produceModel === 'VAC710S' || context.configForm.produceModel === 'RFT200-CAT1'
     || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400' || context.configForm.produceModel === 'WAC300C'
-    || context.configForm.produceModel === 'NTR300' || context.configForm.produceModel === 'CPT100-10A'
+    || context.configForm.produceModel === 'NTR300' || context.configForm.produceModel === 'CPT100-10A' ||context.configForm.produceModel === 'NBT200'
+    || context.configForm.produceModel === 'NTR300RB'
     || context.configForm.produceModel === 'WAC330N' || context.configForm.produceModel === 'WAC400N'||context.configForm.produceModel === 'WAC100N'
     || context.configForm.produceModel === 'VAC710' || context.configForm.produceModel === 'WAC710N' || context.configForm.produceModel === 'BDC100&C17'
   ) {
@@ -1172,7 +1198,8 @@ export const doPrintLabel = async (context, flag, protocolId, type) => {
     || context.configForm.produceModel === 'WAC710C' || context.configForm.produceModel === 'WAC300NS' || context.configForm.produceModel === 'WAC400NS'
     || context.configForm.produceModel === 'VAC005C' || context.configForm.produceModel === 'VAC710S' || context.configForm.produceModel === 'RFT200-CAT1'
     || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400' || context.configForm.produceModel === 'WAC300C'
-    || context.configForm.produceModel === 'NTR300' || context.configForm.produceModel === 'CPT100-10A'
+    || context.configForm.produceModel === 'NTR300' || context.configForm.produceModel === 'CPT100-10A' || context.configForm.produceModel === 'NBT200'
+    || context.configForm.produceModel === 'NTR300RB'
     || context.configForm.produceModel === 'WAC330N' || context.configForm.produceModel === 'WAC400N'|| context.configForm.produceModel === 'WAC100N'
     || context.configForm.produceModel === 'VAC710' || context.configForm.produceModel === 'WAC710N' || context.configForm.produceModel === 'BDC100&C17'
   ) {
@@ -1255,8 +1282,8 @@ export const doPrintLabelTODO = async (context, flag, protocolId, type) => {
   const params = {
     deviceName: context.defaultDeviceName,
     address: printAddress,
-    model: 'VAC200SC',
-    configModel: 'VAC200SC',
+    model: 'HDC-K252N',
+    configModel: 'WAC300NS',
     listDoubleRowLabels: context.listDoubleRowLabels,
     width: context.configDetail.labelWith,
     margin: context.configDetail.labelMargin,
@@ -1279,10 +1306,11 @@ export const doPrintLabelTODO = async (context, flag, protocolId, type) => {
     || context.configForm.produceModel === 'LPC230' || context.configForm.produceModel === 'LPC230E' || context.configForm.produceModel === 'AEC100'
     || context.configForm.produceModel === 'WAC710C' || context.configForm.produceModel === 'WAC300NS' || context.configForm.produceModel === 'WAC400NS'
     || context.configForm.produceModel === 'VAC005C' || context.configForm.produceModel === 'VAC710S' || context.configForm.produceModel === 'RFT200-CAT1'
-    || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400'
+    || context.configForm.produceModel === 'RFT200' || context.configForm.produceModel === 'NBT400'|| context.configForm.produceModel === 'NBT200'
     ||context.configForm.produceModel === 'WAC330HE' || context.configForm.produceModel === 'WAC330CE'||context.configForm.produceModel === 'WAC300SC'
   ) {
-    await ipc.send(ipcApiRoute.doPrintTest, params)
+    // await ipc.send(ipcApiRoute.doPrintTest, params)
+    await ipc.send(ipcApiRoute.printCustomerLabel, params)
   }
 
   context.buttonSuccess('labelPrint')

@@ -46,6 +46,7 @@ import * as PTC100CAT1 from "@/packBuffer/decode/nb/ptc100-cat1";
 import * as NBT400 from "@/packBuffer/decode/nb/nbt400";
 import * as WAC300C from "@/packBuffer/decode/nb/wac300c";
 import * as NTR300 from "@/packBuffer/decode/nb/ntr300";
+import * as NTR300RB from "@/packBuffer/decode/nb/ntr300rb";
 import * as WAC330N from "@/packBuffer/decode/nb/wac330n";
 import * as WAC710N from "@/packBuffer/decode/nb/wac710n";
 import * as WAC730N from "@/packBuffer/decode/nb/wac730n";
@@ -53,7 +54,6 @@ import * as WAC730N from "@/packBuffer/decode/nb/wac730n";
  * 其它
  * */
 import * as NBT200 from "@/packBuffer/decode/nb/nbt200";
-import * as DongYuan from "@/packBuffer/decode/wire/dongyuan";
 
 /**
  * 有线
@@ -688,7 +688,7 @@ export const protocolIDMap = {
       'exitSelfTest': 34,
       'readData': 72,
       'readAddress': 72,
-      'awaken':16
+      'awaken': 16
     },
     deviceActionResponseMessageLength2: {
       'inquireSelfTest': 67,
@@ -701,7 +701,7 @@ export const protocolIDMap = {
       'exitSelfTest': 67,
       'readData': 105,
       'readAddress': 105,
-      'awaken':32
+      'awaken': 32
     },
     portAttribute: {
       parity: '偶校验',
@@ -974,7 +974,7 @@ export const protocolIDMap = {
       readData: (context, data) => {
         return CTW100.readData(context, data);
       },
-      exitSelfTest:(data) => {
+      exitSelfTest: (data) => {
         return CTW100.exitSelfTest(data);
       },
 
@@ -2028,16 +2028,16 @@ export const protocolIDMap = {
         return WAC100N.writeTemperatureProbesConfig(data);
       },
       readSelfTestStatus: (context, data) => {
-        return WAC100N.readSelfTestStatus(context,data)
+        return WAC100N.readSelfTestStatus(context, data)
       },
       readICCID: (context, data) => {
-        return WAC100N.readICCID(context,data)
+        return WAC100N.readICCID(context, data)
       },
       readIMEI: (context, data) => {
-        return WAC100N.readIMEI(context,data)
+        return WAC100N.readIMEI(context, data)
       },
       writeAddress: (leftGenerateAddress, data) => {
-        return WAC100N.writeAddress(leftGenerateAddress,data)
+        return WAC100N.writeAddress(leftGenerateAddress, data)
       },
       awaken: (data) => {
         return WAC100N.awaken(data);
@@ -2049,7 +2049,7 @@ export const protocolIDMap = {
         return WAC100N.readProbesConfig(context, data);
       },
       readAddress: (context, data) => {
-        return WAC100N.readAddress(context,data)
+        return WAC100N.readAddress(context, data)
       },
       exitSelfTest: (data) => {
         return WAC100N.exitSelfTest(data)
@@ -2434,7 +2434,7 @@ export const protocolIDMap = {
       'exitSelfTest': true,
       'readData': true,
       'readTemperatureProbes': true,
-      'awaken':false,
+      'awaken': false,
     },
     deviceActionResponseMessageLength: {
       'inquireSelfTest': 34,
@@ -2448,7 +2448,7 @@ export const protocolIDMap = {
       'exitSelfTest': 34,
       'readData': 106,
       'readTemperatureProbes': 36,
-      'awaken':16
+      'awaken': 16
     },
     deviceActionResponseMessageLength2: {
       'inquireSelfTest': 67,
@@ -2462,7 +2462,7 @@ export const protocolIDMap = {
       'exitSelfTest': 67,
       'readData': 139,
       'readTemperatureProbes': 69,
-      'awaken':32,
+      'awaken': 32,
     },
     portAttribute: {
       parity: '偶校验',
@@ -2501,7 +2501,7 @@ export const protocolIDMap = {
       readTemperatureProbes: (context, data) => {
         return WAC300SC.readProbesConfig(context, data);
       },
-      awaken:(data)=>{
+      awaken: (data) => {
         return WAC300SC.awaken(data)
       }
     },
@@ -4109,6 +4109,73 @@ export const protocolIDMap = {
       },
     },
   },
+  'NBT200': {
+    protocolCode: 'EN1434_9988',
+    protocolId: 73,
+    model: -1, //4-移动,  17-电信
+    joinMode: -1, //2-移动,    8-电信
+    isInfraredDevice: true,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': false,
+      'selfTest': false,
+      'readSelfTestStatus': false,
+      'readIMEI': false,
+      'readICCID': false,
+      'writeAddress': false,
+      'readAddress': false,
+      'exitSelfTest': false,
+      'readData': false,
+    },
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 16,
+      'selfTest': -1,
+      'readSelfTestStatus': 54,
+      'readIMEI': 31,
+      'readICCID': 36,
+      'writeAddress': 16,
+      'readAddress': 21,
+      'exitSelfTest': 16,
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 32,
+      'selfTest': -1,
+      'readSelfTestStatus': 70,
+      'readIMEI': 47,
+      'readICCID': 52,
+      'writeAddress': 37,
+      'readAddress': 37,
+      'exitSelfTest': 32,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return NBT200.inquireSelfTest(data);
+      },
+      readSelfTestStatus: (context, data) => {
+        return NBT200.readSelfTestStatus(context, data)
+      },
+      readIMEI: (context, data) => {
+        return NBT200.readIMEI(context, data)
+      },
+      readICCID: (context, data) => {
+        return NBT200.readICCID(context, data)
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return NBT200.writeAddress(leftGenerateAddress, data)
+      },
+      readAddress: (context, data) => {
+        return NBT200.readAddress(context, data)
+      },
+      exitSelfTest: (data) => {
+        return NBT200.exitSelfTest(data)
+      },
+    },
+  },
   'NBT400': {
     protocolCode: 'EN1434_0103',
     protocolId: 103,
@@ -4451,6 +4518,72 @@ export const protocolIDMap = {
       },
       exitSelfTest: (data) => {
         return NTR300.exitSelfTest(data)
+      },
+    },
+  },
+  'NTR300RB': {
+    protocolCode: 'EN1434_0044',
+    protocolId: 74,
+    model: -1, //9 NTR200_NB电信测量点, 10 NTR200_NB移动测量点
+    joinMode: 2,
+    isInfraredDevice: false,
+    isDeviceActionTransparentTransmissionProtocol: {
+      'inquireSelfTest': false,
+      'selfTest': false,
+      'readSelfTestStatus': false,
+      'readICCID': false,
+      'readIMEI': false,
+      'writeAddress': false,
+      'readAddress': false,
+      'exitSelfTest': false,
+    },
+    deviceActionResponseMessageLength: {
+      'inquireSelfTest': 16,
+      'selfTest': -1,
+      'readSelfTestStatus': 56,
+      'readICCID': 36,
+      'readIMEI': 31,
+      'writeAddress': 16,
+      'readAddress': 21,
+      'exitSelfTest': 16,
+    },
+    deviceActionResponseMessageLength2: {
+      'inquireSelfTest': 32,
+      'selfTest': -1,
+      'readSelfTestStatus': 72,
+      'readICCID': 52,
+      'readIMEI': 47,
+      'writeAddress': 37,
+      'readAddress': 37,
+      'exitSelfTest': 32,
+    },
+    portAttribute: {
+      parity: '偶校验',
+      dataBits: 8,
+      baudRate: 2400,
+      stopBits: 1
+    },
+    validateResponse: {
+      inquireSelfTest: (data) => {
+        return NTR300RB.inquireSelfTest(data)
+      },
+      readSelfTestStatus: (context, data) => {
+        return NTR300RB.readSelfTestStatus(context, data)
+      },
+      readICCID: (context, data) => {
+        return NTR300RB.readICCID(context, data)
+      },
+      readIMEI: (context, data) => {
+        return NTR300RB.readIMEI(context, data)
+      },
+      writeAddress: (leftGenerateAddress, data) => {
+        return NTR300RB.writeAddress(leftGenerateAddress, data)
+      },
+      readAddress: (context, data) => {
+        return NTR300RB.readAddress(context, data)
+      },
+      exitSelfTest: (data) => {
+        return NTR300RB.exitSelfTest(data)
       },
     },
   },
@@ -6050,11 +6183,11 @@ export const protocolIDMap = {
       'inquireSelfTest': false,
       'selfTest': false,
       'readSelfTestStatus': false,
-      'readIMEI':false,
-      'readICCID':false,
-      'writeAddress':false,
-      'exitSelfTest':false,
-      'readAddress':false,
+      'readIMEI': false,
+      'readICCID': false,
+      'writeAddress': false,
+      'exitSelfTest': false,
+      'readAddress': false,
       'readTemperature': false,
     },
     protocolId: 122,
@@ -6066,11 +6199,11 @@ export const protocolIDMap = {
       'inquireSelfTest': 20,
       'selfTest': -1,
       'readSelfTestStatus': 59,
-      'readIMEI':35,
-      'readICCID':40,
-      'writeAddress':20,
-      'exitSelfTest':20,
-      'readAddress':25,
+      'readIMEI': 35,
+      'readICCID': 40,
+      'writeAddress': 20,
+      'exitSelfTest': 20,
+      'readAddress': 25,
       'readTemperature': 13,
     },
     deviceActionResponseMessageLength2: {
@@ -6081,11 +6214,11 @@ export const protocolIDMap = {
       'inquireSelfTest': 20,
       'selfTest': -1,
       'readSelfTestStatus': 59,
-      'readIMEI':35,
-      'readICCID':40,
-      'writeAddress':20,
-      'exitSelfTest':20,
-      'readAddress':25,
+      'readIMEI': 35,
+      'readICCID': 40,
+      'writeAddress': 20,
+      'exitSelfTest': 20,
+      'readAddress': 25,
       'readTemperature': 13,
     },
     portAttribute: {
@@ -6098,11 +6231,11 @@ export const protocolIDMap = {
       zeroMpaDemarcate: (context, data) => {
         return PTC100CAT1.zeroMpaDemarcate(context, data);
       },
-      readPressureGaugePressure: (context, data,isInspection) => {
-        return PTC100CAT1.readPressureGaugePressure(data, context,isInspection);
+      readPressureGaugePressure: (context, data, isInspection) => {
+        return PTC100CAT1.readPressureGaugePressure(data, context, isInspection);
       },
       onePointSixMpaDemarcate: (context, data) => {
-        return PTC100CAT1.onePointSixMpaDemarcate(context,data);
+        return PTC100CAT1.onePointSixMpaDemarcate(context, data);
       },
       readDevicePressure: (context, data) => {
         return PTC100CAT1.readDevicePressure(data, context);
@@ -6126,8 +6259,8 @@ export const protocolIDMap = {
       exitSelfTest: (data) => {
         return PTC100CAT1.exitSelfTest(data);
       },
-      readAddress: (context,data) => {
-        return PTC100CAT1.readAddress(context,data);
+      readAddress: (context, data) => {
+        return PTC100CAT1.readAddress(context, data);
       },
 
       // readTemperature:(context,data) => {
@@ -9393,65 +9526,5 @@ export const protocolIDMap = {
       },
     },
   },
-  '东元热表': {
-    protocolCode: undefined,
-    protocolId: 85,
-    model: undefined,
-    joinMode: undefined,
-    isInfraredDevice: false,
-    isDeviceActionTransparentTransmissionProtocol: {
-      'readAddress': false,
-    },
-    deviceActionResponseMessageLength: {
-      'readAddress': 20,
-    },
-    deviceActionResponseMessageLength2: {
-      'readAddress': 20,
-    },
-    portAttribute: {
-      parity: '偶校验',
-      dataBits: 8,
-      baudRate: 2400,
-      stopBits: 1
-    },
-    validateResponse: {
-      readAddress: (context, data) => {
-        return DongYuan.readAddress(context, data);
-      },
-    },
-  },
-  'NBT200': {
-    protocolCode: undefined,
-    protocolId: 75,
-    model: undefined,
-    joinMode: undefined,
-    isInfraredDevice: true,
-    isDeviceActionTransparentTransmissionProtocol: {
-      'readAddress': false,
-      'readVersion': false
-    },
-    deviceActionResponseMessageLength: {
-      'readAddress': 37,
-      'readVersion': 33
-    },
-    deviceActionResponseMessageLength2: {
-      'readAddress': 16,
-      'readVersion': 16
-    },
-    portAttribute: {
-      parity: '偶校验',
-      dataBits: 8,
-      baudRate: 2400,
-      stopBits: 1
-    },
-    validateResponse: {
-      readAddress: (context, data) => {
-        return NBT200.readAddress(context, data);
-      },
-      readVersion: (context, data, type) => {
-        return NBT200.readVersion(context, data, type);
-      },
-    },
-  }
 
 }

@@ -53,8 +53,8 @@ const ipcApiRoute = {
   printErrorSingleRowInspectLabel5012: 'controller.hardware.printErrorSingleRowInspectLabel5012',
   getPrinterList: 'controller.hardware.getPrinterList',
   printStatus: 'controller.hardware.printStatus',
-  doPrint: 'controller.hardware.doPrint',
   doPrintTest: 'controller.hardware.doPrintTest',
+  printCustomerLabel: 'controller.hardware.printCustomerLabel',
   productionWarehousingFailurePrint: 'controller.hardware.productionWarehousingFailurePrint',
   // effect
   selectFile: 'controller.effect.selectFile',

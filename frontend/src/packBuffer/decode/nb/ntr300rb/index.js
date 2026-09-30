@@ -1,0 +1,7 @@
+export {inquireSelfTest} from './inquireSelfTest'
+export {readSelfTestStatus} from './readSelfTestStatus'
+export {writeAddress} from './writeAddress'
+export {readAddress} from './readAddress'
+export {readICCID} from './readICCID'
+export {readIMEI} from './readIMEI'
+export {exitSelfTest} from './exitSelfTest'
