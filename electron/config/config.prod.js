@@ -22,9 +22,10 @@ module.exports = (appInfo) => {
    * 主窗口
    */
   config.windowsOption = {
-    title: '',
-    width: 450,
-    height: 460,
+    maximized: true,
+    title: '液冷执行器-测试软件',/*应用头部目前做隐藏,目前在任务栏体现*/
+    // width: 450,
+    // height: 460,
     webPreferences: {
       //webSecurity: false,
       contextIsolation: false, // false -> 可在渲染进程中使用electron的api，true->需要bridge.js(contextBridge)
@@ -167,7 +168,7 @@ module.exports = (appInfo) => {
     },
     tray: {
       enable: true,
-      title: '生产软件',
+      title: '液冷执行器测试工具',
       icon: '/public/images/tray.ico'
     },
     security: {

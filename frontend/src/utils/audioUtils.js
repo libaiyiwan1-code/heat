@@ -7,7 +7,7 @@ let currentSource = null;
 
 
 async function playSuccessAudio(context) {
-  context.buttonEnable();
+  context.buttonEnabled();
   const res = await ipc.invoke(ipcApiRoute.getAppPath);
   console.warn('appPath:', res);
   // const audioPath = res + '/frontend/src/utils/audio/success.mp3';
@@ -18,7 +18,7 @@ async function playSuccessAudio(context) {
 
 
 async function playErrorAudio(context) {
-  context.buttonEnable();
+  context.buttonEnabled();
   const res = await ipc.invoke(ipcApiRoute.getAppPath);
   console.warn('appPath:', res);
   const audioPath = path.join(res, "audio", "error.mp3");

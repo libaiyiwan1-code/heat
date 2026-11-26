@@ -144,7 +144,7 @@ export default {
       },
       routerInfo: {
         type: 'vue',
-        windowTitle: '海龙马生产软件',
+        windowTitle: '液冷执行器-测试软件',
         content: '#/device',
         childrenWindowId: undefined,
       },

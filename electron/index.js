@@ -122,7 +122,7 @@ class Index extends Application {
             }
 
             crashReporter.start({
-                productName: 'cegongji-productName',
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        productName: 'cegongji-productName',
                 companyName: 'cegongji-companyName',
                 uploadToServer: false,
                 compress: true,
@@ -172,6 +172,7 @@ class Index extends Application {
      */
     async windowReady() {
         const win = this.electron.mainWindow;
+        win.maximize();//最大化
         // 初始化自动更新
         initUpdater(win);
         // win.openDevTools()

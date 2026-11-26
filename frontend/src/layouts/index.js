@@ -1,5 +1,5 @@
-import Login from '@/views/login/Login.vue'
+import Device from '@/views/device/Device.vue'
 
 export {
-  Login,
+  Device,
 }

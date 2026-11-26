@@ -371,6 +371,9 @@ export function modbusPackDataDomains(afn, fn, context) {
 export function cj88PackDataDomains(afn, fn, protocolID, context) {
   console.log('afn, fn ', afn, fn)
   let arrayBuffer = null;
+  // shortcut: 标定点写额定值（4/20mA、2/10V 小端 float），现场表计接入后再改成实测值
+  const packActual = (di, value) =>
+    mergeArrayBuffer(createBuffer(5, [0x04, 0x07, 0xCC, di, 0x01]), floatToHexBuffer(value, true));
 
   switch (afn) {
     case 'a0':
@@ -385,6 +388,14 @@ export function cj88PackDataDomains(afn, fn, protocolID, context) {
 
       }
       return arrayBuffer;
+    case 'ff':
+      switch (fn) {
+        case '55':
+          arrayBuffer = createBuffer(5, [0x01, 0x03, 0xff, 0x55, 0x00]);
+          break;
+        default:
+      }
+      return mergeArrayBuffer(packBroadcastSevenMacAddr(), arrayBuffer);
     case 'f0':
       switch (fn) {
         case 'dd':
@@ -392,6 +403,36 @@ export function cj88PackDataDomains(afn, fn, protocolID, context) {
           break;
         case 'de':
           arrayBuffer = createBuffer(5, [0x01, 0x03, 0xf0, 0xde, 0x00]);
+          break;
+        case 'f0':
+          arrayBuffer = createBuffer(5, [0x01, 0x03, 0xf0, 0xf0, 0x00]);
+          break;
+        case 'df':
+          arrayBuffer = createBuffer(5, [0x01, 0x03, 0xf0, 0xdf, 0x00]);
+          break;
+        case 'e0':
+          arrayBuffer = createBuffer(5, [0x01, 0x03, 0xf0, 0xe0, 0x00]);
+          break;
+        //写入SN
+        // 写入SN
+        case 'e1':
+          let snStr = context.settingConfig.snCode;
+          // 将字符串转为 ASCII 的 Buffer 数组
+          const snBytes = [];
+          for (let i = 0; i < snStr.length; i++) {
+            snBytes.push(snStr.charCodeAt(i) & 0xFF);
+          }
+          const snLen = snBytes.length;
+          // 数据域长度 L = 3字节(标识 F0 E1 01) + 1字节(SN长度) + SN实际长度
+          const dataLen = 4 + snLen;
+          // 1. 构造前 5 个字节：[控制码(0x04), 长度L, 数据标识F0, E1, 序列号01]
+          arrayBuffer = createBuffer(5, [0x04, dataLen, 0xf0, 0xe1, 0x01]);
+          // 2. 构造接下来的 1 个字节：[SN的长度]
+          const lenBuffer = createBuffer(1, [snLen]);
+          // 3. 构造 SN 的 ASCII 数据 Buffer
+          const snBuffer = Buffer.from(snBytes);
+          // 4. 拼接到一起
+          arrayBuffer = mergeArrayBuffer(arrayBuffer, lenBuffer, snBuffer);
           break;
         default:
         // Log.error("packages: afn[{}] match fail", afn);
@@ -427,19 +468,17 @@ export function cj88PackDataDomains(afn, fn, protocolID, context) {
       return mergeArrayBuffer(packBroadcastSevenMacAddr(), arrayBuffer);
     case 'dd':
       switch (fn) {
+        case 'aa':
+          arrayBuffer = createBuffer(5, [0x04, 0x03, 0xdd, 0xaa, 0x00]);
+          break;
         case 'f0':
           arrayBuffer = createBuffer(5, [0x04, 0x03, 0xdd, 0xf0, 0x00]);
           break;
+        case 'f4':
+          arrayBuffer = createBuffer(5, [0x04, 0x03, 0xdd, 0xf4, 0x00]);
+          break;
         case 'f2':
-          if (context.configDetail.temperatureProbe === '无探头') {
-            arrayBuffer = createBuffer(6, [0x04, 0x04, 0xdd, 0xf2, 0x00, 0x00]);
-          } else if (context.configDetail.temperatureProbe === '回温探头') {
-            arrayBuffer = createBuffer(6, [0x04, 0x04, 0xdd, 0xf2, 0x00, 0x01]);
-          } else if (context.configDetail.temperatureProbe === '进温探头') {
-            arrayBuffer = createBuffer(6, [0x04, 0x04, 0xdd, 0xf2, 0x00, 0x02]);
-          } else if (context.configDetail.temperatureProbe === '双探头') {
-            arrayBuffer = createBuffer(6, [0x04, 0x04, 0xdd, 0xf2, 0x00, 0x03]);
-          }
+          arrayBuffer = createBuffer(6, [0x04, 0x04, 0xdd, 0xf2, 0x00, 0x00]);//默认无探头 液冷执行器没有探头
           break;
       }
       return mergeArrayBuffer(packBroadcastSevenMacAddr(), arrayBuffer);
@@ -465,33 +504,75 @@ export function cj88PackDataDomains(afn, fn, protocolID, context) {
         case '02-4ma':
           arrayBuffer = createBuffer(6, [0x04, 0x04, 0xcc, 0x02, 0x01, 0x04]);
           break;
+          //读设备模拟量采集值
+        case '0f':
+          // 动态读取用户选择的通道：0=电流，1=电压
+          const channel = context.settingConfig.analogChannel ?? 0;
+          arrayBuffer = createBuffer(6, [0x01, 0x04, 0xCC, 0x0F, 0x01, channel]);
+          break;
+        case '0e':
+          const mAStatus = context.calibrationStatus420 ?? 1; // 1:通过, 2:失败
+          arrayBuffer = createBuffer(6, [0x04, 0x04, 0xcc, 0x0e, 0x01, mAStatus]);
+          break;
+        case '12':
+          const vStatus = context.calibrationStatus210 ?? 1;// 1:通过, 2:失败
+          arrayBuffer = createBuffer(6, [0x04, 0x04, 0xcc, 0x12, 0x01, vStatus]);
+          break;
         //写固定输出20ma
         case '02-20ma':
           arrayBuffer = createBuffer(6, [0x04, 0x04, 0xcc, 0x02, 0x01, 0x14]);
           break
-        // 输出4ma实际电流值标定
+        // 输出4ma实际电流值标定。协议 float 为实际 mA，小端
         case '03':
-          let output4CurrentBuffer = floatToHexBuffer(parseFloat(context.ammeterReadCurrentValue.toString()) * 1000, false)
-          arrayBuffer = createBuffer(5, [0x04, 0x07, 0xcc, 0x03, 0x01]);
-          arrayBuffer = mergeArrayBuffer(arrayBuffer, output4CurrentBuffer)
+          arrayBuffer = packActual(0x03, 4);
           break;
         // 输出20ma实际电流值标定
         case '04':
-          let output20CurrentBuffer = floatToHexBuffer(parseFloat(context.ammeterReadCurrentValue.toString()) * 1000, false)
-          arrayBuffer = createBuffer(5, [0x04, 0x07, 0xcc, 0x04, 0x01]);
-          arrayBuffer = mergeArrayBuffer(arrayBuffer, output20CurrentBuffer)
+          arrayBuffer = packActual(0x04, 20);
           break;
-        //写入4MA实际输入电流值
+        // 输出2V电压值标定
+        case '10':
+          arrayBuffer = packActual(0x10, 2);
+          break;
+        // 输出10V电压值标定
+        case '06':
+          arrayBuffer = packActual(0x06, 10);
+          break;
+        // 写入4MA实际输入电流值
         case '09':
-          let input4CurrentBuffer = floatToHexBuffer(parseFloat(context.ammeterReadCurrentValue.toString()) * 1000, false)
-          arrayBuffer = createBuffer(5, [0x04, 0x07, 0xcc, 0x09, 0x01]);
-          arrayBuffer = mergeArrayBuffer(arrayBuffer, input4CurrentBuffer)
+          arrayBuffer = packActual(0x09, 4);
           break;
-        //写入20MA实际输入电流值
+        // 写入20MA实际输入电流值
         case '0a':
-          let input20CurrentBuffer = floatToHexBuffer(parseFloat(context.ammeterReadCurrentValue.toString()) * 1000, false)
-          arrayBuffer = createBuffer(5, [0x04, 0x07, 0xcc, 0x0a, 0x01]);
-          arrayBuffer = mergeArrayBuffer(arrayBuffer, input20CurrentBuffer)
+          arrayBuffer = packActual(0x0A, 20);
+          break;
+        // 写入2V实际输入电压值。数据标识 CC 13
+        case '13':
+          arrayBuffer = packActual(0x13, 2);
+          break;
+        case '11-4mA':
+          // let input4CurrentBuffer = floatToHexBuffer(parseFloat(context.ammeterReadCurrentValue.toString()) * 1000, false)
+          arrayBuffer = createBuffer(7, [0x04, 0x05, 0xcc, 0x11, 0x01,0x00,0x04]);
+          break;
+        case '11-20mA':
+          // let input4CurrentBuffer = floatToHexBuffer(parseFloat(context.ammeterReadCurrentValue.toString()) * 1000, false)
+          arrayBuffer = createBuffer(7, [0x04, 0x05, 0xcc, 0x11, 0x01,0x00,0x14]);
+          break;
+        case '11-1V':
+          // let input4CurrentBuffer = floatToHexBuffer(parseFloat(context.ammeterReadCurrentValue.toString()) * 1000, false)
+          arrayBuffer = createBuffer(7, [0x04, 0x05, 0xcc, 0x11, 0x01,0x01,0x01]);
+          break;
+        case '11-2V':
+          // let input4CurrentBuffer = floatToHexBuffer(parseFloat(context.ammeterReadCurrentValue.toString()) * 1000, false)
+          arrayBuffer = createBuffer(7, [0x04, 0x05, 0xcc, 0x11, 0x01,0x01,0x02]);
+          break;
+        case '11-10V':
+          // let input4CurrentBuffer = floatToHexBuffer(parseFloat(context.ammeterReadCurrentValue.toString()) * 1000, false)
+          arrayBuffer = createBuffer(7, [0x04, 0x05, 0xcc, 0x11, 0x01,0x01,0x0A]);
+          break;
+        // 写入10V实际输入电压值
+        case '0c':
+          arrayBuffer = packActual(0x0C, 10);
           break;
         case '0d':
           arrayBuffer = createBuffer(5, [0x04, 0x03, 0xcc, 0x0d, 0x01]);
@@ -501,6 +582,32 @@ export function cj88PackDataDomains(afn, fn, protocolID, context) {
           break;
         case '0e-error':
           arrayBuffer = createBuffer(6, [0x04, 0x04, 0xcc, 0x0e, 0x01, 0x02]);
+          break;
+        case '20':
+          // ---------- 设置电角度偏移量（CC/20） ----------
+          // 数据域：CC 20 01 方向 偏移量(2)  → L = 6
+          // 方向：0=正转，1=反转
+          // 偏移量：BIN * 0.1°，如 301 → 30.1°
+          const direction = context.settingConfig.offsetDirection ?? 0;   // 0 正转 / 1 反转
+          const angleRaw = context.settingConfig.angleOffset * 10;   // ×10 存整数
+
+          // 组装 6 字节数据域：CC 20 01 方向 低字节 高字节
+          arrayBuffer = createBuffer(8, [
+            0x04,
+            0x06,
+            0xCC,
+            0x20,
+            0x01,
+            direction & 0xFF,
+            angleRaw & 0xFF,          // 小端低字节
+            (angleRaw >> 8) & 0xFF,   // 小端高字节
+          ]);
+          break;
+        case '30':
+          arrayBuffer = createBuffer(5, [0x01, 0x03, 0xcc, 0x30, 0x01]);
+          break;
+        case '31':
+          arrayBuffer = createBuffer(5, [0x01, 0x03, 0xcc, 0x31, 0x01]);
           break;
       }
       return mergeArrayBuffer(packBroadcastSevenMacAddr(), arrayBuffer);

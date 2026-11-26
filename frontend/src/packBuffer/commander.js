@@ -98,7 +98,7 @@ export function cj88Execute(afn, fn, protocolID, context) {
   const bodyBuffer = cj88PackDataDomains(afn, fn, protocolID, context);
   const headBuffer = packCJ88StartHead(protocolID);
   const tailBuffer = packCSTail(mergeArrayBuffer(headBuffer, bodyBuffer));
-  return Buffer.from(mergeArrayBuffer(headBuffer, bodyBuffer, tailBuffer));
+  return Buffer.from(mergeArrayBuffer([0XFE,0XFE,0XFE],headBuffer, bodyBuffer, tailBuffer));
 }
 
 

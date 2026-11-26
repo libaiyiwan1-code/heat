@@ -19,14 +19,14 @@ export async function writeAddress(protocolId, type, context) {
   //   cmdCode: '06',                         // fn 的命令码
   //   protocolId: protocolId,
   //   maxRetries: context.maxRetries,
-  //   expectedLength: protocol.deviceActionResponseMessageLength['readAddress'],
-  //   expectedLength2: protocol.deviceActionResponseMessageLength2['readAddress'],
+  //   expectedLength: protocol.deviceActionResponseMessageLength['readData'],
+  //   expectedLength2: protocol.deviceActionResponseMessageLength2['readData'],
   //   timeout: context.timeout,
-  //   validateResponse: () => protocol.validateResponse.readAddress(context, context.receivedData.globalReceivedOneData),
+  //   validateResponse: () => protocol.validateResponse.readData(context, context.receivedData.globalReceivedOneData),
   //   preprocess: () => {
   //   },
   //   isInfraredDevice: protocol.isInfraredDevice,
-  //   isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.readAddress,
+  //   isTransparentTransmissionProtocol: protocol.isDeviceActionTransparentTransmissionProtocol.readData,
   // }, type)
   // if (readAddressResult) {
   //   context.leftGenerateAddress = ''

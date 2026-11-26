@@ -3,7 +3,7 @@
   "appId": "com.electron.ee",
   "copyright": "© 20248883 生产软件 Technology to 青岛海龙马科技有限公司.",
   "directories": {
-    "output": "D:\\生产软件打包\\海龙马生产软件"
+    "output": "D:\\生产软件打包\\液冷执行器-测试软件"
   },
   "asar": true,
   "files": [
@@ -33,7 +33,7 @@
   },
   "mac": {
     "icon": "build/icons/icon.icns",
-    "artifactName": "$海龙马生产软件-${os}-${version}-${arch}.${ext}",
+    "artifactName": "$液冷执行器-测试软件-${os}-${version}-${arch}.${ext}",
     "darkModeSupport": true,
     "hardenedRuntime": false
   },

@@ -29,9 +29,10 @@ module.exports = (appInfo) => {
      * 主窗口
      */
     config.windowsOption = {
-        title: '登录',/*应用头部目前做隐藏,目前在任务栏体现*/
-        width: 450,
-        height: 460,
+        // fullscreen: true,
+        title: '液冷执行器-测试软件',/*应用头部目前做隐藏,目前在任务栏体现*/
+        // width: 450,
+        // height: 460,
         webPreferences: {
             //webSecurity: false,
             contextIsolation: false, // false -> 可在渲染进程中使用electron的api，true->需要bridge.js(contextBridge)
@@ -40,7 +41,7 @@ module.exports = (appInfo) => {
         },
         frame: false,
         // transparent: true,// 透明窗口
-        show: false,
+        show: true,
         icon: path.join(appInfo.home, 'build','icons', 'title-759x220.png'),
         // titleBarStyle: 'hidden', // 隐藏默认标题栏
 
@@ -182,7 +183,7 @@ module.exports = (appInfo) => {
         },
         tray: {
             enable: true,
-            title: '海龙马生产软件',
+            title: '液冷执行器测试工具',
             icon: '/build/icons/tray.ico'
         },
         security: {

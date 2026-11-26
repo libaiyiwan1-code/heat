@@ -9,7 +9,7 @@
       }
     ]
   },
-  "description": "海龙马生产工具",
+  "description": "液冷执行器测试工具",
   "main": "main.js",
   "scripts": {
     "prebuild-installer": "node update-version.js",

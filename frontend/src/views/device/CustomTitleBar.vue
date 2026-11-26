@@ -2,12 +2,9 @@
   <div class="titlebar">
     <div class="titlebar-left">
       <img class="logo" src="@/assets/title-170x40.png" alt="Logo">
-      <span class="version">{{ this.productModel+version }}</span>
+      <span class="version">{{ this.productModel}}</span>
     </div>
     <div class="window-controls">
-      <div v-if="isDeviceView"  class="user-account">
-        <span class="userID">登录账号：{{ userAccount }}</span>
-      </div>
       <button class="min-btn" @click="minimizeWindow"><span class="min-icon">-</span></button>
       <button class="max-btn" @click="toggleMaximize">
         <svg width="36" height="36" viewBox="0 0 24 24">

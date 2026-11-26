@@ -93,7 +93,7 @@ export function hexToAscii(hexString) {
 
 /**
  * 16进制字符串转换为 ArrayBuffer
- * @param {hex} hex - 要转换的十六进制字符串
+ * @param {String} hex - 要转换的十六进制字符串
  * */
 export const hex2arrayBuffer = function (hex) {
   var typedArray = new Uint8Array(hex.match(/[\da-f]{2}/gi).map(function (h) {
